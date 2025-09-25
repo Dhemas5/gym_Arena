@@ -1,0 +1,390 @@
+<?php include '../../master_member/header.php'; ?>
+<?php include '../../master_member/navbar.php'; ?>
+
+<!-- ===== Konten utama halaman member ===== -->
+<!-- Hero Section Begin -->
+<section class="hero-section">
+    <div class="hs-slider owl-carousel">
+        <div class="hs-item set-bg" data-setbg="../../assets_member/img/hero/hero-1.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 offset-lg-6">
+                        <div class="hi-text">
+                            <span>BENTUK TUBUHMU</span>
+                            <h1>
+                                <strong>Kuatkan </strong>diri latih <strong>lebih </strong>
+                                <strong>keras</strong>
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hs-item set-bg" data-setbg="../../assets_member/img/hero/hero-2.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 offset-lg-6">
+                        <div class="hi-text">
+                            <span>BENTUK TUBUHMU</span>
+                            <h1>
+                                <strong>Kuatkan </strong>diri latih <strong>lebih </strong>
+                                <strong>keras</strong>
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Hero Section End -->
+<!-- ChoseUs Section Begin -->
+<section class="choseus-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-title">
+                    <span>Mengapa memilih kami!</span>
+                    <h2>TRANSFORMASI TUBUH DAN PIKIRANMU</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-sm-6">
+                <div class="cs-item">
+                    <span class="flaticon-034-stationary-bike"></span>
+                    <h4>Peralatan modern<br /><br /></h4>
+                    <p>
+                        Kami menyediakan peralatan canggih yang selalu terjaga
+                        kualitasnya untuk mendukung performa latihan Anda
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="cs-item">
+                    <span class="flaticon-033-juice"></span>
+                    <h4>Rencana nutrisi sehat<br /><br /></h4>
+                    <p>
+                        Dapatkan panduan nutrisi seimbang agar tubuh tetap bugar dan
+                        hasil latihan lebih maksimal
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="cs-item">
+                    <span class="flaticon-002-dumbell"></span>
+                    <h4>Rencana pelatihan profesional</h4>
+                    <p>
+                        Latih diri Anda dengan program khusus dari pelatih berpengalaman
+                        yang siap membimbing langkah demi langkah
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="cs-item">
+                    <span class="flaticon-014-heart-beat"></span>
+                    <h4>Unik untuk kebutuhan Anda<br /><br /></h4>
+                    <p>
+                        Setiap orang memiliki tujuan berbeda, dan kami siap memberikan
+                        solusi yang sesuai dengan kebutuhan Anda
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ChoseUs Section End -->
+
+<!-- Classes Section Begin -->
+<section class="classes-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-title">
+                    <span>Kelas Kami</span>
+                    <h2>APA YANG BISA KAMI TAWARKAN</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="class-item">
+                    <div class="ci-pic">
+                        <img src="../../assets_member/img/classes/class-1.jpg" alt="" />
+                    </div>
+                    <div class="ci-text">
+                        <span>PROGRAM</span>
+                        <h5>Bentuk Tubuh Ideal</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="class-item">
+                    <div class="ci-pic">
+                        <img src="../../assets_member/img/classes/class-2.jpg" alt="" />
+                    </div>
+                    <div class="ci-text">
+                        <span>RILEKSASI</span>
+                        <h5>Yoga & Stretching</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="class-item">
+                    <div class="ci-pic">
+                        <img src="../../assets_member/img/classes/class-3.jpg" alt="" />
+                    </div>
+                    <div class="ci-text">
+                        <span>KEKUATAN</span>
+                        <h5>Latihan Kettlebell</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="class-item">
+                    <div class="ci-pic">
+                        <img src="../../assets_member/img/classes/class-4.jpg" alt="" />
+                    </div>
+                    <div class="ci-text">
+                        <span>KEKUATAN</span>
+                        <h5>Angkat Beban</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="class-item">
+                    <div class="ci-pic">
+                        <img src="../../assets_member/img/classes/class-5.jpg" alt="" />
+                    </div>
+                    <div class="ci-text">
+                        <span>latihan</span>
+                        <h5>Boxing</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ChoseUs Section End -->
+
+<!-- Banner Section Begin -->
+<section class="banner-section set-bg" data-setbg="../../assets_member/img/banner-bg.jpg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="bs-text">
+                    <h2 style="color: #f36100">
+                        DAFTAR SEKARANG & DAPATKAN PENAWARAN TERBAIK
+                    </h2>
+
+                    <div class="bt-tips">
+                        Sehat, bugar, dan percaya diri dimulai dari sini.
+                    </div>
+                    <a href="#" class="primary-btn btn-normal">Daftar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Banner Section End -->
+
+<!-- Pricing Section Begin -->
+<section class="pricing-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-title">
+                    <span>Paket Kami</span>
+                    <h2>Raih Tubuh Sehat dengan Paket yang Tepat</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-8">
+                <div class="ps-item">
+                    <h3>Kelas harian</h3>
+                    <div class="pi-price">
+                        <h3 style="color: #f36100">Rp 39.000</h3>
+                    </div>
+                    <ul>
+                        <li>Bebas bersepeda</li>
+                        <li>Perlatan lengkap</li>
+                        <li>Personal trainer</li>
+                        <li>Kelas penurunan berat badan</li>
+                        <li>Berlaku 1x masuk</li>
+                        <li>Tanpa batasan waktu latihan</li>
+                    </ul>
+                    <a href="#" class="primary-btn pricing-btn">Daftar sekarang</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-8">
+                <div class="ps-item">
+                    <h3>Paket 12 Bulan Unlimited</h3>
+                    <div class="pi-price">
+                        <h3 style="color: #f36100">Rp 999.000</h3>
+                    </div>
+                    <ul>
+                        <li>Bebas bersepeda</li>
+                        <li>Perlatan lengkap</li>
+                        <li>Personal trainer</li>
+                        <li>Kelas penurunan berat badan</li>
+                        <li>Berlaku 12 bulan penuh</li>
+                        <li>Tanpa batasan waktu latihan</li>
+                    </ul>
+                    <a href="#" class="primary-btn pricing-btn">Daftar sekarang</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-8">
+                <div class="ps-item">
+                    <h3>Paket 6 Bulan Unlimited</h3>
+                    <div class="pi-price">
+                        <h3 style="color: #f36100">Rp 590.000</h3>
+                    </div>
+                    <ul>
+                        <li>Bebas bersepeda</li>
+                        <li>Perlatan lengkap</li>
+                        <li>Personal trainer</li>
+                        <li>Kelas penurunan berat badan</li>
+                        <li>Berlaku 6 bulan penuh</li>
+                        <li>Tanpa batasan waktu latihan</li>
+                    </ul>
+                    <a href="#" class="primary-btn pricing-btn">Daftar sekarang</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Pricing Section End -->
+
+<!-- Gallery Section Begin -->
+<div class="gallery-section">
+    <div class="gallery">
+        <div class="grid-sizer"></div>
+        <div
+            class="gs-item grid-wide set-bg"
+            data-setbg="../../assets_member/img/gallery/gallery-1.jpg">
+            <a href="../../assets_member/img/gallery/gallery-1.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-2.jpg">
+            <a href="../../assets_member/img/gallery/gallery-2.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-3.jpg">
+            <a href="../../assets_member/img/gallery/gallery-3.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-4.jpg">
+            <a href="../../assets_member/img/gallery/gallery-4.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-5.jpg">
+            <a href="../../assets_member/img/gallery/gallery-5.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+        <div
+            class="gs-item grid-wide set-bg"
+            data-setbg="../../assets_member/img/gallery/gallery-6.jpg">
+            <a href="../../assets_member/img/gallery/gallery-6.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        </div>
+    </div>
+</div>
+<!-- Gallery Section End -->
+
+<!-- Team Section Begin -->
+<section class="team-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="team-title">
+                    <div class="section-title">
+                        <span>Our Team</span>
+                        <h2>TRAIN WITH EXPERTS</h2>
+                    </div>
+                    <a href="#" class="primary-btn btn-normal appoinment-btn">appointment</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="ts-slider owl-carousel">
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-1.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-2.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-3.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-4.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-5.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-6.jpg">
+                        <div class="ts_text">
+                            <h4>Athart Rachel</h4>
+                            <span>Gym Trainer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Team Section End -->
+
+<!-- Get In Touch Section Begin -->
+<div class="gettouch-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="gt-text">
+                    <i class="fa fa-map-marker"></i>
+                    <p>
+                        Jl. KH Shiddiq No.19, Kelurahan Jember Kidu, Jember Kidul, Kec.
+                        Kaliwates, Kabupaten Jember, Jawa Timur 68131
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="gt-text">
+                    <i class="fa fa-mobile"></i>
+                    <ul>
+                        <li>0821 - 4308 - 0510</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="gt-text email">
+                    <i class="fa fa-envelope"></i>
+                    <p>arenafitclubjbr22@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Get In Touch Section End -->
+<?php include '../../master_member/footer.php'; ?>

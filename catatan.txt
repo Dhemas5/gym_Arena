@@ -1,0 +1,17 @@
+assets = template
+assets > admin = template admin
+assets > member = template member
+
+data = crud php + conten tampilan
+data > admin = crud + tampilan admin (kesulurhan yang ada pada data admin / menu admin)
+contoh : kategori , tambah kategori , edit kategori
+data > member = menampilkan beberapa data pada admin
+contph = beranda adap gambar pelatih atau membership
+
+setting = ada koneksi dan sessions
+koneksi = menyambungkan koneksi dari php ke mysql / database
+sessions = membagi login antara admin / member berdasarkan role dan
+berguna saat member login ke halaman member , member tidak bisa mengakses halaman admin karena takut data bocor / jebol
+
+view = pecahan dari beberapa bagian tampilan agar lebih ringkas pada bagian tampilan data / conten
+contoh : navbar , sidebar , header , footer

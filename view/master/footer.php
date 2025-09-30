@@ -1,13 +1,18 @@
 </div>
 <!-- /.content-wrapper -->
-
 <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
-    All rights reserved.
-    <div class="float-right d-none d-sm-inline-block">
-        <b>Version</b> 3.1.0
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <strong>&copy; 2024 GymApp.</strong> All rights reserved.
+            </div>
+            <div class="col-sm-6 text-right d-none d-sm-block">
+                <b>Version</b> 1.0
+            </div>
+        </div>
     </div>
 </footer>
+
 
 <aside class="control-sidebar control-sidebar-dark"></aside>
 
@@ -40,31 +45,58 @@
 <script src="../../../assets/assets_admin/plugins/pdfmake/vfs_fonts.js"></script>
 <script src="../../../assets/assets_admin/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        $('#tabelPelatih').DataTable({
-            "responsive": true,
-            "lengthChange": false,
-            "autoWidth": false
+    $(function() {
+        var table = $("#tabelPelatih").DataTable({
+            paging: true,
+            lengthChange: false,
+            searching: false,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: true,
+            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
         });
+
+        table.buttons().container().appendTo('#tabelPelatih_wrapper .col-md-6:eq(0)');
+
     });
 </script>
 
 <script>
-    // Tambahkan event click agar baris berubah putih saat diklik
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('#tabelPelatih tbody tr');
-        rows.forEach(row => {
-            row.addEventListener('click', () => {
-                rows.forEach(r => r.classList.remove('active'));
-                row.classList.add('active');
-            });
+    $(function() {
+        var $sidebar = $(".control-sidebar");
+        $sidebar.empty(); // kosongkan isi default
+
+        var $container = $("<div />", {
+            class: "p-3 control-sidebar-content",
+        });
+        $sidebar.append($container);
+
+        // Judul
+        $container.append('<h5>Pengaturan Tampilan</h5><hr class="mb-2"/>');
+
+        // Dark Mode dengan Label
+        var darkModeHtml =
+            '<div class="form-group">' +
+            '<div class="custom-control custom-switch">' +
+            '<input type="checkbox" class="custom-control-input" id="dark-mode-switch">' +
+            '<label class="custom-control-label" for="dark-mode-switch">Aktifkan Dark Mode</label>' +
+            '</div>' +
+            '</div>';
+
+        $container.append(darkModeHtml);
+
+        // Script toggle Dark Mode
+        $('#dark-mode-switch').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('body').addClass('dark-mode');
+            } else {
+                $('body').removeClass('dark-mode');
+            }
         });
     });
 </script>
-
-
 </body>
 
 </html>

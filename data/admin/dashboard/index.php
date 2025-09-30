@@ -8,16 +8,16 @@ require "../../../setting/session.php";
 $queryKategori = mysqli_query($con, "SELECT *  FROM tbl_kategori");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 
-$queryUser = mysqli_query($con, "SELECT *  FROM users");
+$queryUser = mysqli_query($con, "SELECT *  FROM tbl_user");
 $jumlahUser = mysqli_num_rows($queryUser);
 ?>
 
 <!-- Content Header -->
-<div class="content-header">
+<section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Dashboard</h1>
+                <h1>Dashboard</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -27,36 +27,31 @@ $jumlahUser = mysqli_num_rows($queryUser);
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Main content -->
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <!-- Contoh info-box -->
-            <div class="col-12 col-sm-6 col-md-3">
+            <div class="col-12 col-sm-6 col-md-4">
                 <div class="info-box">
-                    <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-dumbbell"></i></span>
+                    <span class="info-box-icon bg-info elevation-1">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Pelatih</span>
-                        <span class="info-box-number">12</span>
+                        <span class="info-box-text">Dashboard</span>
+                        <span class="info-box-number">-</span>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
+            <!-- User -->
+            <div class="col-12 col-sm-6 col-md-4">
                 <div class="info-box">
-                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-users"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Member</span>
-                        <span class="info-box-number">150</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box">
-                    <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-user-shield"></i></span>
+                    <span class="info-box-icon bg-warning elevation-1">
+                        <i class="fas fa-user-shield"></i>
+                    </span>
                     <div class="info-box-content">
                         <span class="info-box-text">User</span>
                         <span class="info-box-number"><?php echo $jumlahUser ?></span>
@@ -64,24 +59,66 @@ $jumlahUser = mysqli_num_rows($queryUser);
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
+            <!-- Member -->
+            <div class="col-12 col-sm-6 col-md-4">
                 <div class="info-box">
-                    <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-layer-group"></i></span>
+                    <span class="info-box-icon bg-success elevation-1">
+                        <i class="fas fa-users"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Member</span>
+                        <span class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kategori -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="info-box">
+                    <span class="info-box-icon bg-danger elevation-1">
+                        <i class="fas fa-layer-group"></i>
+                    </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Kategori Gym</span>
                         <span class="info-box-number"><?php echo $jumlahKategori ?></span>
                     </div>
                 </div>
             </div>
+
+            <!-- Pelatih -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary elevation-1">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Pelatih</span>
+                        <span class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jadwal Kelas -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="info-box">
+                    <span class="info-box-icon bg-secondary elevation-1">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Jadwal Kelas</span>
+                        <span class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
             <div class="col-12">
-                <div class="card shadow rounded-3 overflow-hidden">
+                <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">Data Pelatih</h3>
+                        <h3 class="card-title">Data Pelatih</h3>
                     </div>
 
-                    <div class="card-body bg-dark p-3">
+                    <div class="card-body">
                         <div class="table-responsive rounded">
-                            <table id="tabelPelatih" class="table table-bordered table-hover text-white mb-0">
+                            <table id="tabelPelatih" class="table table-bordered table-striped">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>

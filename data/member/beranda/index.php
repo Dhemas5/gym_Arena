@@ -1,11 +1,12 @@
-<?php include '../../master_member/header.php'; ?>
-<?php include '../../master_member/navbar.php'; ?>
+<?php include '../../../view/master_member/header.php'; ?>
+<?php include '../../../view/master_member/navbar.php'; ?>
+
 
 <!-- ===== Konten utama halaman member ===== -->
 <!-- Hero Section Begin -->
 <section class="hero-section">
     <div class="hs-slider owl-carousel">
-        <div class="hs-item set-bg" data-setbg="../../assets_member/img/hero/hero-1.jpg">
+        <div class="hs-item set-bg" data-setbg="../../../assets/assets_member/img/hero/hero-1.jpg">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 offset-lg-6">
@@ -20,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="hs-item set-bg" data-setbg="../../assets_member/img/hero/hero-2.jpg">
+        <div class="hs-item set-bg" data-setbg="../../../assets/assets_member/img/hero/hero-2.jpg">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 offset-lg-6">
@@ -110,7 +111,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="class-item">
                     <div class="ci-pic">
-                        <img src="../../assets_member/img/classes/class-1.jpg" alt="" />
+                        <img src="../../../assets/assets_member/img/classes/class-1.jpg" alt="" />
                     </div>
                     <div class="ci-text">
                         <span>PROGRAM</span>
@@ -121,7 +122,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="class-item">
                     <div class="ci-pic">
-                        <img src="../../assets_member/img/classes/class-2.jpg" alt="" />
+                        <img src="../../../assets/assets_member/img/classes/class-2.jpg" alt="" />
                     </div>
                     <div class="ci-text">
                         <span>RILEKSASI</span>
@@ -132,7 +133,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="class-item">
                     <div class="ci-pic">
-                        <img src="../../assets_member/img/classes/class-3.jpg" alt="" />
+                        <img src="../../../assets/assets_member/img/classes/class-3.jpg" alt="" />
                     </div>
                     <div class="ci-text">
                         <span>KEKUATAN</span>
@@ -143,7 +144,7 @@
             <div class="col-lg-6 col-md-6">
                 <div class="class-item">
                     <div class="ci-pic">
-                        <img src="../../assets_member/img/classes/class-4.jpg" alt="" />
+                        <img src="../../../assets/assets_member/img/classes/class-4.jpg" alt="" />
                     </div>
                     <div class="ci-text">
                         <span>KEKUATAN</span>
@@ -154,7 +155,7 @@
             <div class="col-lg-6">
                 <div class="class-item">
                     <div class="ci-pic">
-                        <img src="../../assets_member/img/classes/class-5.jpg" alt="" />
+                        <img src="../../../assets/assets_member/img/classes/class-5.jpg" alt="" />
                     </div>
                     <div class="ci-text">
                         <span>latihan</span>
@@ -168,7 +169,7 @@
 <!-- ChoseUs Section End -->
 
 <!-- Banner Section Begin -->
-<section class="banner-section set-bg" data-setbg="../../assets_member/img/banner-bg.jpg">
+<section class="banner-section set-bg" data-setbg="../../../assets/assets_member/img/banner-bg.jpg">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
@@ -262,25 +263,25 @@
         <div class="grid-sizer"></div>
         <div
             class="gs-item grid-wide set-bg"
-            data-setbg="../../assets_member/img/gallery/gallery-1.jpg">
-            <a href="../../assets_member/img/gallery/gallery-1.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+            data-setbg="../../../assets/assets_member/img/gallery/gallery-1.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-1.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
-        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-2.jpg">
-            <a href="../../assets_member/img/gallery/gallery-2.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        <div class="gs-item set-bg" data-setbg="../../../assets/assets_member/img/gallery/gallery-2.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-2.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
-        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-3.jpg">
-            <a href="../../assets_member/img/gallery/gallery-3.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        <div class="gs-item set-bg" data-setbg="../../../assets/assets_member/img/gallery/gallery-3.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-3.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
-        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-4.jpg">
-            <a href="../../assets_member/img/gallery/gallery-4.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        <div class="gs-item set-bg" data-setbg="../../../assets/assets_member/img/gallery/gallery-4.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-4.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
-        <div class="gs-item set-bg" data-setbg="../../assets_member/img/gallery/gallery-5.jpg">
-            <a href="../../assets_member/img/gallery/gallery-5.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+        <div class="gs-item set-bg" data-setbg="../../../assets/assets_member/img/gallery/gallery-5.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-5.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
         <div
             class="gs-item grid-wide set-bg"
-            data-setbg="../../assets_member/img/gallery/gallery-6.jpg">
-            <a href="../../assets_member/img/gallery/gallery-6.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
+            data-setbg="../../../assets/assets_member/img/gallery/gallery-6.jpg">
+            <a href="../../../assets/assets_member/img/gallery/gallery-6.jpg" class="thumb-icon image-popup"><i class="fa fa-picture-o"></i></a>
         </div>
     </div>
 </div>
@@ -303,7 +304,7 @@
         <div class="row">
             <div class="ts-slider owl-carousel">
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-1.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-1.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -311,7 +312,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-2.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-2.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -319,7 +320,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-3.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-3.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -327,7 +328,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-4.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-4.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -335,7 +336,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-5.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-5.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -343,7 +344,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="ts-item set-bg" data-setbg="../../assets_member/img/team/team-6.jpg">
+                    <div class="ts-item set-bg" data-setbg="../../../assets/assets_member/img/team/team-6.jpg">
                         <div class="ts_text">
                             <h4>Athart Rachel</h4>
                             <span>Gym Trainer</span>
@@ -387,4 +388,4 @@
     </div>
 </div>
 <!-- Get In Touch Section End -->
-<?php include '../../master_member/footer.php'; ?>
+<?php include '../../../assets/../view/master_member/footer.php'; ?>

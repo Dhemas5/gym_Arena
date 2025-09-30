@@ -2,11 +2,15 @@
 ob_start();
 session_start();
 require "../../../setting/koneksi.php";
+require "../../../setting/session.php";
+blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
 
 // Cek koneksi database
 if ($con->connect_error) {
     die("Koneksi gagal: " . $con->connect_error);
 }
+
+$error = "";
 
 // Jika tombol login ditekan
 if (isset($_POST['loginbtn'])) {
@@ -22,7 +26,7 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Bandingkan kata sandi langsung (tanpa hashing)
+        // Bandingkan password langsung (disarankan hashing pakai password_hash)
         if ($password === $user['password']) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
@@ -32,9 +36,9 @@ if (isset($_POST['loginbtn'])) {
 
             // Arahkan sesuai role
             if ($user['role'] === 'admin') {
-                header("Location: index.php");
+                header("Location: ../dashboard/index.php");
             } else {
-                header("Location: ../../member/index.php");
+                header("Location: ../../member/beranda/index.php");
             }
             exit;
         } else {
@@ -45,48 +49,90 @@ if (isset($_POST['loginbtn'])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login — GymFit</title>
-    <link rel="stylesheet" href="../../../assets/assets_member/css/login.css" />
+    <title>AdminLTE 3 | Log in (v2)</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/plugins/fontawesome-free/css/all.min.css" />
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
 </head>
 
-<body>
-    <div class="login-card">
-        <div class="logo">GF</div>
-        <h1>Login Member</h1>
-        <form method="POST">
-            <div class="form-group">
-                <label for="email">Email / Username</label>
-                <input
-                    name="username"
-                    type="text"
-                    id="email"
-                    placeholder="contoh@email.com"
-                    required />
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a href="#">
+                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
+                </a>
             </div>
-            <div class="form-group">
-                <label for="password">Kata Sandi</label>
-                <input
-                    name="password"
-                    type="password"
-                    id="password"
-                    placeholder="••••••••"
-                    required />
+            <div class="card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
+
+                <!-- tampilkan pesan error -->
+                <?php if (!empty($error)) : ?>
+                    <div class="alert alert-danger"><?= $error; ?></div>
+                <?php endif; ?>
+
+                <!-- perbaikan form -->
+                <form action="" method="POST">
+                    <div class="input-group mb-3">
+                        <input name="username" type="text" class="form-control" placeholder="Email / Username" required />
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input name="password" type="password" class="form-control" placeholder="Password" required />
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tombol login submit -->
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="mb-1 mt-3">
+                    <a href="forgot-password.html">I forgot my password</a>
+                </p>
+                <p class="mb-0">
+                    <a href="register.html" class="text-center">Register a new membership</a>
+                </p>
             </div>
-            <button type="submit" class="btn" name="loginbtn">Masuk</button>
-        </form>
-        <?php if (!empty($error)) : ?>
-            <p style="color: red;"><?= htmlspecialchars($error); ?></p>
-        <?php endif; ?>
-        <a href="lupapassword.html" class="link">Lupa Password?</a>
-        <a href="register.html" class="link">Belum punya akun? Daftar</a>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
     </div>
+    <!-- /.login-box -->
+
+    <!-- jQuery -->
+    <script src="../../../assets/assets_admin/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
 </body>
 
 </html>
+
 <?php ob_end_flush(); ?>

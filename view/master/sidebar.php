@@ -21,9 +21,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     style="width:40px; height:40px; object-fit:cover;">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Alexander Pierce</a>
+                <a href="#" class="d-block">
+                    <?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Guest'; ?>
+                </a>
             </div>
         </div>
+
 
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column">
@@ -35,6 +38,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Dashboard</p>
                     </a>
                 </li>
+
+                <li class="nav-header">MASTER DATA</li>
+
                 <li class="nav-item">
                     <a href="../../../data/admin/user/user.php" class="nav-link <?php if ($current_page == 'user.php') {
                                                                                     echo 'active';
@@ -43,14 +49,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>User</p>
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="../../../data/admin/pelatih/pelatih.php" class="nav-link <?php if ($current_page == 'pelatih.php') {
-                                                                                            echo 'active';
-                                                                                        } ?>">
-                        <i class="nav-icon fas fa-dumbbell"></i>
-                        <p>Pelatih</p>
+                    <a href="../../../data/admin/member/member.php" class="nav-link <?php if ($current_page == 'member.php') {
+                                                                                        echo 'active';
+                                                                                    } ?>">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Member</p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a href="../../../data/admin/kategori/kategori.php" class="nav-link <?php if ($current_page == 'kategori.php') {
                                                                                             echo 'active';
@@ -59,8 +67,27 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Kategori</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="../../../data/admin/instruktur/instruktur.php" class="nav-link <?php if ($current_page == 'pelatih.php') {
+                                                                                                echo 'active';
+                                                                                            } ?>">
+                        <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                        <p>Instruktur</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../../../data/admin/jadwal/jadwal.php" class="nav-link <?php if ($current_page == 'jadwal.php') {
+                                                                                        echo 'active';
+                                                                                    } ?>">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>Jadwal Kelas</p>
+                    </a>
+                </li>
             </ul>
         </nav>
+
     </div>
 </aside>
 

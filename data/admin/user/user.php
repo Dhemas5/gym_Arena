@@ -5,7 +5,7 @@
 require "../../../setting/session.php";
 require "../../../setting/koneksi.php";
 
-$queryUser = mysqli_query($con, "SELECT * FROM users");
+$queryUser = mysqli_query($con, "SELECT * FROM tbl_user");
 $jumlahUser = mysqli_num_rows($queryUser)
 ?>
 <!-- Content Header -->
@@ -13,7 +13,7 @@ $jumlahUser = mysqli_num_rows($queryUser)
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Data User</h1>
+                <h1>Menu User</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -30,18 +30,19 @@ $jumlahUser = mysqli_num_rows($queryUser)
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card shadow rounded-3 overflow-hidden">
+                <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0">Data User</h3>
+                        <h3 class="card-title">Data User</h3>
                     </div>
 
-                    <div class="card-body bg-dark p-3">
+                    <div class="card-body">
                         <div class="table-responsive rounded">
-                            <table id="tabelPelatih" class="table table-bordered table-hover text-white mb-0">
-                                <thead class="bg-primary text-white">
+                            <table id="tabelPelatih" class="table table-bordered table-striped">
+                                <thead class="bg-primary">
                                     <tr>
                                         <th style="width: 5%;">No</th>
                                         <th style="width: 20%;">Username</th>
+                                        <th style="width: 20%;">Nama Lengkap</th>
                                         <th style="width: 15%;">Password</th>
                                         <th style="width: 20%;">Email</th>
                                         <th style="width: 20%;">Role</th>
@@ -62,6 +63,7 @@ $jumlahUser = mysqli_num_rows($queryUser)
                                             <tr>
                                                 <td><?php echo $jumlah; ?></td>
                                                 <td><?php echo $data['username']; ?></td>
+                                                <td><?php echo $data['nama_lengkap']; ?></td>
                                                 <td><?php echo $data['password']; ?></td>
                                                 <td><?php echo $data['email']; ?></td>
                                                 <td><?php echo $data['role']; ?></td>

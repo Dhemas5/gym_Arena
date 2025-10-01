@@ -1,5 +1,5 @@
 <?php
-require "../../admin/session.php"; // Sesuaikan path ke session.php
+require "../../../setting/session.php"; // Sesuaikan path ke session.php
 checkSession('member');
 ?>
 <!DOCTYPE html>
@@ -26,14 +26,14 @@ checkSession('member');
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <!-- Css Styles -->
-    <link rel="stylesheet" href="../../assets_member/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/flaticon.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/barfiller.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/magnific-popup.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="../../assets_member/css/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/flaticon.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/owl.carousel.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/barfiller.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/magnific-popup.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/slicknav.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../assets/assets_member/css/style.css" type="text/css" />
 </head>
 
 <body>

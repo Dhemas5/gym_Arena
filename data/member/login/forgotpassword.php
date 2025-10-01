@@ -3,7 +3,7 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
+blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka forgot-password.php
 
 // Cek koneksi database
 if ($con->connect_error) {
@@ -11,41 +11,36 @@ if ($con->connect_error) {
 }
 
 $error = "";
+$success = "";
 
-// Jika tombol login ditekan
-if (isset($_POST['loginbtn'])) {
-    $username = trim(htmlspecialchars($_POST['username']));
-    $password = trim(htmlspecialchars($_POST['password']));
+// Jika tombol reset ditekan
+if (isset($_POST['resetbtn'])) {
+    $email = trim(htmlspecialchars($_POST['email']));
 
-    // Cek username/email
-    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-    $query->bind_param("ss", $username, $username);
-    $query->execute();
-    $result = $query->get_result();
-
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-
-        // Bandingkan password langsung (disarankan hashing pakai password_hash)
-        if ($password === $user['password']) {
-            // Simpan data ke sesi
-            $_SESSION['login'] = true;
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-            // Arahkan sesuai role
-            if ($user['role'] === 'admin') {
-                header("Location: ../dashboard/index.php");
-            } else {
-                header("Location: ../../member/beranda/index.php");
-            }
-            exit;
-        } else {
-            $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
-        }
+    // Validasi email
+    if (empty($email)) {
+        $error = "Email harus diisi!";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Format email tidak valid!";
     } else {
-        $error = "Username atau email tidak ditemukan!";
+        // Cek apakah email terdaftar
+        $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ?");
+        $query->bind_param("s", $email);
+        $query->execute();
+        $result = $query->get_result();
+
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            
+            // Tampilkan password langsung (untuk development/testing)
+            // CATATAN: Ini tidak aman untuk production!
+            $success = "Password Anda adalah: <strong>" . $user['password'] . "</strong><br>Silakan login kembali.";
+            
+            // Atau bisa redirect ke halaman reset password dengan token
+            // header("refresh:3;url=login.php");
+        } else {
+            $error = "Email tidak terdaftar dalam sistem!";
+        }
     }
 }
 ?>
@@ -56,7 +51,7 @@ if (isset($_POST['loginbtn'])) {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AdminLTE 3 | Log in (v2)</title>
+    <title>AdminLTE 3 | Forgot Password</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -71,7 +66,6 @@ if (isset($_POST['loginbtn'])) {
 
 <body class="hold-transition login-page">
     <div class="login-box">
-        <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
                 <a href="#">
@@ -79,44 +73,42 @@ if (isset($_POST['loginbtn'])) {
                 </a>
             </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">You forgot your password? Here you can retrieve your password.</p>
 
                 <!-- tampilkan pesan error -->
                 <?php if (!empty($error)) : ?>
                     <div class="alert alert-danger"><?= $error; ?></div>
                 <?php endif; ?>
 
-                <!-- perbaikan form -->
+                <!-- tampilkan pesan sukses -->
+                <?php if (!empty($success)) : ?>
+                    <div class="alert alert-success"><?= $success; ?></div>
+                <?php endif; ?>
+
+                <!-- form forgot password -->
                 <form action="" method="POST">
                     <div class="input-group mb-3">
-                        <input name="username" type="text" class="form-control" placeholder="Email / Username" required />
+                        <input name="email" type="email" class="form-control" placeholder="Email" required 
+                               value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" />
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
-                        <input name="password" type="password" class="form-control" placeholder="Password" required />
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tombol login submit -->
+                    <!-- Tombol reset submit -->
                     <div class="row">
                         <div class="col-12">
-                            <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
+                            <button type="submit" name="resetbtn" class="btn btn-primary btn-block">Request Password</button>
                         </div>
                     </div>
                 </form>
 
-                <p class="mb-1 mt-3">
-                    <a href="forgot-password.html">I forgot my password</a>
+                <p class="mt-3 mb-1">
+                    <a href="login.php">Back to Login</a>
                 </p>
                 <p class="mb-0">
-                    <a href="register.html" class="text-center">Register a new membership</a>
+                    <a href="register.php" class="text-center">Register a new membership</a>
                 </p>
             </div>
             <!-- /.card-body -->

@@ -18,7 +18,7 @@ if (isset($_POST['loginbtn'])) {
     $password = trim(htmlspecialchars($_POST['password']));
 
     // Cek username/email
-    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    $query = $con->prepare("SELECT * FROM tbl_member WHERE nama = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
@@ -30,16 +30,12 @@ if (isset($_POST['loginbtn'])) {
         if ($password === $user['password']) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
+            $_SESSION['id_member'] = $user['id_member'];
+            $_SESSION['nama'] = $user['nama'];
+            $_SESSION['email'] = $user['email']; 
+             $_SESSION['password'] = $user['password']; 
+              $_SESSION['no_hp'] = $user['no_hp']; 
 
-            // Arahkan sesuai role
-            if ($user['role'] === 'admin') {
-                header("Location: ../dashboard/index.php");
-            } else {
-                header("Location: ../../member/beranda/index.php");
-            }
             exit;
         } else {
             $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
@@ -113,10 +109,10 @@ if (isset($_POST['loginbtn'])) {
                 </form>
 
                 <p class="mb-1 mt-3">
-                    <a href="forgot-password.html">I forgot my password</a>
+                    <a href="forgotpassword.php">I forgot my password</a>
                 </p>
                 <p class="mb-0">
-                    <a href="register.html" class="text-center">Register a new membership</a>
+                    <a href="register.php" class="text-center">Register a new membership</a>
                 </p>
             </div>
             <!-- /.card-body -->

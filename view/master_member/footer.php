@@ -6,7 +6,7 @@
                 <div class="col-lg-2 col-md-3 col-sm-12 text-center text-lg-start">
                     <div class="fa-logo">
                         <img
-                            src="../../assets_member/img/logo.png"
+                            src="../../../assets/assets_member/img/logo.png"
                             alt="Logo"
                             style="width: 70px; height: auto" />
                     </div>
@@ -93,14 +93,14 @@
     <!-- Search model end -->
 
     <!-- Js Plugins -->
-    <script src="../../assets_member/js/jquery-3.3.1.min.js"></script>
-    <script src="../../assets_member/js/bootstrap.min.js"></script>
-    <script src="../../assets_member/js/jquery.magnific-popup.min.js"></script>
-    <script src="../../assets_member/js/masonry.pkgd.min.js"></script>
-    <script src="../../assets_member/js/jquery.barfiller.js"></script>
-    <script src="../../assets_member/js/jquery.slicknav.js"></script>
-    <script src="../../assets_member/js/owl.carousel.min.js"></script>
-    <script src="../../assets_member/js/main.js"></script>
+    <script src="../../../assets/assets_member/js/jquery-3.3.1.min.js"></script>
+    <script src="../../../assets/assets_member/js/bootstrap.min.js"></script>
+    <script src="../../../assets/assets_member/js/jquery.magnific-popup.min.js"></script>
+    <script src="../../../assets/assets_member/js/masonry.pkgd.min.js"></script>
+    <script src="../../../assets/assets_member/js/jquery.barfiller.js"></script>
+    <script src="../../../assets/assets_member/js/jquery.slicknav.js"></script>
+    <script src="../../../assets/assets_member/js/owl.carousel.min.js"></script>
+    <script src="../../../assets/assets_member/js/main.js"></script>
     </body>
 
     </html>

@@ -74,13 +74,13 @@ if (isset($_POST['loginbtn'])) {
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
-            <div class="card-header text-center bg-dark">
+            <div class="card-header text-center">
                 <a href="#">
-                    <img src="../../../assets/assets_admin/dist/img/logoadmin.png" alt="Logo" class="img-fluid" style="max-height:100px;">
+                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
                 </a>
             </div>
-            <div class="card-body bg-dark">
-                <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
+            <div class="card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
 
                 <!-- tampilkan pesan error -->
                 <?php if (!empty($error)) : ?>
@@ -112,6 +112,13 @@ if (isset($_POST['loginbtn'])) {
                         </div>
                     </div>
                 </form>
+
+                <p class="mb-1 mt-3">
+                    <a href="forgot-password.html">I forgot my password</a>
+                </p>
+                <p class="mb-0">
+                    <a href="register.html" class="text-center">Register a new membership</a>
+                </p>
             </div>
             <!-- /.card-body -->
         </div>
@@ -128,18 +135,18 @@ if (isset($_POST['loginbtn'])) {
     <script>
         // Efek loading pada tombol login
         $(document).ready(function() {
-        $('form').on('submit', function() {
-            $('button[name="loginbtn"]').addClass('btn-loading');
-        });
-        
-        // Efek fokus pada input
-        $('.form-control').on('focus', function() {
-            $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
-        });
-        
-        $('.form-control').on('blur', function() {
-            $(this).parent().css('box-shadow', 'none');
-        });
+            $('form').on('submit', function() {
+                $('button[name="loginbtn"]').addClass('btn-loading');
+            });
+
+            // Efek fokus pada input
+            $('.form-control').on('focus', function() {
+                $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
+            });
+
+            $('.form-control').on('blur', function() {
+                $(this).parent().css('box-shadow', 'none');
+            });
         });
     </script>
 </body>

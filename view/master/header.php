@@ -1,7 +1,3 @@
-<?php
-require "../../../setting/session.php"; // Sesuaikan path ke session.php
-checkSession('admin');
-?>
 <!DOCTYPE html>
 <html lang="en">
 

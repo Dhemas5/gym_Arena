@@ -3,7 +3,8 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
+blockLoginPageIfLoggedIn(); // kalau sudah login, otomatis redirectByRole()
+
 
 // Cek koneksi database
 if ($con->connect_error) {
@@ -16,39 +17,37 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
+    $password_md5 = md5($password); // hashing md5
 
-    // Cek username/email
-    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    // Cek user dengan role admin
+    $query = $con->prepare("SELECT * FROM tbl_user WHERE (username = ? OR email = ?) AND role = 'admin' LIMIT 1");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
 
-    if ($result->num_rows === 1) {
+    if ($result && $result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Bandingkan password langsung (disarankan hashing pakai password_hash)
-        if ($password === $user['password']) {
+        // Cek password
+        if ($password_md5 === $user['password']) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
 
-            // Arahkan sesuai role
-            if ($user['role'] === 'admin') {
-                header("Location: ../dashboard/index.php");
-            } else {
-                header("Location: ../../member/beranda/index.php");
-            }
+            // Arahkan ke dashboard admin
+            header("Location: ../dashboard/index.php");
             exit;
         } else {
             $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
         }
     } else {
-        $error = "Username atau email tidak ditemukan!";
+        $error = "User admin tidak ditemukan!";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -73,13 +72,13 @@ if (isset($_POST['loginbtn'])) {
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
-            <div class="card-header text-center">
+            <div class="card-header text-center bg-dark">
                 <a href="#">
-                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
+                    <img src="../../../assets/assets_admin/dist/img/logoadmin.png" alt="Logo" class="img-fluid" style="max-height:100px;">
                 </a>
             </div>
-            <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+            <div class="card-body bg-dark">
+                <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
 
                 <!-- tampilkan pesan error -->
                 <?php if (!empty($error)) : ?>
@@ -111,13 +110,6 @@ if (isset($_POST['loginbtn'])) {
                         </div>
                     </div>
                 </form>
-
-                <p class="mb-1 mt-3">
-                    <a href="forgot-password.html">I forgot my password</a>
-                </p>
-                <p class="mb-0">
-                    <a href="register.html" class="text-center">Register a new membership</a>
-                </p>
             </div>
             <!-- /.card-body -->
         </div>

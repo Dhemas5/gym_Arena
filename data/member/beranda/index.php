@@ -1,3 +1,7 @@
+<?php
+require "../../../setting/session.php";
+checkSession("member"); // hanya member boleh masuk
+?>
 <?php include '../../../view/master_member/header.php'; ?>
 <?php include '../../../view/master_member/navbar.php'; ?>
 

@@ -85,6 +85,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Jadwal Kelas</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="../../../data/admin/paket/paket.php" class="nav-link <?php if ($current_page == 'paket.php') {
+                                                                                        echo 'active';
+                                                                                    } ?>">
+                        <i class="nav-icon fas fa-tags"></i>
+                        <p>Paket</p>
+                    </a>
+                </li>
             </ul>
         </nav>
 

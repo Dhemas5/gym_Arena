@@ -3,8 +3,7 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn(); // kalau sudah login, otomatis redirectByRole()
-
+blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
 
 // Cek koneksi database
 if ($con->connect_error) {
@@ -17,37 +16,35 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // hashing md5
 
-    // Cek user dengan role admin
-    $query = $con->prepare("SELECT * FROM tbl_user WHERE (username = ? OR email = ?) AND role = 'admin' LIMIT 1");
+    // Cek username/email
+    $query = $con->prepare("SELECT * FROM tbl_member WHERE nama = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
 
-    if ($result && $result->num_rows === 1) {
+    if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Cek password
-        if ($password_md5 === $user['password']) {
+        // Bandingkan password langsung (disarankan hashing pakai password_hash)
+        if ($password === $user['password']) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
+            $_SESSION['id_member'] = $user['id_member'];
+            $_SESSION['nama'] = $user['nama'];
+            $_SESSION['email'] = $user['email']; 
+             $_SESSION['password'] = $user['password']; 
+              $_SESSION['no_hp'] = $user['no_hp']; 
 
-            // Arahkan ke dashboard admin
-            header("Location: ../dashboard/index.php");
             exit;
         } else {
             $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
         }
     } else {
-        $error = "User admin tidak ditemukan!";
+        $error = "Username atau email tidak ditemukan!";
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -74,13 +71,13 @@ if (isset($_POST['loginbtn'])) {
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
-            <div class="card-header text-center bg-dark">
+            <div class="card-header text-center">
                 <a href="#">
-                    <img src="../../../assets/assets_admin/dist/img/logoadmin.png" alt="Logo" class="img-fluid" style="max-height:100px;">
+                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
                 </a>
             </div>
-            <div class="card-body bg-dark">
-                <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
+            <div class="card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
 
                 <!-- tampilkan pesan error -->
                 <?php if (!empty($error)) : ?>
@@ -112,6 +109,13 @@ if (isset($_POST['loginbtn'])) {
                         </div>
                     </div>
                 </form>
+
+                <p class="mb-1 mt-3">
+                    <a href="forgotpassword.php">I forgot my password</a>
+                </p>
+                <p class="mb-0">
+                    <a href="register.php" class="text-center">Register a new membership</a>
+                </p>
             </div>
             <!-- /.card-body -->
         </div>
@@ -125,7 +129,7 @@ if (isset($_POST['loginbtn'])) {
     <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
-    <script>
+        <script>
         // Efek loading pada tombol login
         $(document).ready(function() {
         $('form').on('submit', function() {

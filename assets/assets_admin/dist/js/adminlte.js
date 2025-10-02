@@ -1604,7 +1604,7 @@
   var SELECTOR_CONTROL_SIDEBAR_BTN = '[data-widget="control-sidebar"]';
   var SELECTOR_FOOTER = '.main-footer';
   var SELECTOR_PUSHMENU_BTN = '[data-widget="pushmenu"]';
-  var SELECTOR_LOGIN_BOX = '.login-box';
+  var SELECTOR_LOGIN_BOX = '.';
   var SELECTOR_REGISTER_BOX = '.register-box';
   var SELECTOR_PRELOADER = '.preloader';
   var CLASS_NAME_SIDEBAR_COLLAPSED$1 = 'sidebar-collapse';

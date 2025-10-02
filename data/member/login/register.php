@@ -74,11 +74,13 @@ if (isset($_POST['registerbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <!-- Theme style -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-regis.css" />
 </head>
 
 <body class="hold-transition register-page">
-    <div class="register-box">
-        <div class="card card-outline card-primary">
+    <div class="register-box register-container">
+        <div class="card card-outline card-primary register-card">
             <div class="card-header text-center">
                 <a href="#">
                     <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">

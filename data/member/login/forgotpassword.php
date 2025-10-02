@@ -62,11 +62,13 @@ if (isset($_POST['resetbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <!-- Theme style -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-forgot.css" />
 </head>
 
 <body class="hold-transition login-page">
-    <div class="login-box">
-        <div class="card card-outline card-primary">
+    <div class="login-box forgot-container">
+        <div class="card card-outline card-primary forgot-card">
             <div class="card-header text-center">
                 <a href="#">
                     <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">

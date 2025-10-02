@@ -488,20 +488,20 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
   justify-content: center;
 }
 
-.login-box,
+.,
 .register-box {
   width: 360px;
 }
 
 @media (max-width: 576px) {
-  .login-box,
+  .,
   .register-box {
     margin-top: .5rem;
     width: 90%;
   }
 }
 
-.login-box .card,
+. .card,
 .register-box .card {
   margin-bottom: 0;
 }
@@ -563,7 +563,7 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.login-box-msg,
+.-msg,
 .register-box-msg {
   margin: 0;
   padding: 0 20px 20px;

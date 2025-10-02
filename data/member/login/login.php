@@ -52,7 +52,7 @@ if (isset($_POST['loginbtn'])) {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AdminLTE 3 | Log in (v2)</title>
+    <title>Log in</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -63,6 +63,8 @@ if (isset($_POST['loginbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <!-- Theme style -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
 </head>
 
 <body class="hold-transition login-page">
@@ -127,6 +129,23 @@ if (isset($_POST['loginbtn'])) {
     <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
+        <script>
+        // Efek loading pada tombol login
+        $(document).ready(function() {
+        $('form').on('submit', function() {
+            $('button[name="loginbtn"]').addClass('btn-loading');
+        });
+        
+        // Efek fokus pada input
+        $('.form-control').on('focus', function() {
+            $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
+        });
+        
+        $('.form-control').on('blur', function() {
+            $(this).parent().css('box-shadow', 'none');
+        });
+        });
+    </script>
 </body>
 
 </html>

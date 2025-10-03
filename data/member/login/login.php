@@ -3,7 +3,7 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
+
 
 // Cek koneksi database
 if ($con->connect_error) {
@@ -26,17 +26,20 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Bandingkan password langsung (disarankan hashing pakai password_hash)
-        if ($password === $user['password']) {
+        // Verifikasi password menggunakan password_verify()
+        if (password_verify($password, $user['password'])) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
             $_SESSION['id_member'] = $user['id_member'];
             $_SESSION['nama'] = $user['nama'];
             $_SESSION['email'] = $user['email']; 
-             $_SESSION['password'] = $user['password']; 
-              $_SESSION['no_hp'] = $user['no_hp']; 
+            $_SESSION['password'] = $user['password']; 
+            $_SESSION['no_hp'] = $user['no_hp']; 
 
-            exit;
+            // Redirect ke halaman dashboard atau home
+         header("Location: login.php");
+         exit;
+
         } else {
             $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
         }

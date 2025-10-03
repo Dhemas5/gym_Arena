@@ -1,6 +1,7 @@
 <?php
 require "../../../setting/session.php"; // Sesuaikan path ke session.php
 checkSession('member');
+
 ?>
 <!DOCTYPE html>
 <html lang="zxx">

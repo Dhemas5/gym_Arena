@@ -18,7 +18,7 @@ if (isset($_POST['loginbtn'])) {
     $password = trim(htmlspecialchars($_POST['password']));
 
     // Cek username/email
-    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    $query = $con->prepare("SELECT * FROM tbl_user WHERE username = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();

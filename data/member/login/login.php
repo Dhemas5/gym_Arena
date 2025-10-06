@@ -36,6 +36,7 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['password'] = $user['password'];
             $_SESSION['no_hp'] = $user['no_hp'];
 
+                header("Location: ../beranda/index.php");
             exit;
         } else {
             $error = "Kata sandi salah! Pastikan kata sandi sesuai.";

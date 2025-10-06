@@ -5,7 +5,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Enhanced brand link with better styling -->
-    <a href="dashboard.php" class="brand-link text-center">
+    <a href="../../../data/admin/dashboard/index.php" class="brand-link text-center">
         <img src="../../../assets/assets_admin/dist/img/logoadmin.png"
             alt="Gym Logo"
             class="brand-image img-circle elevation-3"

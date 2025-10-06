@@ -71,7 +71,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Member</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
                     </div>
                 </div>
             </div>
@@ -84,7 +84,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Kategori Gym</span>
-                        <span class="info-box-number"><?php echo $jumlahKategori ?></span>
+                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Pelatih</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
                     </div>
                 </div>
             </div>
@@ -110,45 +110,27 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Jadwal Kelas</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title">Data Pelatih</h3>
-                    </div>
+        </div>
 
+        <!-- Line Chart Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Statistik Pendaftaran Member Tahun <?php echo date('Y'); ?></h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <div class="table-responsive rounded">
-                            <table id="tabelPelatih" class="table table-bordered table-striped">
-                                <thead class="bg-primary text-white">
-                                    <tr>
-                                        <th style="width: 5%;">No</th>
-                                        <th style="width: 20%;">Nama</th>
-                                        <th>Bio</th>
-                                        <th style="width: 15%;">No HP</th>
-                                        <th style="width: 20%;">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Andi</td>
-                                        <td>Pelatih fitness</td>
-                                        <td>08123456789</td>
-                                        <td>andi@example.com</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Budi</td>
-                                        <td>Pelatih yoga</td>
-                                        <td>0822334455</td>
-                                        <td>budi@example.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="chart">
+                            <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>

@@ -32,9 +32,9 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['login'] = true;
             $_SESSION['id_member'] = $user['id_member'];
             $_SESSION['nama'] = $user['nama'];
-            $_SESSION['email'] = $user['email']; 
-             $_SESSION['password'] = $user['password']; 
-              $_SESSION['no_hp'] = $user['no_hp']; 
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['password'] = $user['password'];
+            $_SESSION['no_hp'] = $user['no_hp'];
 
             exit;
         } else {
@@ -129,21 +129,21 @@ if (isset($_POST['loginbtn'])) {
     <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
-        <script>
+    <script>
         // Efek loading pada tombol login
         $(document).ready(function() {
-        $('form').on('submit', function() {
-            $('button[name="loginbtn"]').addClass('btn-loading');
-        });
-        
-        // Efek fokus pada input
-        $('.form-control').on('focus', function() {
-            $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
-        });
-        
-        $('.form-control').on('blur', function() {
-            $(this).parent().css('box-shadow', 'none');
-        });
+            $('form').on('submit', function() {
+                $('button[name="loginbtn"]').addClass('btn-loading');
+            });
+
+            // Efek fokus pada input
+            $('.form-control').on('focus', function() {
+                $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
+            });
+
+            $('.form-control').on('blur', function() {
+                $(this).parent().css('box-shadow', 'none');
+            });
         });
     </script>
 </body>

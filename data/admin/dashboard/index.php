@@ -1,3 +1,7 @@
+<?php
+require "../../../setting/session.php";
+checkSession("admin"); // hanya admin boleh masuk 
+?>
 <?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/sidebar.php'; ?>
 
@@ -5,11 +9,25 @@
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
 
-$queryKategori = mysqli_query($con, "SELECT *  FROM tbl_kategori");
+// Jumlah kategori gym
+$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 
-$queryUser = mysqli_query($con, "SELECT *  FROM tbl_user");
+// Jumlah user (admin + member)
+$queryUser = mysqli_query($con, "SELECT * FROM tbl_user");
 $jumlahUser = mysqli_num_rows($queryUser);
+
+// Jumlah member
+$queryMember = mysqli_query($con, "SELECT * FROM tbl_member");
+$jumlahMember = mysqli_num_rows($queryMember);
+
+// Jumlah pelatih
+$queryPelatih = mysqli_query($con, "SELECT * FROM tbl_instruktur");
+$jumlahPelatih = mysqli_num_rows($queryPelatih);
+
+// Jumlah jadwal kelas
+$queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
+$jumlahJadwal = mysqli_num_rows($queryJadwal);
 ?>
 
 <!-- Content Header -->
@@ -33,7 +51,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <!-- Contoh info-box -->
+            <!-- Dashboard -->
             <div class="col-12 col-sm-6 col-md-4">
                 <div class="info-box">
                     <span class="info-box-icon bg-info elevation-1">
@@ -54,7 +72,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">User</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-number"><?php echo $jumlahUser; ?></span>
                     </div>
                 </div>
             </div>
@@ -67,7 +85,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Member</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-number"><?php echo $jumlahMember; ?></span>
                     </div>
                 </div>
             </div>
@@ -80,7 +98,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Kategori Gym</span>
-                        <span class="info-box-number"><?php echo $jumlahKategori ?></span>
+                        <span class="info-box-number"><?php echo $jumlahKategori; ?></span>
                     </div>
                 </div>
             </div>
@@ -92,8 +110,8 @@ $jumlahUser = mysqli_num_rows($queryUser);
                         <i class="fas fa-chalkboard-teacher"></i>
                     </span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Pelatih</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-text">Instruktur</span>
+                        <span class="info-box-number"><?php echo $jumlahPelatih; ?></span>
                     </div>
                 </div>
             </div>
@@ -106,45 +124,27 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Jadwal Kelas</span>
-                        <span class="info-box-number"></span>
+                        <span class="info-box-number"><?php echo $jumlahJadwal; ?></span>
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title">Data Pelatih</h3>
-                    </div>
+        </div>
 
+        <!-- Line Chart Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Statistik Pendaftaran Member Tahun <?php echo date('Y'); ?></h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <div class="table-responsive rounded">
-                            <table id="tabelPelatih" class="table table-bordered table-striped">
-                                <thead class="bg-primary text-white">
-                                    <tr>
-                                        <th style="width: 5%;">No</th>
-                                        <th style="width: 20%;">Nama</th>
-                                        <th>Bio</th>
-                                        <th style="width: 15%;">No HP</th>
-                                        <th style="width: 20%;">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Andi</td>
-                                        <td>Pelatih fitness</td>
-                                        <td>08123456789</td>
-                                        <td>andi@example.com</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Budi</td>
-                                        <td>Pelatih yoga</td>
-                                        <td>0822334455</td>
-                                        <td>budi@example.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="chart">
+                            <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -152,6 +152,5 @@ $jumlahUser = mysqli_num_rows($queryUser);
         </div>
     </div>
 </section>
-
 
 <?php include '../../../view/master/footer.php'; ?>

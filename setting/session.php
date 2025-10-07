@@ -1,18 +1,79 @@
 <?php
-ob_start();
+// setting/session.php
+// Safe session handler with function guards to avoid "Cannot redeclare" errors.
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Fungsi untuk mencegah akses login.php kalau sudah login
-if (!function_exists('blockLoginPageIfLoggedIn')) {
-    function blockLoginPageIfLoggedIn()
+// Fungsi untuk cek login & role
+if (!function_exists('checkSession')) {
+    function checkSession($required_role)
     {
-        if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
-            header('Location: ../../../data/member/beranda/index.php'); // landing utama
+        // Jika belum login arahkan ke Landing Page utama
+        if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
+            session_unset();
+            session_destroy();
+            header('Location: ../../../data/member/beranda/index.php'); // landing page utama
             exit;
         }
+
+        // Kalau role tidak sesuai
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== $required_role) {
+            if ($_SESSION['role'] === 'admin') {
+                header('Location: ../../../data/admin/dashboard/index.php');
+            } elseif ($_SESSION['role'] === 'member') {
+                header('Location: ../../../data/member/beranda/index.php'); // tetap ke beranda member
+            } else {
+                session_unset();
+                session_destroy();
+                header('Location: ../../../data/member/beranda/index.php'); // fallback ke landing utama
+            }
+            exit;
+        }
+    }
+}
+
+/**
+ * Block halaman login jika user sudah login
+ * (panggil di halaman login admin/member)
+ */
+if (!function_exists('blockLoginPageIfLoggedIn')) {
+    function blockLoginPageIfLoggedIn($role = null)
+    {
+        if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
+            redirectByRole();
+            exit;
+        }
+    }
+}
+
+/**
+ * Logout universal
+ */
+if (!function_exists('logout')) {
+    function logout()
+    {
+        session_unset();
+        session_destroy();
+        header('Location: ../../index.php');
+        exit;
+    }
+}
+
+/**
+ * Auto logout jika idle (opsional)
+ */
+if (!function_exists('autoLogout')) {
+    function autoLogout($timeout = 600)
+    {
+        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
+            session_unset();
+            session_destroy();
+            header("Location: ../../index.php?timeout=1");
+            exit;
+        }
+        $_SESSION['LAST_ACTIVITY'] = time();
     }
 }
 

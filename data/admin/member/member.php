@@ -1,3 +1,6 @@
+<?php require "../../../setting/session.php";
+checkSession("admin"); // hanya admin boleh masuk 
+?>
 <?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/sidebar.php'; ?>
 

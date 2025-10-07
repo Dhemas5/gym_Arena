@@ -1,0 +1,291 @@
+/* custom-regis.css */
+/* Styling khusus untuk halaman register dengan animasi */
+
+/* Animasi untuk transisi halaman */
+.register-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide animation untuk form */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.form-slide-in {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+/* Styling khusus untuk halaman register */
+.register-page {
+    background: linear-gradient(120deg, #007bff, #d2d6de);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background animation */
+.register-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shimmer 8s infinite linear;
+    z-index: 0;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.register-box {
+    width: 360px;
+    margin: 7% auto;
+    position: relative;
+    z-index: 1;
+}
+
+.register-card {
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.register-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    padding: 20px;
+    border-bottom: none;
+    text-align: center;
+}
+
+.card-header img {
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+    max-height: 60px;
+}
+
+.card-header img:hover {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.login-box-msg {
+    margin: 0 0 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Input group styling */
+.input-group {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.input-group .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.input-group .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group-append .input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    transition: all 0.3s ease;
+}
+
+.input-group .form-control:focus + .input-group-append .input-group-text {
+    border-color: #007bff;
+    background-color: #e9f4ff;
+}
+
+/* Button styling */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Link styling */
+.text-center {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.text-center:hover {
+    color: #0056b3;
+}
+
+.text-center::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+.text-center:hover::after {
+    width: 100%;
+}
+
+/* Alert animations */
+.alert {
+    border-radius: 5px;
+    border: none;
+    animation: alertPop 0.5s ease-out;
+}
+
+@keyframes alertPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    70% {
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+    .register-box {
+        width: 90%;
+        margin: 10% auto;
+    }
+    
+    .register-card {
+        margin: 0 10px;
+    }
+}
+
+/* Loading animation for form submission */
+.btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Floating label effect */
+.input-group {
+    position: relative;
+}
+
+.input-group label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background: white;
+    padding: 0 5px;
+}
+
+.input-group .form-control:focus + label,
+.input-group .form-control:not(:placeholder-shown) + label {
+    top: 0;
+    font-size: 12px;
+    color: #007bff;
+}

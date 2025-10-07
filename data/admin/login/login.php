@@ -1,9 +1,10 @@
 <?php
 ob_start();
 session_start();
+require "../../../setting/session.php";
+blockLoginPageIfLoggedIn('admin'); // atau 'member'
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn(); // kalau sudah login, otomatis redirectByRole()
 
 
 // Cek koneksi database

@@ -34,7 +34,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
 
         <!-- Added search form in sidebar -->
-        <div class="form-inline mb-3">
+        <div class="form-inline">
             <div class="input-group" data-widget="sidebar-search">
                 <input class="form-control form-control-sidebar" type="search" placeholder="Cari menu..." aria-label="Search">
                 <div class="input-group-append">
@@ -99,14 +99,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <li class="nav-item">
-                    <a href="../../../data/admin/jadwal_kelas/jadwal_kelas.php" class="nav-link <?php if ($current_page == 'jadwal.php') {
+                    <a href="../../../data/admin/jadwal/jadwal.php" class="nav-link <?php if ($current_page == 'jadwal.php') {
                                                                                         echo 'active';
                                                                                     } ?>">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Jadwal Kelas</p>
                     </a>
                 </li>
-                
+
                 <li class="nav-item">
                     <a href="../../../data/admin/paket/paket.php" class="nav-link <?php if ($current_page == 'paket.php') {
                                                                                         echo 'active';
@@ -118,7 +118,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <!-- Added Reports section -->
                 <li class="nav-header">LAPORAN</li>
-                
+
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-chart-bar"></i>

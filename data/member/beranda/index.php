@@ -392,4 +392,4 @@ checkSession("member"); // hanya member boleh masuk
     </div>
 </div>
 <!-- Get In Touch Section End -->
-<?php include '../../../assets/../view/master_member/footer.php'; ?>
+<?php include '../../../view/master_member/footer.php'; ?>

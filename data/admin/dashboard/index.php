@@ -1,19 +1,33 @@
-<?php require "../../../setting/session.php";
+<?php
+require "../../../setting/session.php";
 checkSession("admin"); // hanya admin boleh masuk 
 ?>
 <?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/sidebar.php'; ?>
 
-
 <?php
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
 
-$queryKategori = mysqli_query($con, "SELECT *  FROM tbl_kategori");
+// Jumlah kategori gym
+$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 
-$queryUser = mysqli_query($con, "SELECT *  FROM tbl_user");
+// Jumlah user (admin + member)
+$queryUser = mysqli_query($con, "SELECT * FROM tbl_user");
 $jumlahUser = mysqli_num_rows($queryUser);
+
+// Jumlah member
+$queryMember = mysqli_query($con, "SELECT * FROM tbl_member");
+$jumlahMember = mysqli_num_rows($queryMember);
+
+// Jumlah pelatih
+$queryPelatih = mysqli_query($con, "SELECT * FROM tbl_instruktur");
+$jumlahPelatih = mysqli_num_rows($queryPelatih);
+
+// Jumlah jadwal kelas
+$queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
+$jumlahJadwal = mysqli_num_rows($queryJadwal);
 ?>
 
 <!-- Content Header -->
@@ -37,7 +51,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <!-- Contoh info-box -->
+            <!-- Dashboard -->
             <div class="col-12 col-sm-6 col-md-4">
                 <div class="info-box">
                     <span class="info-box-icon bg-info elevation-1">
@@ -58,7 +72,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">User</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-number"><?php echo $jumlahUser; ?></span>
                     </div>
                 </div>
             </div>
@@ -71,7 +85,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Member</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-number"><?php echo $jumlahMember; ?></span>
                     </div>
                 </div>
             </div>
@@ -84,7 +98,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Kategori Gym</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-number"><?php echo $jumlahKategori; ?></span>
                     </div>
                 </div>
             </div>
@@ -96,8 +110,8 @@ $jumlahUser = mysqli_num_rows($queryUser);
                         <i class="fas fa-chalkboard-teacher"></i>
                     </span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Pelatih</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-text">Instruktur</span>
+                        <span class="info-box-number"><?php echo $jumlahPelatih; ?></span>
                     </div>
                 </div>
             </div>
@@ -110,7 +124,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                     </span>
                     <div class="info-box-content">
                         <span class="info-box-text">Jadwal Kelas</span>
-                        <span class="info-box-number"><?php echo $jumlahUser ?></span>
+                        <span class="info-box-number"><?php echo $jumlahJadwal; ?></span>
                     </div>
                 </div>
             </div>
@@ -138,6 +152,5 @@ $jumlahUser = mysqli_num_rows($queryUser);
         </div>
     </div>
 </section>
-
 
 <?php include '../../../view/master/footer.php'; ?>

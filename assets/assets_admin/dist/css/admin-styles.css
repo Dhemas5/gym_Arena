@@ -5,7 +5,7 @@
 
 /* ============ ROOT VARIABLES ============ */
 :root {
-  --primary-color: #000B58;
+  --primary-color: #000b58;
   --primary-dark: #003161;
   --secondary-color: #6c757d;
   --success-color: #28a745;
@@ -14,7 +14,7 @@
   --info-color: #17a2b8;
   --dark-color: #343a40;
   --light-color: #f8f9fa;
-  --sidebar-bg: #000B58;
+  --sidebar-bg: #000b58;
   --sidebar-hover: #003161;
   --navbar-bg: #ffffff;
   --transition-speed: 0.3s;
@@ -28,8 +28,8 @@
 }
 
 body {
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   color: #333;
@@ -43,7 +43,7 @@ html {
 
 /* ============ HEADER / NAVBAR ============ */
 .main-header.navbar {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   border-bottom: none;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
@@ -100,7 +100,7 @@ html {
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff !important;
   transform: translateX(5px);
 }
@@ -116,9 +116,100 @@ html {
   padding: 0.75rem 1.5rem;
 }
 
+/* ==== FIX MODE COLLAPSE ==== */
+
+/* Pastikan logo tetap proporsional saat collapse */
+.sidebar-collapse .main-sidebar .brand-link {
+  justify-content: center !important;
+  padding: 1rem 0.5rem !important;
+}
+
+.sidebar-collapse .main-sidebar .brand-link .brand-image {
+  width: 40px !important;
+  height: 40px !important;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.sidebar-collapse .main-sidebar .brand-text {
+  display: none !important; /* hanya hilang saat collapse */
+}
+
+/* User panel tetap rapi di tengah saat collapse */
+.sidebar-collapse .main-sidebar .user-panel {
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center;
+  padding: 1rem 0 !important;
+}
+
+.sidebar-collapse .main-sidebar .user-panel .image {
+  margin: 0 auto !important;
+}
+
+.sidebar-collapse .main-sidebar .user-panel .info {
+  display: none !important; /* sembunyikan nama user saat collapse */
+}
+
+/* Menu item di collapse mode */
+.sidebar-collapse .main-sidebar .nav-sidebar .nav-link {
+  justify-content: center !important;
+  text-align: center;
+  padding: 0.6rem 0 !important;
+  width: 100% !important;
+  border-radius: 8px;
+  margin: 0.3rem auto !important;
+}
+
+/* Tampilkan teks hanya di mode expanded */
+.main-sidebar:not(.sidebar-collapse) .nav-sidebar .nav-link p {
+  display: inline !important;
+}
+
+/* Sembunyikan teks hanya di mode collapse */
+.sidebar-collapse .main-sidebar .nav-sidebar .nav-link p {
+  display: none !important;
+}
+
+/* Active link di mode collapse */
+.sidebar-collapse .main-sidebar .nav-sidebar .nav-link.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  width: 70% !important;
+  margin: 0 auto !important;
+  box-shadow: none !important;
+  border-radius: 10px;
+}
+
+/* Ikon tetap di tengah */
+.sidebar-collapse .main-sidebar .nav-sidebar .nav-link i {
+  font-size: 1.2rem;
+  margin: 0 auto;
+}
+
+/* ==== FIX: Active link tidak melebar keluar sidebar ==== */
+.main-sidebar .nav-sidebar .nav-link {
+  box-sizing: border-box; /* pastikan padding tidak menambah lebar total */
+  width: calc(100% - 1rem); /* sesuaikan dengan margin kiri-kanan */
+  margin: 0.25rem 0.5rem; /* jarak kiri-kanan */
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.main-sidebar .nav-sidebar .nav-link.active {
+  background: linear-gradient(135deg, #001a6e 0%, #003f88 100%);
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 #00aaff;
+  transform: none;
+  width: calc(100% - 1rem); /* ⛔ pastikan lebar aktif sama */
+  margin: 0.25rem 0.5rem; /* ⛔ margin konsisten */
+}
+
 /* ============ SIDEBAR ============ */
 .main-sidebar {
-  background: linear-gradient(180deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(180deg, #000b58 0%, #003161 100%);
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-speed) ease;
 }
@@ -172,7 +263,7 @@ html {
 
 .user-panel:hover .image img {
   transform: scale(1.1);
-  border-color: #000B58;
+  border-color: #000b58;
 }
 
 .user-panel .info a {
@@ -208,7 +299,7 @@ html {
 }
 
 .nav-sidebar .nav-link.active {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0, 11, 88, 0.3);
 }
@@ -289,14 +380,14 @@ html {
 }
 
 .card-header {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   border-bottom: none;
   padding: 1.25rem 1.5rem;
   border-radius: 12px 12px 0 0 !important;
 }
 
 .card-header.bg-primary {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%) !important;
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%) !important;
 }
 
 .card-title {
@@ -332,7 +423,7 @@ html {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff;
 }
 
@@ -341,13 +432,13 @@ html {
 }
 
 .btn-outline-primary {
-  border: 2px solid #000B58;
-  color: #000B58;
+  border: 2px solid #000b58;
+  color: #000b58;
   background: transparent;
 }
 
 .btn-outline-primary:hover {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff;
   border-color: transparent;
 }
@@ -378,7 +469,7 @@ html {
 }
 
 .table thead th {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff;
   font-weight: 600;
   text-transform: uppercase;
@@ -424,7 +515,7 @@ html {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff !important;
   border-color: transparent;
 }
@@ -438,7 +529,7 @@ html {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   color: #ffffff;
   border-bottom: none;
   padding: 1.5rem;
@@ -469,7 +560,7 @@ html {
 }
 
 .modal-body.bg-dark {
-  background: #000B58 !important;
+  background: #000b58 !important;
 }
 
 .modal-footer {
@@ -478,7 +569,7 @@ html {
 }
 
 .modal-footer.bg-dark {
-  background: #000B58 !important;
+  background: #000b58 !important;
   border-top-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -503,7 +594,7 @@ html {
 }
 
 .form-control:focus {
-  border-color: #000B58;
+  border-color: #000b58;
   box-shadow: 0 0 0 0.2rem rgba(0, 11, 88, 0.25);
   outline: none;
 }
@@ -516,7 +607,7 @@ html {
 
 .bg-dark .form-control:focus {
   background: #002244;
-  border-color: #000B58;
+  border-color: #000b58;
 }
 
 /* ============ FOOTER ============ */
@@ -535,7 +626,7 @@ html {
 
 /* ============ CONTROL SIDEBAR ============ */
 .control-sidebar {
-  background: #000B58;
+  background: #000b58;
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -560,7 +651,7 @@ html {
 }
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
 }
 
 /* ============ DARK MODE ============ */
@@ -569,12 +660,12 @@ html {
 }
 
 .dark-mode .content-header {
-  background: #000B58;
+  background: #000b58;
   color: #ffffff;
 }
 
 .dark-mode .card {
-  background: #000B58;
+  background: #000b58;
   color: #ffffff;
 }
 
@@ -587,7 +678,7 @@ html {
 }
 
 .dark-mode .main-footer {
-  background: #000B58;
+  background: #000b58;
   color: #ffffff;
   border-top-color: #001a40;
 }
@@ -806,7 +897,7 @@ html {
 
 /* ============ UTILITY CLASSES ============ */
 .text-gradient {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -836,7 +927,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #000B58 0%, #003161 100%);
+  background: linear-gradient(135deg, #000b58 0%, #003161 100%);
   border-radius: 10px;
 }
 
@@ -876,7 +967,7 @@ html {
 .btn:focus,
 .form-control:focus,
 .nav-link:focus {
-  outline: 2px solid #000B58;
+  outline: 2px solid #000b58;
   outline-offset: 2px;
 }
 

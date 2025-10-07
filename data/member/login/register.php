@@ -40,10 +40,12 @@ if (isset($_POST['registerbtn'])) {
         if ($check_result->num_rows > 0) {
             $error = "Username atau email sudah terdaftar!";
         } else {
+            // Hash password menggunakan password_hash()
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            
             // Insert data ke database
-            // Note: Disarankan menggunakan password_hash() untuk keamanan
             $insert_query = $con->prepare("INSERT INTO tbl_member (nama, email, password, no_hp) VALUES (?, ?, ?, ?)");
-            $insert_query->bind_param("ssss", $nama, $email, $password, $no_hp);
+            $insert_query->bind_param("ssss", $nama, $email, $hashed_password, $no_hp);
 
             if ($insert_query->execute()) {
                 $success = "Registrasi berhasil! Silakan login.";

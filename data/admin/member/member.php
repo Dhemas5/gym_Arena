@@ -9,12 +9,12 @@ checkSession("admin"); // hanya admin boleh masuk
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Menu Pelatih</h1>
+                <h1>Menu Member</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Pelatih</li>
+                    <li class="breadcrumb-item active">Member</li>
                 </ol>
             </div>
         </div>
@@ -28,7 +28,7 @@ checkSession("admin"); // hanya admin boleh masuk
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h3 class="card-title">Data Pelatih</h3>
+                        <h3 class="card-title">Data Member</h3>
                     </div>
 
                     <div class="card-body">

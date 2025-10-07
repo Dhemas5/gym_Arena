@@ -20,8 +20,8 @@ if (isset($_POST['loginbtn'])) {
     $password = trim(htmlspecialchars($_POST['password']));
     $password_md5 = md5($password); // hashing md5
 
-    // Cek user dengan role admin
-    $query = $con->prepare("SELECT * FROM tbl_user WHERE (username = ? OR email = ?) AND role = 'admin' LIMIT 1");
+    // Cek username/email
+    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();

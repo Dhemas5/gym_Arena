@@ -5,9 +5,7 @@ require "../../../setting/session.php";
 blockLoginPageIfLoggedIn('member'); // atau 'member'
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
-
-// Jika sudah login, arahkan sesuai role
-blockLoginPageIfLoggedIn('member');
+blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
 
 // Cek koneksi database
 if ($con->connect_error) {
@@ -31,16 +29,17 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Bandingkan password MD5
-        if ($password_md5 === $user['password']) {
+        // Bandingkan password langsung (disarankan hashing pakai password_hash)
+        if ($password === $user['password']) {
+            // Simpan data ke sesi
             $_SESSION['login'] = true;
             $_SESSION['role'] = 'member';
             $_SESSION['id_member'] = $user['id_member'];
             $_SESSION['nama'] = $user['nama'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['no_hp'] = $user['no_hp'];
+            $_SESSION['email'] = $user['email']; 
+             $_SESSION['password'] = $user['password']; 
+              $_SESSION['no_hp'] = $user['no_hp']; 
 
-            header("Location: ../beranda/index.php");
             exit;
         } else {
             $error = "Kata sandi salah! Pastikan sesuai.";

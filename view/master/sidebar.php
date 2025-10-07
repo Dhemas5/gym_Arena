@@ -99,9 +99,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <li class="nav-item">
-                    <a href="../../../data/admin/jadwal_kelas/jadwal_kelas.php" class="nav-link <?php if ($current_page == 'jadwal_kelas.php') {
-                                                                                                    echo 'active';
-                                                                                                } ?>">
+                    <a href="../../../data/admin/jadwal/jadwal.php" class="nav-link <?php if ($current_page == 'jadwal.php') {
+                                                                                        echo 'active';
+                                                                                    } ?>">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Jadwal Kelas</p>
                     </a>

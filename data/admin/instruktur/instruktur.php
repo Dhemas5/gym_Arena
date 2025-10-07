@@ -107,7 +107,7 @@ if ($action == 'edit' && $id) {
 }
 
 // READ - Ambil semua data
-$sql = "SELECT * FROM tbl_instruktur ORDER BY id_instruktur DESC";
+$sql = "SELECT * FROM tbl_instruktur ORDER BY id_instruktur ASC";
 $result = $conn->query($sql);
 ?>
 
@@ -157,7 +157,6 @@ $result = $conn->query($sql);
                         <i class="fas fa-plus"></i> Tambah Instruktur
                     </button>
                 </div>
-
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title">Data Pelatih</h3>

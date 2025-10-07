@@ -105,7 +105,7 @@ if (isset($_GET['hapus'])) {
 }
 
 // ====== TAMPILKAN DATA USER ======
-$queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user DESC");
+$queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
 $jumlahUser = mysqli_num_rows($queryUser);
 ?>
 
@@ -129,62 +129,128 @@ $jumlahUser = mysqli_num_rows($queryUser);
 <!-- Main Content -->
 <section class="content">
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title">Data User</h3>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-                    <i class="fas fa-plus"></i> Tambah User
-                </button>
-
-                <div class="table-responsive rounded">
-                    <table id="tabelPelatih" class="table table-bordered table-striped">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th>No</th>
-                                <th>Username</th>
-                                <th>Nama Lengkap</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Dibuat</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if ($jumlahUser == 0): ?>
-                                <tr>
-                                    <td colspan="7" class="text-center">Belum ada data user</td>
-                                </tr>
-                                <?php else:
-                                $no = 1;
-                                while ($data = mysqli_fetch_assoc($queryUser)): ?>
+        <div class="row">
+            <div class="col-12">
+                     <div class="mb-3">
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
+                                <i class="fas fa-plus-circle mr-2"></i>Tambah User
+                            </button>
+                            <span class="ml-3 text-muted">
+                                <i class="fas fa-users mr-1"></i>Total: <strong><?= $jumlahUser ?></strong> user
+                            </span>
+                        </div>
+                <div class="card card-outline card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data User</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
+                                <thead class="thead-dark">
                                     <tr>
-                                        <td><?= $no++; ?></td>
-                                        <td><?= htmlspecialchars($data['username']); ?></td>
-                                        <td><?= htmlspecialchars($data['nama_lengkap']); ?></td>
-                                        <td><?= htmlspecialchars($data['email']); ?></td>
-                                        <td><?= htmlspecialchars($data['role']); ?></td>
-                                        <td><?= htmlspecialchars($data['created_at']); ?></td>
-                                        <td class="text-center align-middle">
-                                            <div class="btn-group" role="group" style="gap: 8px;">
-                                                <button class="btn btn-warning btn-sm px-3 py-2"
-                                                    data-toggle="modal"
-                                                    data-target="#modalEdit<?= $data['id_user']; ?>">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <a href="user.php?hapus=<?= $data['id_user']; ?>"
-                                                    onclick="return confirm('Yakin hapus user <?= htmlspecialchars($data['username']); ?>?')"
-                                                    class="btn btn-danger btn-sm px-3 py-2">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
+                                        <th style="width: 50px;">No</th>
+                                        <th>Username</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Tanggal Buat</th>
+                                        <th style="width: 150px;">Aksi</th>
                                     </tr>
-                            <?php endwhile;
-                            endif; ?>
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    if ($jumlahUser == 0) {
+                                        echo "<tr><td colspan='7' class='text-center text-muted'><i class='fas fa-inbox fa-3x mb-3 d-block'></i>Tidak ada data user</td></tr>";
+                                    } else {
+                                        $no = 1;
+                                        while ($user = mysqli_fetch_array($queryUser)) {
+                                    ?>
+                                            <tr>
+                                                <td class="text-center"><?= $no++; ?></td>
+                                                <td><i class="fas fa-user mr-2 text-primary"></i><?= $user['username']; ?></td>
+                                                <td><?= $user['nama_lengkap']; ?></td>
+                                                <td><i class="fas fa-envelope mr-2 text-muted"></i><?= $user['email']; ?></td>
+                                                <td>
+                                                    <?php if($user['role'] == 'admin'): ?>
+                                                        <span class="badge badge-danger"><i class="fas fa-crown mr-1"></i>Admin</span>
+                                                    <?php else: ?>
+                                                        <span class="badge badge-info"><i class="fas fa-user mr-1"></i>Staff</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><i class="far fa-clock mr-2 text-muted"></i><?= date('d M Y', strtotime($user['created_at'])); ?></td>
+                                                <td class="text-center">
+                                                    <div class="btn-group" role="group">
+                                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $user['id_user']; ?>" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <a href="user.php?hapus=<?= $user['id_user']; ?>" onclick="return confirm('Yakin hapus user ini?')" class="btn btn-danger btn-sm" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Modal Edit -->
+                                            <div class="modal fade" id="modalEdit<?= $user['id_user']; ?>" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <form method="POST">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-warning">
+                                                                <h5 class="modal-title"><i class="fas fa-edit mr-2"></i>Edit User</h5>
+                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <input type="hidden" name="id_user" value="<?= $user['id_user']; ?>">
+                                                                <div class="form-group">
+                                                                    <label><i class="fas fa-user mr-2"></i>Username</label>
+                                                                    <input type="text" class="form-control" name="username" value="<?= $user['username']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label><i class="fas fa-id-card mr-2"></i>Nama Lengkap</label>
+                                                                    <input type="text" class="form-control" name="nama_lengkap" value="<?= $user['nama_lengkap']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label><i class="fas fa-envelope mr-2"></i>Email</label>
+                                                                    <input type="email" class="form-control" name="email" value="<?= $user['email']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label><i class="fas fa-user-tag mr-2"></i>Role</label>
+                                                                    <select name="role" class="form-control" required>
+                                                                        <option value="admin" <?= $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                                                        <option value="staff" <?= $user['role'] == 'staff' ? 'selected' : ''; ?>>Staff</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label><i class="fas fa-lock mr-2"></i>Password Baru</label>
+                                                                    <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
+                                                                    <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                                    <i class="fas fa-times mr-2"></i>Batal
+                                                                </button>
+                                                                <button type="submit" name="update" class="btn btn-warning">
+                                                                    <i class="fas fa-save mr-2"></i>Update
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -233,53 +299,5 @@ $jumlahUser = mysqli_num_rows($queryUser);
         </form>
     </div>
 </div>
-
-<!-- Modal Edit User -->
-<?php
-mysqli_data_seek($queryUser, 0);
-while ($data = mysqli_fetch_assoc($queryUser)) { ?>
-    <div class="modal fade" id="modalEdit<?= $data['id_user']; ?>" tabindex="-1">
-        <div class="modal-dialog">
-            <form method="POST">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-dark">
-                        <h5 class="modal-title">Edit User</h5>
-                        <button type="button" class="close text-dark" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id_user" value="<?= $data['id_user']; ?>">
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($data['username']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Password (kosongkan jika tidak ingin ubah)</label>
-                            <input type="password" class="form-control" name="password" placeholder="Masukkan password baru">
-                        </div>
-                        <div class="form-group">
-                            <label>Nama Lengkap</label>
-                            <input type="text" class="form-control" name="nama_lengkap" value="<?= htmlspecialchars($data['nama_lengkap']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($data['email']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Role</label>
-                            <select name="role" class="form-control" required>
-                                <option value="admin" <?= ($data['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
-                                <option value="member" <?= ($data['role'] == 'member') ? 'selected' : ''; ?>>Member</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button class="btn btn-warning" name="update">Update</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-<?php } ?>
 
 <?php include '../../../view/master/footer.php'; ?>

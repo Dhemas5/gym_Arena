@@ -97,7 +97,7 @@ if (isset($_GET['hapus'])) {
     mysqli_stmt_close($delete);
 }
 
-$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori DESC");
+$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori ASC");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 ?>
 <!-- Content Header -->
@@ -122,15 +122,17 @@ $jumlahKategori = mysqli_num_rows($queryKategori);
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
+                <div class="mb-3">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
+                            <i class="fas fa-plus"></i> Tambah Kategori
+                        </button>
+                    </div>
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title">Data Kategori</h3>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive rounded">
-                            <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-                                <i class="fas fa-plus"></i> Tambah Kategori
-                            </button>
                             <table id="tabelPelatih" class="table table-bordered table-striped">
                                 <thead class="bg-primary text-white">
                                     <tr>

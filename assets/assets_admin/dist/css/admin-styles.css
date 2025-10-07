@@ -536,7 +536,7 @@ html {
 }
 
 .modal-header.bg-warning {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  background: linear-gradient(135deg, #000B58 0%, #003161 100%) !important;
 }
 
 .modal-title {

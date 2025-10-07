@@ -21,7 +21,7 @@ if (isset($_POST['loginbtn'])) {
     $password_md5 = md5($password); // hashing md5
 
     // Cek username/email
-    $query = $con->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    $query = $con->prepare("SELECT * FROM tbl_users WHERE username = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();

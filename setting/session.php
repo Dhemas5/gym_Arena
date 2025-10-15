@@ -1,150 +1,67 @@
 <?php
-// setting/session.php
-// Safe session handler with function guards to avoid "Cannot redeclare" errors.
-
+// Pastikan session aktif
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Fungsi untuk cek login & role
+/**
+ * Fungsi untuk cek login & role user
+ * - $required_role: "admin" atau "member"
+ * - Jika belum login → diarahkan ke index utama
+ * - Jika role salah → diarahkan ke halaman sesuai rolenya
+ */
 if (!function_exists('checkSession')) {
     function checkSession($required_role)
     {
-        // Jika belum login arahkan ke Landing Page utama
+        // Jika belum login
         if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
             session_unset();
             session_destroy();
-            header('Location: ../../../data/member/beranda/index.php'); // landing page utama
+            header('Location: ../../../index.php'); // ke landing page utama
             exit;
         }
 
-        // Kalau role tidak sesuai
+        // Jika role tidak sesuai, arahkan ke halaman role masing-masing
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== $required_role) {
-            if ($_SESSION['role'] === 'admin') {
-                header('Location: ../../../data/admin/dashboard/index.php');
-            } elseif ($_SESSION['role'] === 'member') {
-                header('Location: ../../../data/member/beranda/index.php'); // tetap ke beranda member
-            } else {
-                session_unset();
-                session_destroy();
-                header('Location: ../../../data/member/beranda/index.php'); // fallback ke landing utama
-            }
+            redirectByRole($_SESSION['role']);
             exit;
         }
     }
 }
 
 /**
- * Fungsi untuk redirect user berdasarkan role
+ * Fungsi untuk redirect otomatis sesuai role
+ * - Admin diarahkan ke dashboard admin
+ * - Member diarahkan ke beranda member
  */
 if (!function_exists('redirectByRole')) {
-    function redirectByRole()
+    function redirectByRole($role)
     {
-        if (!isset($_SESSION['role'])) {
-            header('Location: ../../../data/member/beranda/index.php');
-            exit;
-        }
-
-        if ($_SESSION['role'] === 'admin') {
+        if ($role === 'admin') {
             header('Location: ../../../data/admin/dashboard/index.php');
-        } elseif ($_SESSION['role'] === 'member') {
+        } elseif ($role === 'member') {
             header('Location: ../../../data/member/beranda/index.php');
         } else {
-            header('Location: ../../../data/member/beranda/index.php'); // fallback
-        }
-        exit;
-    }
-}
-
-/**
- * Block halaman login jika user sudah login
- * (panggil di halaman login admin/member)
- */
-if (!function_exists('blockLoginPageIfLoggedIn')) {
-    function blockLoginPageIfLoggedIn($role = null)
-    {
-        if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
-            redirectByRole();
-            exit;
-        }
-    }
-}
-
-/**
- * Logout universal
- */
-if (!function_exists('logout')) {
-    function logout()
-    {
-        session_unset();
-        session_destroy();
-        header('Location: ../../index.php');
-        exit;
-    }
-}
-
-/**
- * Auto logout jika idle (opsional)
- */
-if (!function_exists('autoLogout')) {
-    function autoLogout($timeout = 600)
-    {
-        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
+            // Role tidak dikenali, logout paksa
             session_unset();
             session_destroy();
-            header("Location: ../../index.php?timeout=1");
-            exit;
+            header('Location: ../../../index.php');
         }
-        $_SESSION['LAST_ACTIVITY'] = time();
+        exit;
     }
 }
 
-// Fungsi untuk proteksi halaman yang butuh login
-if (!function_exists('requireLogin')) {
-    function requireLogin()
+/**
+ * Fungsi untuk mencegah halaman login diakses ulang
+ * - Jika sudah login, diarahkan ke halaman sesuai role
+ * - Misal admin sudah login → tidak bisa buka login member
+ */
+if (!function_exists('blockLoginPageIfLoggedIn')) {
+    function blockLoginPageIfLoggedIn()
     {
-        if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
-            header('Location: ../../../data/autentikasi/login/login.php');
+        if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
+            redirectByRole($_SESSION['role']);
             exit;
         }
     }
 }
-
-// Fungsi checkSession untuk handle halaman register dan halaman yang butuh login
-if (!function_exists('checkSession')) {
-    function checkSession($userType = 'member')
-    {
-        // Deteksi halaman register atau halaman publik
-        $current_page = basename($_SERVER['PHP_SELF']);
-        $request_uri = $_SERVER['REQUEST_URI'];
-        
-        // List halaman publik yang tidak butuh login
-        $public_pages = ['register', 'login', 'forgot'];
-        
-        $is_public = false;
-        foreach ($public_pages as $page) {
-            if (strpos($request_uri, $page) !== false) {
-                $is_public = true;
-                break;
-            }
-        }
-        
-        if ($is_public) {
-            // Untuk halaman publik (register/login)
-            // Jika sudah login, redirect ke dashboard
-            if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
-                header('Location: ../../../data/member/beranda/index.php');
-                exit;
-            }
-            // Jika belum login, biarkan akses
-            return;
-        }
-        
-        // Untuk halaman yang butuh login (dashboard, profile, dll)
-        if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
-            header('Location: ../../../data/autentikasi/login/login.php');
-            exit;
-        }
-    }
-}
-?>

@@ -1,9 +1,8 @@
 <?php
 require "../../../setting/session.php";
-checkSession("member"); // hanya member boleh masuk
+checkSession("member");
 ?>
 <?php include '../../../view/master_member/header.php'; ?>
-<?php include '../../../view/master_member/navbar.php'; ?>
 <?php
 require "../../../setting/koneksi.php";
 
@@ -31,78 +30,80 @@ while ($row = mysqli_fetch_assoc($result)) {
         'end' => $end
     ];
 
-    // Simpan kombinasi waktu unik (supaya jadi baris tabel)
     $key = $start . '|' . $end;
     if (!in_array($key, $timeSlots)) {
         $timeSlots[] = $key;
     }
 }
 
-// 🔹 Urutkan waktu mulai agar rapi di tabel
 usort($timeSlots, function ($a, $b) {
     [$aStart] = explode('|', $a);
     [$bStart] = explode('|', $b);
     return strcmp($aStart, $bStart);
 });
 
-// 🔹 Ambil kategori
 $kategori_result = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_kategori ASC");
 ?>
 
-<section class="breadcrumb-section set-bg" data-setbg="../../../assets/assets_member/img/breadcrumb-bg.jpg">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="breadcrumb-text">
-                    <h2>Timetable</h2>
-                    <div class="bt-option">
-                        <a href="./index.html">Home</a>
-                        <a href="#">Pages</a>
-                        <span>Services</span>
-                    </div>
+<!-- ====== AdminLTE Content Wrapper ====== -->
+<div class="content-wrapper">
+    <!-- Header Page -->
+    <div class="content-header">
+        <div class="container">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Daftar Pengguna Gym</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Pengguna</li>
+                    </ol>
                 </div>
             </div>
         </div>
     </div>
-</section>
 
-<section class="class-timetable-section spad">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="section-title">
-                    <span>Find Your Time</span>
-                    <h2>Find Your Time</h2>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+
+            <!-- Filter kategori -->
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-filter"></i> Filter Kategori</h3>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="table-controls">
-                    <ul>
-                        <li class="active" data-tsfilter="all">All Event</li>
+                <div class="card-body">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a class="nav-link active" href="#" data-tsfilter="all">Semua</a></li>
                         <?php while ($kategori = mysqli_fetch_assoc($kategori_result)) : ?>
-                            <li data-tsfilter="<?= strtolower($kategori['nama_kategori']) ?>">
-                                <?= htmlspecialchars($kategori['nama_kategori']) ?>
+                            <li class="nav-item">
+                                <a class="nav-link text-capitalize" href="#" data-tsfilter="<?= strtolower($kategori['nama_kategori']) ?>">
+                                    <?= htmlspecialchars($kategori['nama_kategori']) ?>
+                                </a>
                             </li>
                         <?php endwhile; ?>
                     </ul>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="class-timetable">
-                    <table>
-                        <thead>
+            <!-- Jadwal -->
+            <div class="card card-success card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-clock"></i> Jadwal Mingguan</h3>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-bordered table-striped text-center align-middle">
+                        <thead class="thead-dark">
                             <tr>
-                                <th></th>
-                                <th>Monday</th>
-                                <th>Tuesday</th>
-                                <th>Wednesday</th>
-                                <th>Thursday</th>
-                                <th>Friday</th>
-                                <th>Saturday</th>
-                                <th>Sunday</th>
+                                <th>Waktu</th>
+                                <th>Senin</th>
+                                <th>Selasa</th>
+                                <th>Rabu</th>
+                                <th>Kamis</th>
+                                <th>Jumat</th>
+                                <th>Sabtu</th>
+                                <th>Minggu</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,21 +113,24 @@ $kategori_result = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_
                             foreach ($timeSlots as $slot) {
                                 [$start, $end] = explode('|', $slot);
                                 echo "<tr>";
-                                echo "<td class='class-time'>" . date("g.ia", strtotime($start)) . " - " . date("g.ia", strtotime($end)) . "</td>";
+                                echo "<td><b>" . date("H:i", strtotime($start)) . " - " . date("H:i", strtotime($end)) . "</b></td>";
 
                                 foreach ($days as $day) {
                                     if (isset($schedule[$day][$start])) {
                                         $data = $schedule[$day][$start];
                                         $kategori_lower = strtolower($data['kategori']);
                                         echo "
-                                            <td class='dark-bg hover-bg ts-meta' data-tsmeta='{$kategori_lower}'>
-                                                <h5>{$data['kategori']}</h5>
-                                                <span>{$data['instruktur']}</span>
-                                            </td>";
+                            <td class='ts-meta' data-tsmeta='{$kategori_lower}'>
+                              <div class='p-1'>
+                                <h6 class='mb-0 text-primary'>{$data['kategori']}</h6>
+                                <small class='text-muted'>{$data['instruktur']}</small>
+                              </div>
+                            </td>";
                                     } else {
-                                        echo "<td class='blank-td'></td>";
+                                        echo "<td class='bg-light'></td>";
                                     }
                                 }
+
                                 echo "</tr>";
                             }
                             ?>
@@ -134,25 +138,25 @@ $kategori_result = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
 
-<!-- 🔹 Script untuk filter kategori -->
+        </div>
+    </section>
+</div>
+
+<!-- Script filter kategori -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const filterButtons = document.querySelectorAll(".table-controls li");
-        const scheduleCells = document.querySelectorAll(".class-timetable td.ts-meta");
+        const filterButtons = document.querySelectorAll("[data-tsfilter]");
+        const scheduleCells = document.querySelectorAll(".ts-meta");
 
         filterButtons.forEach(button => {
-            button.addEventListener("click", function() {
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
                 const filter = this.getAttribute("data-tsfilter");
 
-                // hapus class active dari semua
                 filterButtons.forEach(btn => btn.classList.remove("active"));
                 this.classList.add("active");
 
-                // tampilkan / sembunyikan berdasarkan kategori
                 scheduleCells.forEach(cell => {
                     if (filter === "all" || cell.getAttribute("data-tsmeta") === filter) {
                         cell.style.display = "";

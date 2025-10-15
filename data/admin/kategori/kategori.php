@@ -7,13 +7,10 @@ checkSession("admin"); // hanya admin boleh masuk
 
 <?php
 require "../../../setting/koneksi.php";
-
-// Proses tambah kategori
 if (isset($_POST['simpan'])) {
     $nama = htmlspecialchars($_POST['nama_kategori']);
-    $deskripsi = htmlspecialchars($_POST['deskripsi'] ?? ''); // Tambahkan deskripsi
+    $deskripsi = htmlspecialchars($_POST['deskripsi'] ?? '');
 
-    // Gunakan prepared statement untuk keamanan
     $cek = mysqli_prepare($con, "SELECT * FROM tbl_kategori WHERE nama_kategori = ?");
     mysqli_stmt_bind_param($cek, "s", $nama);
     mysqli_stmt_execute($cek);
@@ -22,7 +19,7 @@ if (isset($_POST['simpan'])) {
     if (mysqli_num_rows($result) > 0) {
         echo "<script>alert('Kategori sudah ada!');</script>";
     } else {
-        $insert = mysqli_prepare($con, "INSERT INTO tbl_kategori(nama_kategori, deskripsi) VALUES(?, ?)");
+        $insert = mysqli_prepare($con, "INSERT INTO tbl_kategori (nama_kategori, deskripsi) VALUES (?, ?)");
         mysqli_stmt_bind_param($insert, "ss", $nama, $deskripsi);
 
         if (mysqli_stmt_execute($insert)) {
@@ -31,10 +28,10 @@ if (isset($_POST['simpan'])) {
                 window.location='kategori.php';
             </script>";
         } else {
-            echo "<script>
-                alert('Gagal menambahkan kategori! Error: " . mysqli_error($con) . "');
-            </script>";
+            $error = addslashes(mysqli_error($con));
+            echo "<script>alert('Gagal menambahkan kategori! Error: $error');</script>";
         }
+
         mysqli_stmt_close($insert);
     }
     mysqli_stmt_close($cek);

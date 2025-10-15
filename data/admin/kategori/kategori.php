@@ -7,13 +7,10 @@ checkSession("admin"); // hanya admin boleh masuk
 
 <?php
 require "../../../setting/koneksi.php";
-
-// Proses tambah kategori
 if (isset($_POST['simpan'])) {
     $nama = htmlspecialchars($_POST['nama_kategori']);
-    $deskripsi = htmlspecialchars($_POST['deskripsi'] ?? ''); // Tambahkan deskripsi
+    $deskripsi = htmlspecialchars($_POST['deskripsi'] ?? '');
 
-    // Gunakan prepared statement untuk keamanan
     $cek = mysqli_prepare($con, "SELECT * FROM tbl_kategori WHERE nama_kategori = ?");
     mysqli_stmt_bind_param($cek, "s", $nama);
     mysqli_stmt_execute($cek);
@@ -22,7 +19,7 @@ if (isset($_POST['simpan'])) {
     if (mysqli_num_rows($result) > 0) {
         echo "<script>alert('Kategori sudah ada!');</script>";
     } else {
-        $insert = mysqli_prepare($con, "INSERT INTO tbl_kategori(nama_kategori, deskripsi) VALUES(?, ?)");
+        $insert = mysqli_prepare($con, "INSERT INTO tbl_kategori (nama_kategori, deskripsi) VALUES (?, ?)");
         mysqli_stmt_bind_param($insert, "ss", $nama, $deskripsi);
 
         if (mysqli_stmt_execute($insert)) {
@@ -31,10 +28,10 @@ if (isset($_POST['simpan'])) {
                 window.location='kategori.php';
             </script>";
         } else {
-            echo "<script>
-                alert('Gagal menambahkan kategori! Error: " . mysqli_error($con) . "');
-            </script>";
+            $error = addslashes(mysqli_error($con));
+            echo "<script>alert('Gagal menambahkan kategori! Error: $error');</script>";
         }
+
         mysqli_stmt_close($insert);
     }
     mysqli_stmt_close($cek);
@@ -97,7 +94,7 @@ if (isset($_GET['hapus'])) {
     mysqli_stmt_close($delete);
 }
 
-$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori DESC");
+$queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori ASC");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 ?>
 <!-- Content Header -->
@@ -122,15 +119,17 @@ $jumlahKategori = mysqli_num_rows($queryKategori);
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
+                <div class="mb-3">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
+                            <i class="fas fa-plus"></i> Tambah Kategori
+                        </button>
+                    </div>
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title">Data Kategori</h3>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive rounded">
-                            <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-                                <i class="fas fa-plus"></i> Tambah Kategori
-                            </button>
                             <table id="tabelPelatih" class="table table-bordered table-striped">
                                 <thead class="bg-primary text-white">
                                     <tr>

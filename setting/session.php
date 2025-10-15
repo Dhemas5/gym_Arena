@@ -35,6 +35,28 @@ if (!function_exists('checkSession')) {
 }
 
 /**
+ * Fungsi untuk redirect user berdasarkan role
+ */
+if (!function_exists('redirectByRole')) {
+    function redirectByRole()
+    {
+        if (!isset($_SESSION['role'])) {
+            header('Location: ../../../data/member/beranda/index.php');
+            exit;
+        }
+
+        if ($_SESSION['role'] === 'admin') {
+            header('Location: ../../../data/admin/dashboard/index.php');
+        } elseif ($_SESSION['role'] === 'member') {
+            header('Location: ../../../data/member/beranda/index.php');
+        } else {
+            header('Location: ../../../data/member/beranda/index.php'); // fallback
+        }
+        exit;
+    }
+}
+
+/**
  * Block halaman login jika user sudah login
  * (panggil di halaman login admin/member)
  */

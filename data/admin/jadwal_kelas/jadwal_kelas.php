@@ -19,7 +19,7 @@ if (isset($_POST['simpan'])) {
   if ($insert) {
     echo "<script>
             alert('Jadwal berhasil ditambahkan!');
-            window.location='jadwal.php';
+            window.location='jadwal_kelas.php';
         </script>";
   } else {
     echo "<script>alert('Gagal menambahkan jadwal! Error: " . mysqli_error($con) . "');</script>";

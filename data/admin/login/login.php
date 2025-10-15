@@ -2,9 +2,8 @@
 ob_start();
 session_start();
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn('admin'); // atau 'member'
+blockLoginPageIfLoggedIn();
 require "../../../setting/koneksi.php";
-require "../../../setting/session.php";
 
 
 // Cek koneksi database
@@ -21,7 +20,7 @@ if (isset($_POST['loginbtn'])) {
     $password_md5 = md5($password); // hashing md5
 
     // Cek username/email
-    $query = $con->prepare("SELECT * FROM tbl_users WHERE username = ? OR email = ?");
+    $query = $con->prepare("SELECT * FROM tbl_user WHERE username = ? OR email = ?");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();

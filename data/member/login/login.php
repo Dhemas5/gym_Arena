@@ -53,6 +53,7 @@ if (isset($_POST['loginbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-regis.css" /> <!-- styling sama seperti register -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
 </head>
 
 <body class="hold-transition register-page">

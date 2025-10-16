@@ -32,14 +32,6 @@
 <body class="hold-transition light-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <div class="wrapper">
 
-        <!-- Preloader -->
-        <div class="preloader flex-column justify-content-center align-items-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-            <p class="mt-2">Loading...</p>
-        </div>
-
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-light">
             <!-- Left navbar links -->

@@ -35,7 +35,7 @@ checkSession("member"); // hanya member boleh masuk
                             <div class="card-body box-profile">
                                 <i class="fas fa-user fa-3x mb-2 text-primary"></i>
 
-                                <h3 class="profile-username">Mahar</h3>
+                                <h3 class="profile-username">Profile</h3>
                                 <p class="text-muted">Member Aktif</p>
                                 <a href="../../../data/member/profile/profile.php" class="btn btn-primary btn-block"><b>Lihat Profil</b></a>
                             </div>

@@ -123,7 +123,7 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
 <!-- Tambahan CSS -->
 <style>
     .card {
-        background: #ffffff;
+        background: #333;
         border: none;
         transition: all 0.3s ease;
     }
@@ -133,12 +133,12 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
     }
 
     th {
-        color: #002b5b;
+        color: #f8f9fa;
         font-weight: 600;
     }
 
     td {
-        color: #333;
+        color: #f8f9fa;
     }
 
     .badge-success {

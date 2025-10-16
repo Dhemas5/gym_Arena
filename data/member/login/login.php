@@ -22,18 +22,27 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        if ($password_md5 === $user['password']) {
-            $_SESSION['login'] = true;
-            $_SESSION['role'] = 'member';
-            $_SESSION['id_member'] = $user['id_member'];
-            $_SESSION['nama'] = $user['nama'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['no_hp'] = $user['no_hp'];
+        // Periksa apakah kolom is_verified ada dan nilainya
+        // Jika kolom tidak ada di database, kita skip pengecekan verifikasi
+        $is_verified = isset($user['is_verified']) ? $user['is_verified'] : 1;
 
-            header("Location: ../beranda/index.php");
-            exit;
+        if ($is_verified == 0) {
+            $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
         } else {
-            $error = "❌ Kata sandi salah! Pastikan sesuai.";
+            // Lanjut pengecekan password
+            if ($password_md5 === $user['password']) {
+                $_SESSION['login'] = true;
+                $_SESSION['role'] = 'member';
+                $_SESSION['id_member'] = $user['id_member'];
+                $_SESSION['nama'] = $user['nama'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['no_hp'] = $user['no_hp'];
+
+                header("Location: ../beranda/index.php");
+                exit;
+            } else {
+                $error = "❌ Kata sandi salah! Pastikan sesuai.";
+            }
         }
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";

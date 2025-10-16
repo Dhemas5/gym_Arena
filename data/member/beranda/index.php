@@ -49,7 +49,7 @@ checkSession("member"); // hanya member boleh masuk
                                 <i class="fas fa-calendar-alt fa-3x mb-2 text-success"></i>
                                 <h5 class="profile-username">Jadwal Kelas</h5>
                                 <p class="text-muted">Lihat jadwal kelas gym Anda.</p>
-                                <a href="jadwal.php" class="btn btn-success btn-block"><b>Lihat Jadwal</b></a>
+                                <a href="../../../data/member/jadwal/jadwal.php" class="btn btn-success btn-block"><b>Lihat Jadwal</b></a>
                             </div>
                         </div>
                     </div>
@@ -61,7 +61,7 @@ checkSession("member"); // hanya member boleh masuk
                                 <i class="fas fa-dumbbell fa-3x mb-2 text-danger"></i>
                                 <h5 class="profile-username">Program Latihan</h5>
                                 <p class="text-muted">Lihat dan ikuti program latihan Anda.</p>
-                                <a href="program.php" class="btn btn-danger btn-block"><b>Lihat Program</b></a>
+                                <a href="../../../data/member/program/program-latihan.php" class="btn btn-danger btn-block"><b>Lihat Program</b></a>
                             </div>
                         </div>
                     </div>

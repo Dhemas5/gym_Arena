@@ -2,9 +2,8 @@
 ob_start();
 session_start();
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn('admin'); // atau 'member'
+blockLoginPageIfLoggedIn();
 require "../../../setting/koneksi.php";
-require "../../../setting/session.php";
 
 
 // Cek koneksi database

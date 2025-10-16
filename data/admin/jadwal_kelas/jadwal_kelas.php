@@ -19,7 +19,7 @@ if (isset($_POST['simpan'])) {
   if ($insert) {
     echo "<script>
             alert('Jadwal berhasil ditambahkan!');
-            window.location='jadwal.php';
+            window.location='jadwal_kelas.php';
         </script>";
   } else {
     echo "<script>alert('Gagal menambahkan jadwal! Error: " . mysqli_error($con) . "');</script>";
@@ -94,15 +94,16 @@ $jumlah = mysqli_num_rows($query);
 <!-- Main Content -->
 <section class="content">
   <div class="container-fluid">
+    <div class="mb-3">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
+          <i class="fas fa-plus"></i> Tambah Jadwal
+        </button>
+    </div>
     <div class="card">
       <div class="card-header bg-primary text-white">
         <h3 class="card-title">Data Jadwal Kelas</h3>
       </div>
       <div class="card-body">
-        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-          <i class="fas fa-plus"></i> Tambah Jadwal
-        </button>
-
         <div class="table-responsive rounded">
           <table id="tabelPelatih" class="table table-bordered table-striped">
             <thead class="bg-primary text-white">

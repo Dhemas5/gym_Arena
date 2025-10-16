@@ -11,24 +11,20 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // gunakan md5 sesuai format di database
 
     // Cek username/email di tabel member
     $query = $con->prepare("SELECT * FROM tbl_member WHERE (nama = ? OR email = ?) LIMIT 1");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
-    
-    if ($user['is_verified'] == 0) {
-    $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
-} else {
-    // Proses login normal
-}
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        if ($password_md5 === $user['password']) {
+        // CEK VERIFIKASI EMAIL - DIPINDAH KE SINI SETELAH $user DIDEFINISIKAN
+        if ($user['is_verified'] == 0) {
+            $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
+        } elseif (password_verify($password, $user['password'])) {
             $_SESSION['login'] = true;
             $_SESSION['role'] = 'member';
             $_SESSION['id_member'] = $user['id_member'];

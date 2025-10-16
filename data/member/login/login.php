@@ -18,6 +18,12 @@ if (isset($_POST['loginbtn'])) {
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
+    
+    if ($user['is_verified'] == 0) {
+    $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
+} else {
+    // Proses login normal
+}
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();

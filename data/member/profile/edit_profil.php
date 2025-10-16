@@ -81,8 +81,18 @@ if (isset($_POST['update_profile'])) {
 
 <div class="content-wrapper">
     <div class="content-header">
-        <div class="container-fluid">
-            <h4><i class="fas fa-user-edit"></i> Edit Profil</h4>
+        <div class="container">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-primary"><i class="fas fa-user-circle"></i> Edit Profil Member</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="../dashboard/index.php">Home</a></li>
+                        <li class="breadcrumb-item active">Edit Profil</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -94,8 +104,8 @@ if (isset($_POST['update_profile'])) {
                         <div class="row">
                             <div class="col-md-4 text-center">
                                 <img src="../../../data/member/img/<?= !empty($member['foto']) ? htmlspecialchars($member['foto']) : 'default.png'; ?>"
-                                    class="img-fluid rounded-circle mb-3 border"
-                                    style="max-width: 180px; height: 180px; object-fit: cover;">
+                                    class="img-fluid rounded-circle mb-3 shadow border"
+                                    style="max-width: 150px; height: 150px; object-fit: cover;">
                                 <input type="file" name="foto" class="form-control mt-2" accept="image/*">
                             </div>
 

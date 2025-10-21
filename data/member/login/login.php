@@ -11,7 +11,6 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // gunakan md5 sesuai format di database
 
     // Cek username/email di tabel member
     $query = $con->prepare("SELECT * FROM tbl_member WHERE (nama = ? OR email = ?) LIMIT 1");
@@ -22,7 +21,10 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        if ($password_md5 === $user['password']) {
+        // CEK VERIFIKASI EMAIL - DIPINDAH KE SINI SETELAH $user DIDEFINISIKAN
+        if ($user['is_verified'] == 0) {
+            $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
+        } elseif (password_verify($password, $user['password'])) {
             $_SESSION['login'] = true;
             $_SESSION['role'] = 'member';
             $_SESSION['id_member'] = $user['id_member'];
@@ -30,15 +32,15 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['no_hp'] = $user['no_hp'];
 
-            header("Location: ../beranda/index.php");
-            exit;
-        } else {
-            $error = "❌ Kata sandi salah! Pastikan sesuai.";
+                header("Location: ../beranda/index.php");
+                exit;
+            } else {
+                $error = "❌ Kata sandi salah! Pastikan sesuai.";
+            }
         }
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
-}
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +55,7 @@ if (isset($_POST['loginbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-regis.css" /> <!-- styling sama seperti register -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
 </head>
 
 <body class="hold-transition register-page">

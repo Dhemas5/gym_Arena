@@ -38,6 +38,10 @@
 <script src="../../../assets/assets_admin/plugins/jquery-mapael/maps/usa_states.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/chart.js/Chart.min.js"></script>
 
+
+<!-- Tambahkan CDN SweetAlert2 di header atau footer jika belum ada -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- DataTables  & Plugins -->
 <script src="../../../assets/assets_admin/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -80,8 +84,8 @@
 <!-- Enhanced DataTables initialization with better options -->
 <script>
     $(function() {
-        // Check if table exists before initializing
-        if ($("#tabelPelatih").length) {
+        // Jalankan hanya jika tabel ada dan belum pernah diinisialisasi
+        if ($("#tabelPelatih").length && !$.fn.DataTable.isDataTable("#tabelPelatih")) {
             var table = $("#tabelPelatih").DataTable({
                 paging: true,
                 lengthChange: true,
@@ -111,10 +115,12 @@
                 }
             });
 
+            // Tambahkan tombol export di posisi atas tabel
             table.buttons().container().appendTo('#tabelPelatih_wrapper .col-md-6:eq(0)');
         }
     });
 </script>
+
 
 <!-- Enhanced control sidebar with better dark mode toggle -->
 <script>

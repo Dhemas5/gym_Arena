@@ -41,7 +41,6 @@ if (isset($_POST['loginbtn'])) {
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
-}
 ?>
 
 <!DOCTYPE html>

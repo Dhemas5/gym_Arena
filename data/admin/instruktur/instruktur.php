@@ -188,11 +188,10 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                 </button>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
+                    <table id="tabelPelatih" class="table table-bordered table-striped">
                         <thead class="bg-primary text-white">
                             <tr>
                                 <th>No</th>
-                                <th>ID</th>
                                 <th>Nama</th>
                                 <th>Spesialisasi</th>
                                 <th>No. HP</th>
@@ -212,7 +211,6 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                             ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-                                        <td><?= htmlspecialchars($data['id_instruktur']); ?></td>
                                         <td><?= htmlspecialchars($data['nama_instruktur']); ?></td>
                                         <td><?= htmlspecialchars($data['spesialisasi']); ?></td>
                                         <td><?= htmlspecialchars($data['no_hp']); ?></td>

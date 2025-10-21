@@ -131,15 +131,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                     <div class="mb-3">
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
-                                <i class="fas fa-plus-circle mr-2"></i>Tambah User
-                            </button>
-                            <span class="ml-3 text-muted">
-                                <i class="fas fa-users mr-1"></i>Total: <strong><?= $jumlahUser ?></strong> user
-                            </span>
-                        </div>
-                <div class="card card-outline card-primary">
+                <div class="card card-outline">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data User</h3>
                         <div class="card-tools">
@@ -149,6 +141,9 @@ $jumlahUser = mysqli_num_rows($queryUser);
                         </div>
                     </div>
                     <div class="card-body">
+                        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+                            <i class="fas fa-plus"></i> Tambah User
+                        </button>
                         <div class="table-responsive">
                             <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
                                 <thead class="thead-dark">
@@ -176,7 +171,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                                                 <td><?= $user['nama_lengkap']; ?></td>
                                                 <td><i class="fas fa-envelope mr-2 text-muted"></i><?= $user['email']; ?></td>
                                                 <td>
-                                                    <?php if($user['role'] == 'admin'): ?>
+                                                    <?php if ($user['role'] == 'admin'): ?>
                                                         <span class="badge badge-danger"><i class="fas fa-crown mr-1"></i>Admin</span>
                                                     <?php else: ?>
                                                         <span class="badge badge-info"><i class="fas fa-user mr-1"></i>Staff</span>

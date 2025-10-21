@@ -11,7 +11,6 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // gunakan md5 sesuai format di database
 
     // Cek username/email di tabel member
     $query = $con->prepare("SELECT * FROM tbl_member WHERE (nama = ? OR email = ?) LIMIT 1");
@@ -22,21 +21,16 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Periksa apakah kolom is_verified ada dan nilainya
-        // Jika kolom tidak ada di database, kita skip pengecekan verifikasi
-        $is_verified = isset($user['is_verified']) ? $user['is_verified'] : 1;
-
-        if ($is_verified == 0) {
+        // CEK VERIFIKASI EMAIL - DIPINDAH KE SINI SETELAH $user DIDEFINISIKAN
+        if ($user['is_verified'] == 0) {
             $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
-        } else {
-            // Lanjut pengecekan password
-            if ($password_md5 === $user['password']) {
-                $_SESSION['login'] = true;
-                $_SESSION['role'] = 'member';
-                $_SESSION['id_member'] = $user['id_member'];
-                $_SESSION['nama'] = $user['nama'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['no_hp'] = $user['no_hp'];
+        } elseif (password_verify($password, $user['password'])) {
+            $_SESSION['login'] = true;
+            $_SESSION['role'] = 'member';
+            $_SESSION['id_member'] = $user['id_member'];
+            $_SESSION['nama'] = $user['nama'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['no_hp'] = $user['no_hp'];
 
                 header("Location: ../beranda/index.php");
                 exit;

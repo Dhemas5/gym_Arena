@@ -290,3 +290,40 @@ $jumlahMember = mysqli_num_rows($queryMember);
 </div>
 
 <?php include '../../../view/master/footer.php'; ?>
+
+<!-- Tambahkan script DataTables + Buttons -->
+<script>
+$(document).ready(function () {
+    $('#tabelMember').DataTable({
+        dom:
+            "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+            "<'row'<'col-sm-12'B>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        language: {
+            "sProcessing":   "Sedang memproses...",
+            "sLengthMenu":   "Tampilkan _MENU_ data per halaman",
+            "sZeroRecords":  "Tidak ada data yang sesuai",
+            "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+            "sInfoFiltered": "(disaring dari total _MAX_ data)",
+            "sSearch":       "Cari:",
+            "oPaginate": {
+                "sFirst":    "Pertama",
+                "sPrevious": "Sebelumnya",
+                "sNext":     "Selanjutnya",
+                "sLast":     "Terakhir"
+            },
+            "buttons": {
+                "copy": "Copy",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pdf": "PDF",
+                "print": "Print"
+            }
+        },
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]] // 🔥 Tambahkan ini
+    });
+});
+</script>

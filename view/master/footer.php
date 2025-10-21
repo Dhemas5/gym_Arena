@@ -9,8 +9,8 @@
                 <strong>&copy; 2025 <a href="#" class="text-primary">Arena Gym Fit Club</a>.</strong> All rights reserved.
             </div>
             <div class="col-sm-6 text-right d-none d-sm-block">
-                <b>Version</b> 1.0.0 | 
-                <a href="#" class="text-muted">Dokumentasi</a> | 
+                <b>Version</b> 1.0.0 |
+                <a href="#" class="text-muted">Dokumentasi</a> |
                 <a href="#" class="text-muted">Support</a>
             </div>
         </div>
@@ -38,6 +38,10 @@
 <script src="../../../assets/assets_admin/plugins/jquery-mapael/maps/usa_states.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/chart.js/Chart.min.js"></script>
 
+
+<!-- Tambahkan CDN SweetAlert2 di header atau footer jika belum ada -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- DataTables  & Plugins -->
 <script src="../../../assets/assets_admin/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -55,7 +59,7 @@
 <script>
     // Debug log to check if script is running
     console.log("[v0] Footer script loaded");
-    
+
     // Hide preloader immediately when DOM is ready
     $(document).ready(function() {
         console.log("[v0] Document ready, hiding preloader");
@@ -64,7 +68,7 @@
             $(this).remove();
         });
     });
-    
+
     // Backup: also try on window load
     $(window).on('load', function() {
         console.log("[v0] Window loaded");
@@ -80,12 +84,15 @@
 <!-- Enhanced DataTables initialization with better options -->
 <script>
     $(function() {
-        // Check if table exists before initializing
-        if ($("#tabelPelatih").length) {
+        // Jalankan hanya jika tabel ada dan belum pernah diinisialisasi
+        if ($("#tabelPelatih").length && !$.fn.DataTable.isDataTable("#tabelPelatih")) {
             var table = $("#tabelPelatih").DataTable({
                 paging: true,
                 lengthChange: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Semua"]
+                ],
                 searching: true,
                 ordering: true,
                 info: true,
@@ -108,10 +115,12 @@
                 }
             });
 
+            // Tambahkan tombol export di posisi atas tabel
             table.buttons().container().appendTo('#tabelPelatih_wrapper .col-md-6:eq(0)');
         }
     });
 </script>
+
 
 <!-- Enhanced control sidebar with better dark mode toggle -->
 <script>
@@ -166,7 +175,7 @@
 <script>
     $(function() {
         var $scrollBtn = $('#scrollToTop');
-        
+
         $(window).scroll(function() {
             if ($(this).scrollTop() > 300) {
                 $scrollBtn.fadeIn();
@@ -174,16 +183,18 @@
                 $scrollBtn.fadeOut();
             }
         });
-        
+
         $scrollBtn.click(function() {
-            $('html, body').animate({scrollTop: 0}, 600);
+            $('html, body').animate({
+                scrollTop: 0
+            }, 600);
             return false;
         });
     });
 </script>
 
-<!-- Added form validation and loading states -->
-<!-- <script>
+<!-- Added form validation and loading states
+<script>
     $(function() {
         // Form validation
         $('form').on('submit', function() {
@@ -202,6 +213,8 @@
         }, 5000);
     });
 </script> -->
+</script> -->
 
 </body>
+
 </html>

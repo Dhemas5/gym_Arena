@@ -102,7 +102,6 @@ $jumlah = mysqli_num_rows($query);
         <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
           <i class="fas fa-plus"></i> Tambah Jadwal
         </button>
-
         <div class="table-responsive rounded">
           <table id="tabelPelatih" class="table table-bordered table-striped">
             <thead class="bg-primary text-white">

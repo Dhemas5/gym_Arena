@@ -5,6 +5,14 @@ require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
 blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka register.php
 
+// Tambah PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../../../vendor/autoload.php';
+
+date_default_timezone_set('Asia/Jakarta');
+
 // Cek koneksi database
 if ($con->connect_error) {
     die("Koneksi gagal: " . $con->connect_error);
@@ -43,14 +51,49 @@ if (isset($_POST['registerbtn'])) {
             // Hash password menggunakan password_hash()
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            // Insert data ke database
-            $insert_query = $con->prepare("INSERT INTO tbl_member (nama, email, password, no_hp) VALUES (?, ?, ?, ?)");
-            $insert_query->bind_param("ssss", $nama, $email, $hashed_password, $no_hp);
+            // Generate kode verifikasi 6 digit
+            $verification_code = sprintf("%06d", mt_rand(1, 999999));
+            $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+            
+            // Insert data ke database dengan is_verified = 0
+            $insert_query = $con->prepare("INSERT INTO tbl_member (nama, email, password, no_hp, verification_code, code_expiry, is_verified) VALUES (?, ?, ?, ?, ?, ?, 0)");
+            $insert_query->bind_param("ssssss", $nama, $email, $hashed_password, $no_hp, $verification_code, $code_expiry);
 
             if ($insert_query->execute()) {
-                $success = "Registrasi berhasil! Silakan login.";
-                // Redirect ke login setelah 2 detik
-                header("refresh:2;url=login.php");
+                // Kirim kode verifikasi via email
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.gmail.com';
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'valhidayat01@gmail.com'; // ganti dengan email Anda
+                    $mail->Password   = 'ecbnikaaznxaujbk';   // ganti dengan app password
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port       = 587;
+
+                    // Pengirim & penerima
+                    $mail->setFrom('valhidayat01@gmail.com', 'Gym Arena');
+                    $mail->addAddress($email);
+
+                    // Konten
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Kode Verifikasi Registrasi Gym Arena';
+                    $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
+                                      Terima kasih telah mendaftar di Gym Arena!<br><br>
+                                      Kode verifikasi Anda adalah: <h2>$verification_code</h2><br>
+                                      Kode ini berlaku selama 1 jam.<br><br>
+                                      Silakan masukkan kode ini pada halaman verifikasi.";
+
+                    $mail->send();
+                    
+                    // Redirect ke halaman verifikasi
+                    $_SESSION['verify_email'] = $email;
+                    header("Location: verify.php");
+                    exit();
+                    
+                } catch (Exception $e) {
+                    $error = "Registrasi berhasil, tapi gagal mengirim email verifikasi. Error: " . $mail->ErrorInfo;
+                }
             } else {
                 $error = "Terjadi kesalahan saat registrasi. Silakan coba lagi!";
             }

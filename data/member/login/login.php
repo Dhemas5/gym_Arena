@@ -32,15 +32,15 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['no_hp'] = $user['no_hp'];
 
-            header("Location: ../beranda/index.php");
-            exit;
-        } else {
-            $error = "❌ Kata sandi salah! Pastikan sesuai.";
+                header("Location: ../beranda/index.php");
+                exit;
+            } else {
+                $error = "❌ Kata sandi salah! Pastikan sesuai.";
+            }
         }
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
-}
 ?>
 
 <!DOCTYPE html>

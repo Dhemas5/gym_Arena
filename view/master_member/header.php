@@ -108,7 +108,7 @@ checkSession('member');
                             <i class="fas fa-user-circle"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a href="../../../data/member/profil/profil.php" class="dropdown-item">
+                            <a href="../../../data/member/profile/profile.php" class="dropdown-item">
                                 <i class="fas fa-id-badge mr-2"></i> Profil Saya
                             </a>
                             <div class="dropdown-divider"></div>

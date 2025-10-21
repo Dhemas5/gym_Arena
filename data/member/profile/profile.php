@@ -28,6 +28,9 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
 }
 ?>
 
+<!-- Tambahan CSS -->
+<link rel="stylesheet" href="../../../assets/assets_member/css/custom-program.css">
+
 <!-- Konten -->
 <div class="content-wrapper">
     <!-- Header Halaman -->
@@ -39,7 +42,7 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="../dashboard/index.php">Home</a></li>
+                        <li class="breadcrumb-item"><a href="../../../data/member/beranda/index.php">Home</a></li>
                         <li class="breadcrumb-item active">Profil</li>
                     </ol>
                 </div>
@@ -51,62 +54,68 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
     <section class="content">
         <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-md-8">
+                <div class="col-md-10 col-lg-8">
                     <!-- Kartu Profil -->
-                    <div class="card card-outline card-primary shadow-lg" style="border-radius: 15px;">
-                        <div class="card-body p-4">
-                            <div class="row">
-                                <!-- Foto Profil -->
-                                <div class="col-md-4 text-center mb-3">
-                                    <img src="<?= htmlspecialchars($foto_path); ?>" alt="Foto Profil"
-                                        class="img-fluid rounded-circle mb-3 shadow border"
-                                        style="width: 150px; height: 150px; object-fit: cover; background-color: #f8f9fa;">
-
-                                    <h5 class="text-primary font-weight-bold">
-                                        <?= htmlspecialchars($data['nama']); ?>
-                                    </h5>
-                                    <p class="text-muted small mb-2">
+                    <div class="card profile-card fade-in">
+                        <div class="card-body p-0">
+                            <div class="row no-gutters">
+                                <!-- Sidebar dengan Foto Profil -->
+                                <div class="col-md-4 profile-sidebar">
+                                    <div class="profile-image-container">
+                                        <img src="<?= htmlspecialchars($foto_path); ?>" alt="Foto Profil" class="profile-image rounded-circle">
+                                        <div class="profile-badge">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="profile-name"><?= htmlspecialchars($data['nama']); ?></h3>
+                                    <p class="profile-id">
                                         <i class="fas fa-id-badge"></i> <?= htmlspecialchars($data['id_member']); ?>
                                     </p>
-
-                                    <a href="edit_profil.php" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i> Edit Profil
-                                    </a>
-                                    <a href="ubah_password.php" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-key"></i> Ubah Password
-                                    </a>
+                                    
+                                    <div class="profile-actions">
+                                        <a href="edit_profil.php" class="btn btn-outline-light mb-2">
+                                            <i class="fas fa-edit"></i> Edit Profil
+                                        </a>
+                                        <a href="ubah_password.php" class="btn btn-outline-warning">
+                                            <i class="fas fa-key"></i> Ubah Password
+                                        </a>
+                                    </div>
                                 </div>
 
-                                <!-- Detail Informasi -->
-                                <div class="col-md-8">
-                                    <table class="table table-borderless">
+                                <!-- Konten Detail Informasi -->
+                                <div class="col-md-8 profile-content">
+                                    <h4 class="text-light mb-4"><i class="fas fa-info-circle text-primary me-2"></i>Informasi Profil</h4>
+                                    
+                                    <table class="detail-table">
                                         <tr>
-                                            <th width="35%">Email</th>
-                                            <td>: <?= htmlspecialchars($data['email']); ?></td>
+                                            <th>Email</th>
+                                            <td><?= htmlspecialchars($data['email']); ?></td>
                                         </tr>
                                         <tr>
                                             <th>No. HP</th>
-                                            <td>: <?= htmlspecialchars($data['no_hp']); ?></td>
+                                            <td><?= htmlspecialchars($data['no_hp']); ?></td>
                                         </tr>
                                         <tr>
                                             <th>Alamat</th>
-                                            <td>: <?= htmlspecialchars($data['alamat']); ?></td>
+                                            <td><?= htmlspecialchars($data['alamat']); ?></td>
                                         </tr>
                                         <tr>
                                             <th>Tanggal Daftar</th>
-                                            <td>: <?= htmlspecialchars($data['tanggal_daftar']); ?></td>
+                                            <td><?= htmlspecialchars($data['tanggal_daftar']); ?></td>
                                         </tr>
                                         <tr>
                                             <th>Status</th>
-                                            <td>: <span class="badge badge-success">Aktif</span></td>
+                                            <td><span class="status-badge">Aktif</span></td>
                                         </tr>
                                     </table>
 
-                                    <hr>
-                                    <p class="text-muted">
-                                        <i class="fas fa-quote-left text-primary"></i>
-                                        Tetap semangat berlatih dan jaga kesehatan tubuh Anda!
-                                    </p>
+                                    <div class="inspiration-quote">
+                                        <p class="mb-0">
+                                            <i class="fas fa-quote-left text-primary me-2"></i>
+                                            Tetap semangat berlatih dan jaga kesehatan tubuh Anda!
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -119,40 +128,3 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
 </div>
 
 <?php include '../../../view/master_member/footer.php'; ?>
-
-<!-- Tambahan CSS -->
-<style>
-    .card {
-        background: #333;
-        border: none;
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: 0 10px 20px rgba(0, 64, 128, 0.15);
-    }
-
-    th {
-        color: #f8f9fa;
-        font-weight: 600;
-    }
-
-    td {
-        color: #f8f9fa;
-    }
-
-    .badge-success {
-        background: linear-gradient(90deg, #00b894, #1dd1a1);
-    }
-
-    .btn-outline-primary:hover {
-        background: #00509e;
-        color: white;
-        border-color: #00509e;
-    }
-
-    .btn-outline-danger:hover {
-        background: #dc3545;
-        color: white;
-    }
-</style>

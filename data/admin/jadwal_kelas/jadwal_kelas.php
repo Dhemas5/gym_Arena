@@ -19,7 +19,7 @@ if (isset($_POST['simpan'])) {
   if ($insert) {
     echo "<script>
             alert('Jadwal berhasil ditambahkan!');
-            window.location='jadwal.php';
+            window.location='jadwal_kelas.php';
         </script>";
   } else {
     echo "<script>alert('Gagal menambahkan jadwal! Error: " . mysqli_error($con) . "');</script>";
@@ -42,7 +42,7 @@ if (isset($_POST['update'])) {
   if ($update) {
     echo "<script>
             alert('Jadwal berhasil diupdate!');
-            window.location='jadwal.php';
+            window.location='jadwal_kelas.php';
         </script>";
   } else {
     echo "<script>alert('Gagal update jadwal! Error: " . mysqli_error($con) . "');</script>";
@@ -56,7 +56,7 @@ if (isset($_GET['hapus'])) {
   if ($delete) {
     echo "<script>
             alert('Jadwal berhasil dihapus!');
-            window.location='jadwal.php';
+            window.location='jadwal_kelas.php';
         </script>";
   } else {
     echo "<script>alert('Gagal hapus jadwal! Error: " . mysqli_error($con) . "');</script>";
@@ -142,7 +142,7 @@ $jumlah = mysqli_num_rows($query);
                           data-selesai="<?= $row['jam_selesai']; ?>">
                           <i class="fas fa-edit"></i>
                         </button>
-                        <a href="jadwal.php?hapus=<?= $row['id_jadwal']; ?>"
+                        <a href="jadwal_kelas.php?hapus=<?= $row['id_jadwal']; ?>"
                           onclick="return confirm('Yakin hapus jadwal ini?')"
                           class="btn btn-danger btn-sm px-3 py-2">
                           <i class="fas fa-trash"></i>

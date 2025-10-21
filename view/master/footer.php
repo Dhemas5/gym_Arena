@@ -183,7 +183,7 @@
 </script>
 
 <!-- Added form validation and loading states -->
-<script>
+<!-- <script>
     $(function() {
         // Form validation
         $('form').on('submit', function() {
@@ -201,7 +201,7 @@
             $('.alert').fadeOut('slow');
         }, 5000);
     });
-</script>
+</script> -->
 
 </body>
 </html>

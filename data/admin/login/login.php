@@ -114,10 +114,7 @@ if (isset($_POST['loginbtn'])) {
                 </form>
 
                 <p class="mb-1 mt-3">
-                    <a href="forgot-password.html">I forgot my password</a>
-                </p>
-                <p class="mb-0">
-                    <a href="register.html" class="text-center">Register a new membership</a>
+                    <a href="forgot-password.php">I forgot my password</a>
                 </p>
             </div>
             <!-- /.card-body -->

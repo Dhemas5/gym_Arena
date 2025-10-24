@@ -110,7 +110,7 @@ $queryMember = mysqli_query($con, "SELECT * FROM tbl_member ORDER BY id_member A
 $jumlahMember = mysqli_num_rows($queryMember);
 ?>
 
-<!-- Content Header -->
+<!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -127,40 +127,33 @@ $jumlahMember = mysqli_num_rows($queryMember);
     </div>
 </section>
 
-<!-- Main Content -->
+<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="mb-3">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
-                        <i class="fas fa-plus-circle mr-2"></i>Tambah Member
-                    </button>
-                    <span class="ml-3 text-muted">
-                        <i class="fas fa-users mr-1"></i>Total: <strong><?= $jumlahMember ?></strong> member
-                    </span>
-                </div>
-                <div class="card card-outline card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data Member</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title text-white"><strong>Data Member</strong></h3>
                     </div>
                     <div class="card-body">
+                        <!-- Tombol Tambah Member -->
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+                            <i class="fas fa-plus"></i> Tambah Member
+                        </button>
+
+                        <!-- DataTable Controls -->
                         <div class="table-responsive">
                             <table id="tabelMember" class="table table-bordered table-striped table-hover">
-                                <thead class="thead-dark">
+                                <thead class="bg-primary">
                                     <tr>
-                                        <th style="width: 50px;">No</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>No. HP</th>
-                                        <th>Alamat</th>
-                                        <th>Tanggal Daftar</th>
-                                        <th style="width: 150px;">Aksi</th>
+                                        <th style="width: 50px;">NO</th>
+                                        <th>NAMA</th>
+                                        <th>EMAIL</th>
+                                        <th>NO. HP</th>
+                                        <th>ALAMAT</th>
+                                        <th>TANGGAL DAFTAR</th>
+                                        <th style="width: 100px;">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -179,14 +172,12 @@ $jumlahMember = mysqli_num_rows($queryMember);
                                                 <td><?= $member['alamat'] ?: '-'; ?></td>
                                                 <td><i class="far fa-clock mr-2 text-muted"></i><?= date('d M Y', strtotime($member['tanggal_daftar'])); ?></td>
                                                 <td class="text-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $member['id_member']; ?>" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <a href="member.php?hapus=<?= $member['id_member']; ?>" onclick="return confirm('Yakin hapus member ini?')" class="btn btn-danger btn-sm" title="Hapus">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
-                                                    </div>
+                                                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $member['id_member']; ?>" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a href="member.php?hapus=<?= $member['id_member']; ?>" onclick="return confirm('Yakin hapus member ini?')" class="btn btn-danger btn-sm" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
 
@@ -323,7 +314,7 @@ $(document).ready(function () {
                 "print": "Print"
             }
         },
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]] // 🔥 Tambahkan ini
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
     });
 });
 </script>

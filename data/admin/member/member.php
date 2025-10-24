@@ -132,58 +132,48 @@ $jumlahMember = mysqli_num_rows($queryMember);
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="mb-3">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
-                        <i class="fas fa-plus-circle mr-2"></i>Tambah Member
-                    </button>
-                    <span class="ml-3 text-muted">
-                        <i class="fas fa-users mr-1"></i>Total: <strong><?= $jumlahMember ?></strong> member
-                    </span>
-                </div>
-                <div class="card card-outline card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data Member</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title">Data Member</h3>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="tabelMember" class="table table-bordered table-striped table-hover">
-                                <thead class="thead-dark">
+                        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+                            <i class="fas fa-plus-circle"></i> Tambah Member
+                        </button>
+                        <div class="table-responsive rounded">
+                            <table id="tabelMember" class="table table-bordered table-striped">
+                                <thead class="bg-primary text-white">
                                     <tr>
-                                        <th style="width: 50px;">No</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>No. HP</th>
-                                        <th>Alamat</th>
-                                        <th>Tanggal Daftar</th>
-                                        <th style="width: 150px;">Aksi</th>
+                                        <th style="width: 5%;">No</th>
+                                        <th style="width: 20%;">Nama</th>
+                                        <th style="width: 20%;">Email</th>
+                                        <th style="width: 15%;">No. HP</th>
+                                        <th style="width: 20%;">Alamat</th>
+                                        <th style="width: 10%;">Tanggal Daftar</th>
+                                        <th style="width: 10%;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
                                     if ($jumlahMember == 0) {
-                                        echo "<tr><td colspan='7' class='text-center text-muted'><i class='fas fa-inbox fa-3x mb-3 d-block'></i>Tidak ada data member</td></tr>";
+                                        echo "<tr><td colspan='7' class='text-center text-muted'>Tidak ada data member</td></tr>";
                                     } else {
                                         $no = 1;
                                         while ($member = mysqli_fetch_array($queryMember)) {
                                     ?>
                                             <tr>
-                                                <td class="text-center"><?= $no++; ?></td>
-                                                <td><i class="fas fa-user mr-2 text-primary"></i><?= $member['nama']; ?></td>
-                                                <td><i class="fas fa-envelope mr-2 text-muted"></i><?= $member['email']; ?></td>
-                                                <td><?= $member['no_hp'] ?: '-'; ?></td>
-                                                <td><?= $member['alamat'] ?: '-'; ?></td>
-                                                <td><i class="far fa-clock mr-2 text-muted"></i><?= date('d M Y', strtotime($member['tanggal_daftar'])); ?></td>
-                                                <td class="text-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $member['id_member']; ?>" title="Edit">
+                                                <td><?= $no++; ?></td>
+                                                <td><?= htmlspecialchars($member['nama']); ?></td>
+                                                <td><?= htmlspecialchars($member['email']); ?></td>
+                                                <td><?= htmlspecialchars($member['no_hp'] ?: '-'); ?></td>
+                                                <td><?= htmlspecialchars($member['alamat'] ?: '-'); ?></td>
+                                                <td><?= date('d M Y', strtotime($member['tanggal_daftar'])); ?></td>
+                                                <td class="text-center align-middle">
+                                                    <div class="btn-group" style="gap:8px;">
+                                                        <button class="btn btn-warning btn-sm px-3 py-2" data-toggle="modal" data-target="#modalEdit<?= $member['id_member']; ?>">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                        <a href="member.php?hapus=<?= $member['id_member']; ?>" onclick="return confirm('Yakin hapus member ini?')" class="btn btn-danger btn-sm" title="Hapus">
+                                                        <a href="member.php?hapus=<?= $member['id_member']; ?>" onclick="return confirm('Yakin hapus member ini?')" class="btn btn-danger btn-sm px-3 py-2">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -195,40 +185,40 @@ $jumlahMember = mysqli_num_rows($queryMember);
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <form method="POST">
                                                         <div class="modal-content">
-                                                            <div class="modal-header bg-warning">
-                                                                <h5 class="modal-title"><i class="fas fa-edit mr-2"></i>Edit Member</h5>
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <div class="modal-header bg-warning text-dark">
+                                                                <h5 class="modal-title">Edit Member</h5>
+                                                                <button type="button" class="close text-dark" data-dismiss="modal">&times;</button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <input type="hidden" name="id_member" value="<?= $member['id_member']; ?>">
                                                                 <div class="form-group">
-                                                                    <label><i class="fas fa-user mr-2"></i>Nama</label>
-                                                                    <input type="text" class="form-control" name="nama" value="<?= $member['nama']; ?>" required>
+                                                                    <label>Nama</label>
+                                                                    <input type="text" class="form-control" name="nama" value="<?= htmlspecialchars($member['nama']); ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label><i class="fas fa-envelope mr-2"></i>Email</label>
-                                                                    <input type="email" class="form-control" name="email" value="<?= $member['email']; ?>" required>
+                                                                    <label>Email</label>
+                                                                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($member['email']); ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label><i class="fas fa-phone mr-2"></i>No. HP</label>
-                                                                    <input type="text" class="form-control" name="no_hp" value="<?= $member['no_hp']; ?>" placeholder="Masukkan nomor HP">
+                                                                    <label>No. HP</label>
+                                                                    <input type="text" class="form-control" name="no_hp" value="<?= htmlspecialchars($member['no_hp']); ?>" placeholder="Masukkan nomor HP">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label><i class="fas fa-map-marker-alt mr-2"></i>Alamat</label>
-                                                                    <textarea class="form-control" name="alamat" rows="3" placeholder="Masukkan alamat"><?= $member['alamat']; ?></textarea>
+                                                                    <label>Alamat</label>
+                                                                    <textarea class="form-control" name="alamat" rows="3" placeholder="Masukkan alamat"><?= htmlspecialchars($member['alamat']); ?></textarea>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label><i class="fas fa-lock mr-2"></i>Password Baru</label>
+                                                                    <label>Password Baru</label>
                                                                     <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
                                                                     <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password</small>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                                                    <i class="fas fa-times mr-2"></i>Batal
+                                                                    <i class="fas fa-times"></i> Batal
                                                                 </button>
                                                                 <button type="submit" name="update" class="btn btn-warning">
-                                                                    <i class="fas fa-save mr-2"></i>Update
+                                                                    <i class="fas fa-edit"></i> Perbarui
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -250,7 +240,7 @@ $jumlahMember = mysqli_num_rows($queryMember);
 </section>
 
 <!-- Modal Tambah Member -->
-<div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form method="POST">
             <div class="modal-content">
@@ -281,8 +271,8 @@ $jumlahMember = mysqli_num_rows($queryMember);
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary" name="simpan">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Batal</button>
+                    <button type="submit" name="simpan" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
                 </div>
             </div>
         </form>
@@ -290,3 +280,43 @@ $jumlahMember = mysqli_num_rows($queryMember);
 </div>
 
 <?php include '../../../view/master/footer.php'; ?>
+
+<!-- Script DataTables dengan tombol Export (Sudah disesuaikan dengan footer.php) -->
+<script>
+$(function() {
+    // Jalankan hanya jika tabel ada dan belum pernah diinisialisasi
+    if ($("#tabelMember").length && !$.fn.DataTable.isDataTable("#tabelMember")) {
+        var table = $("#tabelMember").DataTable({
+            paging: true,
+            lengthChange: true,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: true,
+            buttons: ["copy", "csv", "excel", "pdf", "print"],
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                infoFiltered: "(difilter dari _MAX_ total data)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                },
+                zeroRecords: "Data tidak ditemukan"
+            }
+        });
+
+        // Tambahkan tombol export di posisi atas tabel
+        table.buttons().container().appendTo('#tabelMember_wrapper .col-md-6:eq(0)');
+    }
+});
+</script>

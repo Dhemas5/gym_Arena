@@ -134,11 +134,7 @@ $jumlahUser = mysqli_num_rows($queryUser);
                 <div class="card card-outline">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data User</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
+                        
                     </div>
                     <div class="card-body">
                         <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">

@@ -19,8 +19,8 @@ checkSession('member');
     <!-- Theme style -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css">
 
-    <!-- 🔹 CSS Kustom yang dipisah -->
-    <link rel="stylesheet" href="../../../assets/assets_member/css/custom-member.css">
+    <!->- 🔹 CSS Kustom yang dipisah -->
+    <link rel="stylesheet" href="../../../assets/assets_member/css/custom-member.css"
 </head>
 
 <body class="hold-transition layout-top-nav">

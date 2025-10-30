@@ -21,40 +21,39 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // CEK VERIFIKASI EMAIL - DIPINDAH KE SINI SETELAH $user DIDEFINISIKAN
+        // Cek verifikasi email
         if ($user['is_verified'] == 0) {
             $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
         } elseif (password_verify($password, $user['password'])) {
             $_SESSION['login'] = true;
-            $_SESSION['role'] = 'member';
+            $_SESSION['user_type'] = 'member';
             $_SESSION['id_member'] = $user['id_member'];
             $_SESSION['nama'] = $user['nama'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['no_hp'] = $user['no_hp'];
 
-                header("Location: ../beranda/index.php");
-                exit;
-            } else {
-                $error = "❌ Kata sandi salah! Pastikan sesuai.";
-            }
+            header("Location: ../beranda/index.php");
+            exit;
+        } else {
+            $error = "❌ Kata sandi salah!";
         }
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Member</title>
-
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
-    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-regis.css" /> <!-- styling sama seperti register -->
+    <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-regis.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
 </head>
 
@@ -62,37 +61,30 @@ if (isset($_POST['loginbtn'])) {
     <div class="register-box register-container">
         <div class="card card-outline card-primary login-card">
             <div class="card-header text-center">
-                <a href="#">
-                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
-                </a>
+                <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Silakan Login Sebagai Member</p>
 
-                <!-- tampilkan pesan error -->
                 <?php if (!empty($error)) : ?>
                     <div class="alert alert-danger"><?= $error; ?></div>
                 <?php endif; ?>
 
-                <form action="" method="POST">
+                <form method="POST">
                     <div class="input-group mb-3">
                         <input name="username" type="text" class="form-control" placeholder="Email / Username" required
-                            value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" />
+                            value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
                         <div class="input-group-append">
                             <div class="input-group-text"><span class="fas fa-user"></span></div>
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input name="password" type="password" class="form-control" placeholder="Password" required />
+                        <input name="password" type="password" class="form-control" placeholder="Password" required>
                         <div class="input-group-append">
                             <div class="input-group-text"><span class="fas fa-lock"></span></div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
-                        </div>
-                    </div>
+                    <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
                 </form>
 
                 <p class="mb-1 mt-3"><a href="forgotpassword.php" class="text-warning">Lupa password?</a></p>

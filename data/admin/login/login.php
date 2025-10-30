@@ -2,11 +2,10 @@
 ob_start();
 session_start();
 require "../../../setting/session.php";
-blockLoginPageIfLoggedIn();
+blockLoginPageIfLoggedIn(); // Jika sudah login, tidak bisa akses halaman ini lagi
 require "../../../setting/koneksi.php";
 
-
-// Cek koneksi database
+// Pastikan koneksi database aktif
 if ($con->connect_error) {
     die("Koneksi gagal: " . $con->connect_error);
 }
@@ -17,86 +16,86 @@ $error = "";
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // hashing md5
+    $password_md5 = md5($password); // hashing md5 (disesuaikan dengan database)
 
-    // Cek username/email
-    $query = $con->prepare("SELECT * FROM tbl_user WHERE username = ? OR email = ?");
+    // Cek username/email di tabel admin
+    $query = $con->prepare("SELECT * FROM tbl_user WHERE username = ? OR email = ? LIMIT 1");
     $query->bind_param("ss", $username, $username);
     $query->execute();
     $result = $query->get_result();
 
     if ($result && $result->num_rows === 1) {
-        $user = $result->fetch_assoc();
+        $admin = $result->fetch_assoc();
 
         // Cek password
-        if ($password_md5 === $user['password']) {
+        if ($password_md5 === $admin['password']) {
             // Simpan data ke sesi
             $_SESSION['login'] = true;
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
+            $_SESSION['user_type'] = 'admin';
+            $_SESSION['id_admin'] = $admin['id_admin'];
+            $_SESSION['username'] = $admin['username'];
+            $_SESSION['email'] = $admin['email'];
+            $_SESSION['nama'] = $admin['nama'];
 
             // Arahkan ke dashboard admin
             header("Location: ../dashboard/index.php");
             exit;
         } else {
-            $error = "Kata sandi salah! Pastikan kata sandi sesuai.";
+            $error = "❌ Kata sandi salah! Pastikan benar.";
         }
     } else {
-        $error = "User admin tidak ditemukan!";
+        $error = "⚠️ Username atau email admin tidak ditemukan!";
     }
 }
 ?>
 
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Log in</title>
+    <title>Login Admin</title>
 
-    <!-- Google Font: Source Sans Pro -->
+    <!-- Font & Style -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/fontawesome-free/css/all.min.css" />
-    <!-- icheck bootstrap -->
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
-    <!-- Theme style -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
 </head>
 
 <body class="hold-transition login-page">
     <div class="login-box">
-        <!-- /.login-logo -->
+        <!-- Card Login -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
                 <a href="#">
                     <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
                 </a>
             </div>
-            <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
 
-                <!-- tampilkan pesan error -->
+            <div class="card-body">
+                <p class="login-box-msg">Login Admin Dashboard</p>
+
+                <!-- Tampilkan pesan error jika ada -->
                 <?php if (!empty($error)) : ?>
-                    <div class="alert alert-danger"><?= $error; ?></div>
+                    <div class="alert alert-danger text-center"><?= $error; ?></div>
                 <?php endif; ?>
 
-                <!-- perbaikan form -->
+                <!-- Form login -->
                 <form action="" method="POST">
                     <div class="input-group mb-3">
-                        <input name="username" type="text" class="form-control" placeholder="Email / Username" required />
+                        <input name="username" type="text" class="form-control" placeholder="Email / Username" required
+                            value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" />
                         <div class="input-group-append">
                             <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
+                                <span class="fas fa-user"></span>
                             </div>
                         </div>
                     </div>
+
                     <div class="input-group mb-3">
                         <input name="password" type="password" class="form-control" placeholder="Password" required />
                         <div class="input-group-append">
@@ -105,7 +104,7 @@ if (isset($_POST['loginbtn'])) {
                             </div>
                         </div>
                     </div>
-                    <!-- Tombol login submit -->
+
                     <div class="row">
                         <div class="col-12">
                             <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
@@ -113,35 +112,30 @@ if (isset($_POST['loginbtn'])) {
                     </div>
                 </form>
 
-                <p class="mb-1 mt-3">
-                    <a href="forgot-password.php">I forgot my password</a>
+                <p class="mt-3 text-center">
+                    <a href="forgot-password.php" class="text-warning">Lupa password?</a>
                 </p>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
+        <!-- /Card -->
     </div>
-    <!-- /.login-box -->
 
-    <!-- jQuery -->
+    <!-- Script -->
     <script src="../../../assets/assets_admin/plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
     <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
     <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
+
     <script>
-        // Efek loading pada tombol login
         $(document).ready(function() {
+            // Efek loading tombol
             $('form').on('submit', function() {
-                $('button[name="loginbtn"]').addClass('btn-loading');
+                $('button[name="loginbtn"]').addClass('btn-loading').text('Memproses...');
             });
 
-            // Efek fokus pada input
+            // Efek fokus input
             $('.form-control').on('focus', function() {
-                $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(74, 108, 247, 0.15)');
-            });
-
-            $('.form-control').on('blur', function() {
+                $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(0, 123, 255, 0.25)');
+            }).on('blur', function() {
                 $(this).parent().css('box-shadow', 'none');
             });
         });

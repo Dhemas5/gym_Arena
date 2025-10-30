@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/admin-styles.css">
 </head>
 
-<body class="hold-transition light-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<body class="hold-transition light-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed <?= $body_class ?? '' ?>">
     <div class="wrapper">
 
         <!-- Navbar -->

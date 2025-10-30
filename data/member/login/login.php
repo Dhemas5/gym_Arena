@@ -37,10 +37,10 @@ if (isset($_POST['loginbtn'])) {
             } else {
                 $error = "❌ Kata sandi salah! Pastikan sesuai.";
             }
-        }
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
+}
 ?>
 
 <!DOCTYPE html>

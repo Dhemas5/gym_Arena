@@ -90,7 +90,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <li class="nav-item">
-                    <a href="../../../data/admin/instruktur/instruktur.php" class="nav-link <?php if ($current_page == 'pelatih.php') {
+                    <a href="../../../data/admin/instruktur/instruktur.php" class="nav-link <?php if ($current_page == 'instruktur.php') {
                                                                                                 echo 'active';
                                                                                             } ?>">
                         <i class="nav-icon fas fa-chalkboard-teacher"></i>
@@ -100,8 +100,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                 <li class="nav-item">
                     <a href="../../../data/admin/jadwal_kelas/jadwal_kelas.php" class="nav-link <?php if ($current_page == 'jadwal_kelas.php') {
-                                                                                        echo 'active';
-                                                                                    } ?>">
+                                                                                                    echo 'active';
+                                                                                                } ?>">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Jadwal Kelas</p>
                     </a>
@@ -117,30 +117,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <!-- Added Reports section -->
-                <li class="nav-header">LAPORAN</li>
-
+                <li class="nav-header">TRANSAKSI</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-chart-bar"></i>
-                        <p>
-                            Laporan
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
+                    <a href="../../../data/admin/transaksi/tambah_transaksi.php" class="nav-link <?php if ($current_page == 'tambah_transaksi.php') {
+                                                                                                        echo 'active';
+                                                                                                    } ?>">
+                        <i class="nav-icon fas fa-cash-register"></i>
+                        <p>Transaksi</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Laporan Member</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Laporan Keuangan</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
             </ul>
         </nav>

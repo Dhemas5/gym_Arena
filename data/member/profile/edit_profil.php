@@ -78,13 +78,15 @@ if (isset($_POST['update_profile'])) {
 ?>
 
 <?php include '../../../view/master_member/header.php'; ?>
+<!-- Tambahan CSS -->
+<link rel="stylesheet" href="../../../assets/assets_member/css/custom-profile-edit.css">
 
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-primary"><i class="fas fa-user-circle"></i> Edit Profil Member</h1>
+                    <h1 class="m-0"><i class="fas fa-user-circle"></i> Edit Profil Member</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -149,6 +151,7 @@ if (isset($_POST['update_profile'])) {
 <script src="../../../assets/assets_admin/plugins/jquery/jquery.min.js"></script>
 <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
+<script src="../../../assets/assets_member/js/custom-profile-edit.js"></script>
 </body>
 
 </html>

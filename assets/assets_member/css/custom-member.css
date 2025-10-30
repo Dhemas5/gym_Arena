@@ -1,24 +1,24 @@
 /* ============================================
    CUSTOM MEMBER CSS - MODERN GYM DESIGN
-   Theme: Dark Blue Tone
+   Theme: Light Theme with Blue Accents
    ============================================ */
 
 :root {
-  /* Primary Colors - Dark Blue Tone */
+  /* Primary Colors - Blue Tone */
   --primary-dark: #0f3460;
   --primary-medium: #16213e;
   --primary-light: #1a2f4f;
   --accent-blue: #0ea5e9;
   --accent-light: #38bdf8;
 
-  /* Neutral Colors */
-  --bg-dark: #0a0e27;
-  --bg-secondary: #141829;
-  --bg-tertiary: #1e2a47;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
+  /* Neutral Colors - Light Theme */
+  --bg-dark: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
 
   /* Status Colors */
   --success: #10b981;
@@ -121,7 +121,7 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: var(--text-primary);
+  color: white;
   white-space: nowrap;
 }
 
@@ -138,7 +138,7 @@ body {
 }
 
 .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23f8fafc' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 /* Navbar Collapse */
@@ -158,7 +158,7 @@ body {
 }
 
 .nav-link {
-  color: var(--text-secondary) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   font-size: 0.95rem;
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -182,7 +182,7 @@ body {
 }
 
 .nav-link:hover {
-  color: var(--accent-light) !important;
+  color: white !important;
   background: rgba(14, 165, 233, 0.1);
 }
 
@@ -191,7 +191,7 @@ body {
 }
 
 .nav-link.active {
-  color: var(--accent-light) !important;
+  color: white !important;
   background: rgba(14, 165, 233, 0.15);
 }
 
@@ -203,7 +203,7 @@ body {
 .form-control-navbar {
   background-color: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(14, 165, 233, 0.3) !important;
-  color: var(--text-primary) !important;
+  color: white !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
   border-radius: var(--radius-md) !important;
   transition: all var(--transition-base);
@@ -211,7 +211,7 @@ body {
 }
 
 .form-control-navbar::placeholder {
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .form-control-navbar:focus {
@@ -223,23 +223,23 @@ body {
 .btn-navbar {
   background-color: transparent !important;
   border: none !important;
-  color: var(--text-secondary) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
   transition: all var(--transition-base);
   cursor: pointer;
 }
 
 .btn-navbar:hover {
-  color: var(--accent-light) !important;
+  color: white !important;
   background-color: rgba(14, 165, 233, 0.1) !important;
 }
 
 /* Dropdown Menu */
 .dropdown-menu {
-  background-color: var(--primary-medium) !important;
+  background-color: white !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
   padding: var(--spacing-md) 0 !important;
   margin-top: var(--spacing-sm) !important;
 }
@@ -259,7 +259,7 @@ body {
 }
 
 .dropdown-item {
-  color: var(--text-secondary) !important;
+  color: var(--text-primary) !important;
   padding: var(--spacing-md) var(--spacing-lg) !important;
   transition: all var(--transition-base);
   font-size: 0.95rem;
@@ -267,7 +267,7 @@ body {
 
 .dropdown-item:hover {
   background-color: rgba(14, 165, 233, 0.1) !important;
-  color: var(--accent-light) !important;
+  color: var(--accent-blue) !important;
   padding-left: calc(var(--spacing-lg) + var(--spacing-sm)) !important;
 }
 
@@ -277,7 +277,7 @@ body {
 
 .dropdown-item.text-danger:hover {
   background-color: rgba(239, 68, 68, 0.1) !important;
-  color: #fca5a5 !important;
+  color: #dc2626 !important;
 }
 
 .dropdown-footer {
@@ -322,16 +322,17 @@ body {
 }
 
 .content-header {
-  background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
   padding: var(--spacing-xl) var(--spacing-lg);
   border-radius: var(--radius-xl);
   margin-bottom: var(--spacing-xl);
   box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1);
+  color: white;
 }
 
 .content-header h1 {
   font-weight: 700;
-  color: var(--text-primary);
+  color: white;
   font-size: 2rem;
   margin-bottom: var(--spacing-md);
 }
@@ -343,11 +344,11 @@ body {
 }
 
 .breadcrumb-item {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .breadcrumb-item a {
-  color: var(--accent-blue);
+  color: white;
   text-decoration: none;
   transition: color var(--transition-base);
 }
@@ -358,7 +359,7 @@ body {
 }
 
 .breadcrumb-item.active {
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ============================================
@@ -366,10 +367,10 @@ body {
    ============================================ */
 
 .card {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-dark);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-base);
   margin-bottom: var(--spacing-xl);
   overflow: hidden;
@@ -382,7 +383,7 @@ body {
 }
 
 .card-header {
-  background: linear-gradient(90deg, var(--primary-dark), var(--primary-medium));
+  background: linear-gradient(90deg, var(--bg-secondary), var(--bg-tertiary));
   color: var(--text-primary);
   border-bottom: 2px solid var(--accent-blue);
   padding: var(--spacing-lg);
@@ -393,6 +394,7 @@ body {
 .card-body {
   padding: var(--spacing-lg);
   color: var(--text-secondary);
+  background-color: var(--bg-dark);
 }
 
 .card-footer {
@@ -429,14 +431,14 @@ body {
   color: var(--text-secondary);
   border-collapse: separate;
   border-spacing: 0;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-dark);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .table thead {
-  background: linear-gradient(90deg, var(--primary-dark), var(--primary-medium));
+  background: linear-gradient(90deg, var(--bg-secondary), var(--bg-tertiary));
   color: var(--text-primary);
 }
 
@@ -455,6 +457,7 @@ body {
   border-color: var(--border-color);
   vertical-align: middle;
   font-size: 0.95rem;
+  background-color: var(--bg-dark);
 }
 
 .table tbody tr {
@@ -463,7 +466,7 @@ body {
 }
 
 .table tbody tr:hover {
-  background-color: rgba(14, 165, 233, 0.08);
+  background-color: rgba(14, 165, 233, 0.05);
 }
 
 .table tbody tr:last-child {
@@ -498,7 +501,7 @@ body {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
-  color: var(--bg-dark);
+  color: white;
 }
 
 .btn-primary:hover {
@@ -565,7 +568,7 @@ body {
 
 .btn-outline-primary:hover {
   background-color: var(--accent-blue);
-  color: var(--bg-dark);
+  color: white;
 }
 
 .btn-outline-danger {
@@ -605,7 +608,7 @@ body {
 }
 
 .form-control {
-  background-color: var(--bg-tertiary);
+  background-color: white;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 0.75rem 1rem;
@@ -619,7 +622,7 @@ body {
 }
 
 .form-control:focus {
-  background-color: var(--bg-tertiary);
+  background-color: white;
   border-color: var(--accent-blue);
   color: var(--text-primary);
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
@@ -627,13 +630,13 @@ body {
 }
 
 .form-control:disabled {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-tertiary);
   color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .form-select {
-  background-color: var(--bg-tertiary);
+  background-color: white;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 0.75rem 1rem;
@@ -656,7 +659,7 @@ body {
   margin-top: 0.3rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  background-color: var(--bg-tertiary);
+  background-color: white;
   cursor: pointer;
   transition: all var(--transition-base);
 }
@@ -691,7 +694,7 @@ body {
 
 .badge-primary {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
-  color: var(--bg-dark);
+  color: white;
 }
 
 .badge-success {
@@ -727,6 +730,7 @@ body {
 .box-profile {
   padding: var(--spacing-xl);
   text-align: center;
+  background-color: var(--bg-dark);
 }
 
 .profile-username {
@@ -772,12 +776,12 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .ribbon.bg-primary {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
-  color: var(--bg-dark);
+  color: white;
 }
 
 .ribbon.bg-success {
@@ -793,18 +797,18 @@ body {
   background-color: var(--primary-dark);
   border-top: 2px solid var(--accent-blue);
   padding: var(--spacing-xl) var(--spacing-lg);
-  color: var(--text-secondary);
+  color: white;
   margin-top: var(--spacing-2xl);
 }
 
 .main-footer a {
-  color: var(--accent-blue);
+  color: var(--accent-light);
   text-decoration: none;
   transition: color var(--transition-base);
 }
 
 .main-footer a:hover {
-  color: var(--accent-light);
+  color: white;
   text-decoration: underline;
 }
 

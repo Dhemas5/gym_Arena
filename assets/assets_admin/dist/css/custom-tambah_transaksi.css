@@ -1,0 +1,554 @@
+:root {
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --success: #4cc9f0;
+    --info: #4895ef;
+    --warning: #f72585;
+    --danger: #e63946;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #3a0ca3 100%);
+    --gradient-warning: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+    --gradient-light: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    --gradient-paket: linear-gradient(135deg, #000b58 0%, #003161 100%);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f7fb;
+}
+
+.content-wrapper {
+    background-color: #f5f7fb;
+}
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    padding: 15px 20px;
+    font-weight: 600;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.info-box {
+    border-radius: 12px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+.info-box-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.info-box:hover .info-box-icon {
+    transform: scale(1.1);
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 8px 16px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+#grand_total_display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.form-control, .select2-container--bootstrap4 .select2-selection {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+    padding: 8px 12px;
+}
+
+.form-control:focus, .select2-container--bootstrap4 .select2-selection--single:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.input-group-text {
+    border-radius: 8px;
+}
+
+.bg-gradient-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.bg-gradient-success {
+    background: var(--gradient-success) !important;
+}
+
+.bg-gradient-light {
+    background: var(--gradient-light) !important;
+}
+
+.content-header h1 {
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.badge {
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-weight: 500;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.modal-header {
+    border-radius: 12px 12px 0 0;
+}
+
+.select2-container--bootstrap4 .select2-selection--single {
+    height: calc(2.25rem + 2px);
+}
+
+.select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+    line-height: 2.25rem;
+}
+
+.shadow-xl {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+.highlight {
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: highlight 3s infinite;
+}
+
+@keyframes highlight {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.total-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.total-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+}
+
+.floating-label {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.floating-label .form-control {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.floating-label label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    transition: all 0.2s;
+    pointer-events: none;
+}
+
+.floating-label .form-control:focus ~ label,
+.floating-label .form-control:not(:placeholder-shown) ~ label {
+    top: 0.1rem;
+    font-size: 0.7rem;
+    color: var(--primary);
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.2);
+}
+
+.step-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.step.active .step-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Gradasi untuk card Pilih Paket */
+.card-paket {
+    background: var(--gradient-paket) !important;
+    color: white;
+}
+
+.card-paket .card-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-paket .card-title {
+    color: white;
+}
+
+.card-paket .badge {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #000b58 !important;
+}
+
+/* Style untuk form di dalam card paket */
+.card-paket .form-control {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+.card-paket .form-control:focus {
+    background: white;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+.card-paket .floating-label label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.card-paket .floating-label .form-control:focus ~ label,
+.card-paket .floating-label .form-control:not(:placeholder-shown) ~ label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.card-paket .btn-info {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #000b58;
+    font-weight: 600;
+}
+
+.card-paket .btn-info:hover {
+    background: white;
+    border-color: white;
+    color: #000b58;
+    transform: translateY(-2px);
+}
+
+/* Style untuk Select2 di dalam card paket */
+.card-paket .select2-container--bootstrap4 .select2-selection {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+.card-paket .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+    color: #333;
+}
+
+.card-paket .select2-container--bootstrap4 .select2-selection:focus {
+    background: white;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.card-paket .select2-container--bootstrap4 .select2-selection__arrow b {
+    border-color: #333 transparent transparent transparent;
+}
+
+/* Style untuk dropdown Select2 */
+.card-paket .select2-container--bootstrap4 .select2-dropdown {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-paket .select2-container--bootstrap4 .select2-results__option {
+    padding: 8px 12px;
+}
+
+.card-paket .select2-container--bootstrap4 .select2-results__option--highlighted {
+    background-color: #000b58;
+    color: white;
+}
+
+/* Style untuk card Info Paket Dipilih */
+.card-info-paket {
+    background: linear-gradient(135deg, #4cc9f0 0%, #3a0ca3 100%) !important;
+    color: white;
+}
+
+.card-info-paket .card-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-info-paket .card-title {
+    color: white;
+}
+
+.card-info-paket .badge {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #3a0ca3 !important;
+}
+
+.card-info-paket .form-control {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333;
+    font-weight: 500;
+}
+
+.card-info-paket .form-control[readonly] {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.card-info-paket label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+/* Style untuk card Pembayaran */
+.card-pembayaran {
+    background: linear-gradient(135deg, #4895ef 0%, #4361ee 100%) !important;
+    color: white;
+}
+
+.card-pembayaran .card-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-pembayaran .card-title {
+    color: white;
+}
+
+.card-pembayaran .badge {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #4361ee !important;
+}
+
+.card-pembayaran .form-control {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+.card-pembayaran .form-control:focus {
+    background: white;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+.card-pembayaran .floating-label label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.card-pembayaran .floating-label .form-control:focus ~ label,
+.card-pembayaran .floating-label .form-control:not(:placeholder-shown) ~ label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.card-pembayaran .alert-success {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #155724;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .step-indicator {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .step {
+        margin: 0 10px 10px;
+    }
+    
+    .step-indicator::before {
+        display: none;
+    }
+    
+    #grand_total_display {
+        font-size: 2rem;
+    }
+    
+    .card-body .row {
+        margin-bottom: -1rem;
+    }
+    
+    .card-body .row > div {
+        margin-bottom: 1rem;
+    }
+    
+    .floating-label {
+        margin-bottom: 1rem;
+    }
+    
+    .card-paket .row > div,
+    .card-pembayaran .row > div {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animation untuk transisi */
+.smooth-transition {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Loading state untuk tombol */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: button-loading 0.8s linear infinite;
+}
+
+@keyframes button-loading {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary);
+}

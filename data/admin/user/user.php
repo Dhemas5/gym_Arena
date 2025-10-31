@@ -36,17 +36,13 @@ $queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data User</h3>
-<<<<<<< HEAD
-                        
-=======
->>>>>>> origin/main
                     </div>
                     <div class="card-body">
                         <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
                             <i class="fas fa-plus"></i> Tambah User
                         </button>
                         <div class="table-responsive rounded">
-                            <table id="tabelpelatih" class="table table-bordered table-striped table-hover">
+                            <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>

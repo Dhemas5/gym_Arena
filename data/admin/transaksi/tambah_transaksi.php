@@ -19,64 +19,19 @@ include '../../../view/master/header.php';
 include '../../../view/master/sidebar.php';
 ?>
 
-<!-- Tambahkan CSS Custom untuk tampilan lebih modern -->
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-    }
-
-    .info-box {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .info-box-icon {
-        transition: background-color 0.3s;
-    }
-
-
-    .btn {
-        border-radius: 5px;
-        transition: all 0.3s;
-    }
-
-    .btn:hover {
-        transform: scale(1.05);
-    }
-
-    #grand_total_display {
-        font-size: 2.5rem;
-        font-weight: bold;
-    }
-
-    .form-control {
-        border-radius: 5px;
-    }
-
-    .select2-container--bootstrap4 .select2-selection {
-        border-radius: 5px;
-    }
-</style>
+<!-- Tambahkan CSS Custom -->
+<link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-tambah_transaksi.css">
 
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>Transaksi Penjualan Paket</h1>
+                <p class="text-muted">Lakukan transaksi penjualan paket kepada member atau pelanggan umum</p>
             </div>
             <div class="col-sm-6">
-                <a href="transaksi_offline.php" class="btn btn-sm btn-outline-secondary float-sm-right">
-                    <i class="fas fa-list"></i> Daftar Transaksi
+                <a href="transaksi_offline.php" class="btn btn-sm btn-outline-primary float-sm-right">
+                    <i class="fas fa-list mr-1"></i> Daftar Transaksi
                 </a>
             </div>
         </div>
@@ -85,26 +40,50 @@ include '../../../view/master/sidebar.php';
 
 <section class="content">
     <div class="container-fluid">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Pilih Member</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-label">Pilih Paket</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Pembayaran</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-label">Selesai</div>
+            </div>
+        </div>
+
         <form id="formTransaksi">
             <input type="hidden" name="id_user_kasir" value="<?= $id_kasir ?>">
             <input type="hidden" name="id_member" id="id_member_hidden" value="">
 
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Info Kasir & Member - Dengan animasi fade-in -->
-                    <div class="row">
+                    <!-- Info Kasir & Member -->
+                    <div class="row animate-fade-in">
                         <div class="col-md-4">
-                            <div class="info-box shadow card-outline card-primary">
-                                <span class="info-box-icon bg-info"><i class="far fa-calendar-alt"></i></span>
+                            <div class="info-box bg-gradient-light">
+                                <span class="info-box-icon bg-info d-flex align-items-center justify-content-center">
+                                    <i class="far fa-calendar-alt"></i>
+                                </span>
                                 <div class="info-box-content">
-                                    <span class="info-box-text">Tanggal</span>
+                                    <span class="info-box-text">Tanggal Transaksi</span>
                                     <span class="info-box-number"><?= $tanggal_saat_ini ?></span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="info-box shadow card-outline card-primary">
-                                <span class="info-box-icon bg-warning"><i class="fas fa-user-alt"></i></span>
+                            <div class="info-box bg-gradient-light">
+                                <span class="info-box-icon bg-warning d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user-alt"></i>
+                                </span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Kasir</span>
                                     <span class="info-box-number"><?= $nama_kasir ?></span>
@@ -112,11 +91,13 @@ include '../../../view/master/sidebar.php';
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="info-box card-outline card-primary shadow">
-                                <span class="info-box-icon bg-primary"><i class="fas fa-users"></i></span>
+                            <div class="info-box bg-gradient-light">
+                                <span class="info-box-icon bg-primary d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-users"></i>
+                                </span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Member</span>
-                                    <div class="input-group input-group-sm">
+                                    <div class="input-group input-group-sm mt-1">
                                         <input type="text" class="form-control" id="nama_member_display" value="Umum" readonly>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCariMember">
@@ -129,15 +110,15 @@ include '../../../view/master/sidebar.php';
                         </div>
                     </div>
 
-                    <!-- Pilih Paket - Card dengan gradient -->
-                    <div class="card bg-gradient-light mt-3 shadow-lg">
-                        <div class="card-header bg-primary text-white">
-                            <h3 class="card-title">Pilih Paket</h3>
+                    <!-- Pilih Paket -->
+                    <div class="card mt-4 animate-fade-in" style="animation-delay: 0.1s;">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-box-open mr-2"></i> Pilih Paket</h3>
+                            <span class="badge bg-light text-primary">Langkah 2</span>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-5 form-group">
-                                    <label>Pilih Paket</label>
+                                <div class="col-md-5 form-group floating-label">
                                     <select class="form-control select2" id="id_paket" required>
                                         <option value="">-- Pilih Paket --</option>
                                         <?php foreach ($pakets as $p): ?>
@@ -148,18 +129,19 @@ include '../../../view/master/sidebar.php';
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <label>Pilih Paket</label>
                                 </div>
-                                <div class="col-md-2 form-group">
+                                <div class="col-md-2 form-group floating-label">
+                                    <input type="number" class="form-control" id="qty" min="1" value="1" placeholder=" ">
                                     <label>Qty</label>
-                                    <input type="number" class="form-control" id="qty" min="1" value="1">
                                 </div>
-                                <div class="col-md-3 form-group">
+                                <div class="col-md-3 form-group floating-label">
+                                    <input type="number" class="form-control" id="diskon_item" min="0" value="0" step="0.01" placeholder=" ">
                                     <label>Diskon Item (Rp)</label>
-                                    <input type="number" class="form-control" id="diskon_item" min="0" value="0" step="0.01">
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="button" class="btn btn-info btn-block" id="btnHitung">
-                                        <i class="fas fa-calculator"></i> Hitung
+                                        <i class="fas fa-calculator mr-1"></i> Hitung
                                     </button>
                                 </div>
                             </div>
@@ -167,105 +149,124 @@ include '../../../view/master/sidebar.php';
                     </div>
 
                     <!-- Info Paket Dipilih -->
-                    <div class="card bg-gradient-success mt-3 shadow-lg" id="cardPaketInfo" style="display:none;">
-                        <div class="card-header text-white">
-                            <h3 class="card-title">Detail Paket Dipilih</h3>
+                    <div class="card mt-3 bg-gradient-success text-white" id="cardPaketInfo" style="display:none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-info-circle mr-2"></i> Detail Paket Dipilih</h3>
+                            <span class="badge bg-light text-success">Detail</span>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 form-group">
                                     <label>Paket</label>
-                                    <input type="text" class="form-control" id="info_nama" readonly>
+                                    <input type="text" class="form-control bg-white text-dark" id="info_nama" readonly>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label>Harga</label>
-                                    <input type="text" class="form-control text-right" id="info_harga" readonly>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_harga" readonly>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label>Qty</label>
-                                    <input type="text" class="form-control text-right" id="info_qty" readonly>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_qty" readonly>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label>Diskon Item</label>
-                                    <input type="text" class="form-control text-right" id="info_diskon" readonly>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_diskon" readonly>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label>Sub Total</label>
-                                    <input type="text" class="form-control text-right" id="info_subtotal" readonly>
+                                    <input type="text" class="form-control bg-white text-dark text-right font-weight-bold" id="info_subtotal" readonly>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Pembayaran -->
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <div class="card bg-gradient-light shadow-lg">
-                                <div class="card-body">
-                                    <label>Metode Pembayaran</label>
+                    <div class="card mt-4 animate-fade-in" style="animation-delay: 0.2s;">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-credit-card mr-2"></i> Pembayaran</h3>
+                            <span class="badge bg-light text-info">Langkah 3</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 form-group floating-label">
                                     <select class="form-control" name="metode_pembayaran" id="metode_pembayaran" required>
                                         <option value="">-- Pilih Metode --</option>
                                         <option value="Tunai">Tunai</option>
                                         <option value="Transfer">Transfer</option>
                                         <option value="QRIS">QRIS</option>
                                     </select>
+                                    <label>Metode Pembayaran</label>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-gradient-light shadow-lg">
-                                <div class="card-body" id="tunai_section" style="display:none;">
-                                    <label>Jumlah Dibayar</label>
-                                    <input type="number" class="form-control" name="jumlah_dibayar_tunai" id="jumlah_dibayar_tunai" min="0">
-                                    <small class="text-success">Kembalian: Rp <span id="kembalian">0</span></small>
+                                <div class="col-md-4">
+                                    <div id="tunai_section" style="display:none;">
+                                        <div class="form-group floating-label">
+                                            <input type="number" class="form-control" name="jumlah_dibayar_tunai" id="jumlah_dibayar_tunai" min="0" placeholder=" ">
+                                            <label>Jumlah Dibayar</label>
+                                        </div>
+                                        <div class="alert alert-success py-2">
+                                            <small><i class="fas fa-coins mr-1"></i> Kembalian: Rp <span id="kembalian">0</span></small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-gradient-light shadow-lg">
-                                <div class="card-body">
-                                    <label>Catatan</label>
-                                    <textarea class="form-control" name="keterangan" rows="2" placeholder="Opsional..."></textarea>
+                                <div class="col-md-4 form-group floating-label">
+                                    <textarea class="form-control" name="keterangan" rows="2" placeholder=" "></textarea>
+                                    <label>Catatan (Opsional)</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Total - Dengan efek shadow lebih dalam -->
+                <!-- Total -->
                 <div class="col-lg-4">
-                    <div class="card bg-gradient-primary text-white shadow-xl">
+                    <div class="card total-card bg-gradient-primary text-white shadow-xl pulse">
                         <div class="card-body text-center">
-                            <h5>No. Nota</h5>
-                            <h4><?= $no_transaksi ?></h4>
-                            <hr class="bg-white">
-                            <h3>TOTAL BAYAR</h3>
-                            <h1>Rp <span id="grand_total_display">0</span></h1>
+                            <h5 class="mb-2">No. Nota</h5>
+                            <h4 class="mb-3 font-weight-bold"><?= $no_transaksi ?></h4>
+                            <hr class="bg-white my-3">
+                            <h3 class="mb-3">TOTAL BAYAR</h3>
+                            <h1 class="mb-0">Rp <span id="grand_total_display" class="highlight">0</span></h1>
                             <input type="hidden" id="grand_total_hidden" name="total_bayar" value="0">
                         </div>
                         <div class="card-footer bg-transparent">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-warning btn-block" id="btnBatal">Batal</button>
+                                    <button type="button" class="btn btn-light btn-block" id="btnBatal">
+                                        <i class="fas fa-times mr-1"></i> Batal
+                                    </button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="submit" class="btn btn-success btn-block" id="btnBayar">Bayar</button>
+                                    <button type="submit" class="btn btn-success btn-block" id="btnBayar">
+                                        <i class="fas fa-check mr-1"></i> Bayar
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Detail Perhitungan -->
-                    <div class="card bg-gradient-light mt-3 shadow-lg">
-                        <div class="card-header bg-info text-white">
-                            <h3 class="card-title">Detail Perhitungan</h3>
+                    <div class="card bg-gradient-light mt-3">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-calculator mr-2"></i> Detail Perhitungan</h3>
                         </div>
                         <div class="card-body small">
-                            <div class="d-flex justify-content-between"><span>Sub Total</span> <span id="sub_total_display">Rp 0</span></div>
-                            <div class="d-flex justify-content-between"><span>Diskon Item</span> <span id="diskon_item_display">Rp 0</span></div>
-                            <div class="d-flex justify-content-between"><span>Diskon Global</span> <input type="number" class="form-control form-control-sm text-right" id="diskon_global" value="0" min="0"></div>
-                            <hr>
-                            <div class="d-flex justify-content-between text-success font-weight-bold"><span>Grand Total</span> <span id="grand_total_display2">Rp 0</span></div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Sub Total</span> 
+                                <span id="sub_total_display" class="font-weight-bold">Rp 0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Diskon Item</span> 
+                                <span id="diskon_item_display" class="text-danger">- Rp 0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Diskon Global</span> 
+                                <input type="number" class="form-control form-control-sm text-right w-50" id="diskon_global" value="0" min="0">
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between text-success font-weight-bold">
+                                <span>Grand Total</span> 
+                                <span id="grand_total_display2">Rp 0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -273,22 +274,22 @@ include '../../../view/master/sidebar.php';
         </form>
     </div>
 
-    <!-- Modal Cari Member - Dengan DataTables -->
+    <!-- Modal Cari Member -->
     <div class="modal fade" id="modalCariMember">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Cari Member</h5>
+                    <h5 class="modal-title"><i class="fas fa-search mr-2"></i> Cari Member</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered table-striped" id="tblMember">
-                        <thead>
+                    <table class="table table-bordered table-striped table-hover" id="tblMember">
+                        <thead class="thead-light">
                             <tr>
                                 <th>ID</th>
                                 <th>Nama</th>
                                 <th>Email</th>
-                                <th>Aksi</th>
+                                <th width="15%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -297,7 +298,11 @@ include '../../../view/master/sidebar.php';
                                     <td><?= $m['id_member'] ?></td>
                                     <td><?= htmlspecialchars($m['nama']) ?></td>
                                     <td><?= htmlspecialchars($m['email']) ?></td>
-                                    <td><button class="btn btn-sm btn-info btn-pilih-member" data-id="<?= $m['id_member'] ?>" data-nama="<?= htmlspecialchars($m['nama']) ?>">Pilih</button></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info btn-pilih-member" data-id="<?= $m['id_member'] ?>" data-nama="<?= htmlspecialchars($m['nama']) ?>">
+                                            <i class="fas fa-check mr-1"></i> Pilih
+                                        </button>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -311,9 +316,10 @@ include '../../../view/master/sidebar.php';
 <?php include '../../../view/master/footer.php'; ?>
 
 <!-- Tambahkan library untuk tampilan modern -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
@@ -343,7 +349,7 @@ include '../../../view/master/sidebar.php';
         $('#info_subtotal').val('Rp ' + formatRupiah(subtotal));
 
         $('#sub_total_display').text('Rp ' + formatRupiah(subtotal));
-        $('#diskon_item_display').text('Rp ' + formatRupiah(diskon_item));
+        $('#diskon_item_display').text('- Rp ' + formatRupiah(diskon_item));
         $('#grand_total_display').text(formatRupiah(final_total));
         $('#grand_total_display2').text('Rp ' + formatRupiah(final_total));
         $('#grand_total_hidden').val(final_total.toFixed(2));
@@ -354,12 +360,26 @@ include '../../../view/master/sidebar.php';
             const kembalian = dibayar - final_total;
             $('#kembalian').text(formatRupiah(kembalian > 0 ? kembalian : 0));
         }
+        
+        // Update step indicator
+        if ($('#id_paket').val()) {
+            $('.step').eq(1).addClass('active');
+        } else {
+            $('.step').eq(1).removeClass('active');
+        }
+        
+        if ($('#metode_pembayaran').val()) {
+            $('.step').eq(2).addClass('active');
+        } else {
+            $('.step').eq(2).removeClass('active');
+        }
     }
 
     $(document).ready(function() {
         // Inisialisasi Select2
         $('.select2').select2({
-            theme: 'bootstrap4'
+            theme: 'bootstrap4',
+            placeholder: '-- Pilih Paket --'
         });
 
         // Inisialisasi DataTables untuk modal member
@@ -373,8 +393,8 @@ include '../../../view/master/sidebar.php';
             "language": {
                 "search": "Cari:",
                 "paginate": {
-                    "previous": "<",
-                    "next": ">"
+                    "previous": "<i class='fas fa-chevron-left'></i>",
+                    "next": "<i class='fas fa-chevron-right'></i>"
                 }
             }
         });
@@ -384,6 +404,9 @@ include '../../../view/master/sidebar.php';
             $('#id_member_hidden').val($(this).data('id'));
             $('#nama_member_display').val($(this).data('nama'));
             $('#modalCariMember').modal('hide');
+            
+            // Update step indicator
+            $('.step').eq(0).addClass('active');
         });
 
         // Reset member
@@ -391,12 +414,18 @@ include '../../../view/master/sidebar.php';
             if ($('#id_member_hidden').val()) {
                 Swal.fire({
                     title: 'Reset ke Umum?',
+                    text: 'Data member yang dipilih akan dihapus',
                     icon: 'question',
-                    showCancelButton: true
+                    showCancelButton: true,
+                    confirmButtonColor: '#4361ee',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Reset',
+                    cancelButtonText: 'Batal'
                 }).then(r => {
                     if (r.isConfirmed) {
                         $('#id_member_hidden').val('');
                         $('#nama_member_display').val('Umum');
+                        $('.step').eq(0).removeClass('active');
                     }
                 });
             }
@@ -411,11 +440,12 @@ include '../../../view/master/sidebar.php';
                 $('#cardPaketInfo').fadeOut();
                 $('#info_nama, #info_harga, #info_qty, #info_diskon, #info_subtotal').val('');
                 $('#sub_total_display').text('Rp 0');
-                $('#diskon_item_display').text('Rp 0');
+                $('#diskon_item_display').text('- Rp 0');
                 $('#grand_total_display').text('0');
                 $('#grand_total_display2').text('Rp 0');
                 $('#grand_total_hidden').val(0);
                 $('#kembalian').text('0');
+                $('.step').eq(1).removeClass('active');
             }
         });
 
@@ -442,16 +472,31 @@ include '../../../view/master/sidebar.php';
             e.preventDefault();
 
             if (!$('#id_paket').val()) {
-                return Swal.fire('Pilih paket!', '', 'warning');
+                return Swal.fire({
+                    title: 'Pilih paket!',
+                    text: 'Silakan pilih paket terlebih dahulu',
+                    icon: 'warning',
+                    confirmButtonColor: '#4361ee'
+                });
             }
             if (!$('#metode_pembayaran').val()) {
-                return Swal.fire('Pilih metode pembayaran!', '', 'warning');
+                return Swal.fire({
+                    title: 'Pilih metode pembayaran!',
+                    text: 'Silakan pilih metode pembayaran terlebih dahulu',
+                    icon: 'warning',
+                    confirmButtonColor: '#4361ee'
+                });
             }
             if ($('#metode_pembayaran').val() === 'Tunai') {
                 const dibayar = parseFloat($('#jumlah_dibayar_tunai').val()) || 0;
                 const total = parseFloat($('#grand_total_hidden').val()) || 0;
                 if (dibayar < total) {
-                    return Swal.fire('Uang kurang!', 'Jumlah dibayar kurang dari total.', 'warning');
+                    return Swal.fire({
+                        title: 'Uang kurang!',
+                        text: 'Jumlah dibayar kurang dari total.',
+                        icon: 'warning',
+                        confirmButtonColor: '#4361ee'
+                    });
                 }
             }
 
@@ -470,28 +515,70 @@ include '../../../view/master/sidebar.php';
                 processData: false,
                 contentType: false,
                 dataType: 'json',
-                beforeSend: () => $('#btnBayar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Proses...'),
+                beforeSend: () => {
+                    $('#btnBayar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Memproses...');
+                    $('.step').eq(3).addClass('active');
+                },
                 success: res => {
                     if (res.success) {
-                        Swal.fire('Sukses!', 'Transaksi ' + res.id + ' berhasil!', 'success')
-                            .then(() => location.reload());
+                        Swal.fire({
+                            title: 'Transaksi Berhasil!',
+                            html: `Transaksi <strong>${res.id}</strong> berhasil diproses`,
+                            icon: 'success',
+                            confirmButtonColor: '#4361ee'
+                        }).then(() => location.reload());
                     } else {
-                        Swal.fire('Gagal', res.error, 'error');
+                        Swal.fire({
+                            title: 'Transaksi Gagal',
+                            text: res.error,
+                            icon: 'error',
+                            confirmButtonColor: '#4361ee'
+                        });
+                        $('.step').eq(3).removeClass('active');
                     }
                 },
-                error: xhr => Swal.fire('Error', xhr.responseText.substring(0, 200), 'error'),
-                complete: () => $('#btnBayar').prop('disabled', false).html('Bayar')
+                error: xhr => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: xhr.responseText.substring(0, 200),
+                        icon: 'error',
+                        confirmButtonColor: '#4361ee'
+                    });
+                    $('.step').eq(3).removeClass('active');
+                },
+                complete: () => $('#btnBayar').prop('disabled', false).html('<i class="fas fa-check mr-1"></i> Bayar')
             });
         });
 
         $('#btnBatal').click(() => {
             Swal.fire({
-                title: 'Batalkan?',
+                title: 'Batalkan Transaksi?',
+                text: 'Semua data yang telah diinput akan hilang',
                 icon: 'warning',
-                showCancelButton: true
+                showCancelButton: true,
+                confirmButtonColor: '#4361ee',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Batalkan',
+                cancelButtonText: 'Lanjutkan'
             }).then(r => {
                 if (r.isConfirmed) location.reload();
             });
+        });
+        
+        // Floating label functionality
+        $('.floating-label .form-control').on('focus', function() {
+            $(this).siblings('label').addClass('active');
+        }).on('blur', function() {
+            if (!$(this).val()) {
+                $(this).siblings('label').removeClass('active');
+            }
+        });
+        
+        // Initialize floating labels for pre-filled values
+        $('.floating-label .form-control').each(function() {
+            if ($(this).val()) {
+                $(this).siblings('label').addClass('active');
+            }
         });
     });
 </script>

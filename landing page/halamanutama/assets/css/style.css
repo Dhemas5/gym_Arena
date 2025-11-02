@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #000;
+  background: #0a1929;
   color: #fff;
   overflow-x: hidden;
 }
@@ -22,9 +22,9 @@ html {
    NAVBAR
    =================================== */
 .navbar {
-  background: rgba(0, 0, 0, 0.95) !important;
+  background: rgba(10, 25, 41, 0.95) !important;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(66, 165, 245, 0.2);
   transition: all 0.3s ease;
 }
 
@@ -38,7 +38,7 @@ html {
 }
 
 .brand-box {
-  background: #dc3545;
+  background: #1976d2;
   color: white;
   padding: 5px 10px;
   border-radius: 4px;
@@ -53,7 +53,7 @@ html {
 
 .brand-subtitle {
   font-size: 0.7rem;
-  color: #999;
+  color: #90caf9;
   display: block;
   margin-top: -5px;
 }
@@ -67,11 +67,11 @@ html {
 
 .navbar-nav .nav-link:hover,
 .navbar-nav .nav-link.active {
-  color: #dc3545 !important;
+  color: #42a5f5 !important;
 }
 
 .btn-danger {
-  background: #dc3545;
+  background: #1976d2;
   border: none;
   font-weight: 600;
   padding: 8px 24px;
@@ -80,9 +80,9 @@ html {
 }
 
 .btn-danger:hover {
-  background: #c82333;
+  background: #1565c0;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
 }
 
 /* ===================================
@@ -90,7 +90,7 @@ html {
    =================================== */
 .hero {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%),
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.15) 0%, rgba(10, 25, 41, 0.9) 100%),
               url('../img/hero.jpg') center/cover no-repeat;
   display: flex;
   align-items: center;
@@ -107,7 +107,7 @@ html {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(220, 53, 69, 0.15) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 50%, rgba(25, 118, 210, 0.2) 0%, transparent 50%);
 }
 
 .hero-content {
@@ -128,7 +128,7 @@ html {
 }
 
 .hero .text-danger {
-  color: #dc3545 !important;
+  color: #42a5f5 !important;
 }
 
 .hero p {
@@ -147,13 +147,13 @@ html {
    FEATURES SECTION
    =================================== */
 .features {
-  background: #000;
+  background: #0d1b2a;
   padding: 80px 0;
 }
 
 .feature-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 15px;
   padding: 40px 30px;
   text-align: center;
@@ -162,8 +162,8 @@ html {
 }
 
 .feature-box:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(220, 53, 69, 0.5);
+  background: rgba(25, 118, 210, 0.1);
+  border-color: rgba(66, 165, 245, 0.5);
   transform: translateY(-5px);
 }
 
@@ -171,13 +171,13 @@ html {
   width: 60px;
   height: 60px;
   margin: 0 auto 20px;
-  background: rgba(220, 53, 69, 0.1);
+  background: rgba(25, 118, 210, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  color: #dc3545;
+  color: #42a5f5;
 }
 
 .feature-box h5 {
@@ -198,7 +198,7 @@ html {
    =================================== */
 .about-section {
   padding: 100px 0;
-  background: #000;
+  background: #0a1929;
 }
 
 .about-section h1 {
@@ -209,7 +209,7 @@ html {
 }
 
 .about-section h1 .text-danger {
-  color: #dc3545 !important;
+  color: #42a5f5 !important;
 }
 
 .about-section p {
@@ -232,7 +232,7 @@ html {
   object-fit: cover;
   border-radius: 12px;
   transition: transform 0.3s ease;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
 }
 
 .about-img:hover {
@@ -244,7 +244,7 @@ html {
    =================================== */
 .classes-section {
   padding: 120px 0 80px;
-  background: #000;
+  background: #0d1b2a;
   min-height: 100vh;
 }
 
@@ -268,7 +268,7 @@ html {
 
 .tab-btn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(66, 165, 245, 0.3);
   color: rgba(255, 255, 255, 0.7);
   padding: 10px 30px;
   margin: 0 10px;
@@ -280,15 +280,15 @@ html {
 
 .tab-btn.active,
 .tab-btn:hover {
-  background: #dc3545;
-  border-color: #dc3545;
+  background: #1976d2;
+  border-color: #1976d2;
   color: #fff;
 }
 
 /* Class Cards */
 .class-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 15px;
   overflow: hidden;
   transition: all 0.3s;
@@ -297,8 +297,8 @@ html {
 
 .class-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(220, 53, 69, 0.5);
-  box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+  border-color: rgba(66, 165, 245, 0.5);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
 }
 
 .class-image {
@@ -323,7 +323,7 @@ html {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  background: linear-gradient(to top, rgba(10, 25, 41, 0.9), transparent);
   padding: 20px;
 }
 
@@ -346,7 +346,7 @@ html {
 }
 
 .class-schedule {
-  color: #dc3545;
+  color: #42a5f5;
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 15px;
@@ -354,7 +354,7 @@ html {
 
 .btn-booking {
   width: 100%;
-  background: #dc3545;
+  background: #1976d2;
   color: #fff;
   border: none;
   padding: 12px;
@@ -365,16 +365,16 @@ html {
 }
 
 .btn-booking:hover {
-  background: #c82333;
+  background: #1565c0;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
 }
 /* ===================================
    GALLERY SECTION
    =================================== */
 .gallery-section {
   padding: 100px 0;
-  background: #0a0a0a;
+  background: #0a1929;
 }
 
 .gallery-item {
@@ -401,7 +401,7 @@ html {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  background: linear-gradient(to top, rgba(10, 25, 41, 0.95), transparent);
   padding: 20px;
   transform: translateY(100%);
   transition: transform 0.3s ease;
@@ -423,7 +423,7 @@ html {
    =================================== */
 .testimonial-section {
   padding: 100px 0;
-  background: #000;
+  background: #0d1b2a;
 }
 
 .testimonial-wrapper {
@@ -433,8 +433,8 @@ html {
 }
 
 .testimonial-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 15px;
   padding: 50px;
   text-align: center;
@@ -447,7 +447,7 @@ html {
 }
 
 .star-icon {
-  color: #dc3545;
+  color: #ffc107;
   font-size: 1.5rem;
   font-style: normal;
 }
@@ -471,7 +471,7 @@ html {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 3px solid #dc3545;
+  border: 3px solid #1976d2;
 }
 
 .author-name {
@@ -506,7 +506,7 @@ html {
 
 .nav-dot.active,
 .nav-dot:hover {
-  background: #dc3545;
+  background: #1976d2;
   width: 30px;
   border-radius: 5px;
 }
@@ -526,7 +526,7 @@ html {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(220, 53, 69, 0.8);
+  background: rgba(25, 118, 210, 0.8);
   border: none;
   color: #fff;
   font-size: 1.5rem;
@@ -536,7 +536,7 @@ html {
 }
 
 .arrow-btn:hover {
-  background: #dc3545;
+  background: #1976d2;
   transform: scale(1.1);
 }
 /* ===================================
@@ -544,12 +544,12 @@ html {
    =================================== */
 .membership-section {
   padding: 100px 0;
-  background: #000;
+  background: #0a1929;
 }
 
 .pricing-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 20px;
   padding: 40px 30px;
   text-align: center;
@@ -560,13 +560,13 @@ html {
 
 .pricing-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(220, 53, 69, 0.5);
-  box-shadow: 0 15px 40px rgba(220, 53, 69, 0.2);
+  border-color: rgba(66, 165, 245, 0.5);
+  box-shadow: 0 15px 40px rgba(25, 118, 210, 0.3);
 }
 
 .pricing-card.popular {
-  background: rgba(220, 53, 69, 0.05);
-  border: 2px solid #dc3545;
+  background: rgba(25, 118, 210, 0.1);
+  border: 2px solid #1976d2;
   transform: scale(1.05);
 }
 
@@ -579,7 +579,7 @@ html {
   top: -15px;
   left: 50%;
   transform: translateX(-50%);
-  background: #dc3545;
+  background: #1976d2;
   color: #fff;
   padding: 8px 24px;
   border-radius: 20px;
@@ -599,7 +599,7 @@ html {
 .pricing-price {
   margin-bottom: 30px;
   padding-bottom: 30px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(66, 165, 245, 0.2);
 }
 
 .price-currency {
@@ -642,8 +642,8 @@ html {
 .check-icon {
   width: 24px;
   height: 24px;
-  background: rgba(220, 53, 69, 0.2);
-  color: #dc3545;
+  background: rgba(25, 118, 210, 0.2);
+  color: #42a5f5;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -655,8 +655,8 @@ html {
 .btn-pricing {
   width: 100%;
   background: transparent;
-  border: 2px solid #dc3545;
-  color: #dc3545;
+  border: 2px solid #1976d2;
+  color: #1976d2;
   padding: 14px;
   border-radius: 10px;
   font-weight: 600;
@@ -666,19 +666,19 @@ html {
 }
 
 .btn-pricing:hover {
-  background: #dc3545;
+  background: #1976d2;
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
 }
 
 .btn-pricing.popular-btn {
-  background: #dc3545;
+  background: #1976d2;
   color: #fff;
 }
 
 .btn-pricing.popular-btn:hover {
-  background: #c82333;
+  background: #1565c0;
 }
 
 .pricing-note {
@@ -692,12 +692,12 @@ html {
    =================================== */
 .trainers-section {
   padding: 100px 0;
-  background: #0a0a0a;
+  background: #0d1b2a;
 }
 
 .trainer-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 15px;
   overflow: hidden;
   transition: all 0.3s;
@@ -706,8 +706,8 @@ html {
 
 .trainer-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(220, 53, 69, 0.5);
-  box-shadow: 0 15px 40px rgba(220, 53, 69, 0.2);
+  border-color: rgba(66, 165, 245, 0.5);
+  box-shadow: 0 15px 40px rgba(25, 118, 210, 0.3);
 }
 
 .trainer-image {
@@ -746,7 +746,7 @@ html {
 }
 
 .badge-specialty {
-  background: #dc3545;
+  background: #1976d2;
   color: #fff;
   padding: 5px 15px;
   border-radius: 15px;
@@ -778,7 +778,7 @@ html {
 
 .trainer-certs {
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(66, 165, 245, 0.2);
 }
 
 .cert-title {
@@ -790,27 +790,27 @@ html {
 
 .cert-badge {
   display: inline-block;
-  background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  background: rgba(25, 118, 210, 0.15);
+  color: #42a5f5;
   padding: 5px 12px;
   border-radius: 5px;
   font-size: 0.75rem;
   font-weight: 600;
   margin-right: 8px;
   margin-bottom: 5px;
-  border: 1px solid rgba(220, 53, 69, 0.3);
+  border: 1px solid rgba(66, 165, 245, 0.3);
 }
 /* ===================================
    CONTACT SECTION
    =================================== */
 .contact-section {
   padding: 100px 0;
-  background: #000;
+  background: #0a1929;
 }
 
 .contact-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(25, 118, 210, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 15px;
   padding: 40px 25px;
   text-align: center;
@@ -820,20 +820,20 @@ html {
 
 .contact-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(220, 53, 69, 0.5);
-  box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+  border-color: rgba(66, 165, 245, 0.5);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
 }
 
 .contact-icon {
   width: 70px;
   height: 70px;
   margin: 0 auto 20px;
-  background: rgba(220, 53, 69, 0.1);
+  background: rgba(25, 118, 210, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #dc3545;
+  color: #42a5f5;
 }
 
 .contact-title {
@@ -856,7 +856,7 @@ html {
 }
 
 .contact-link:hover {
-  color: #dc3545;
+  color: #42a5f5;
 }
 
 /* Instagram CTA */
@@ -892,12 +892,12 @@ html {
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s;
-  box-shadow: 0 5px 20px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 5px 20px rgba(188, 24, 136, 0.3);
 }
 
 .btn-instagram:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(220, 53, 69, 0.5);
+  box-shadow: 0 8px 30px rgba(188, 24, 136, 0.5);
   color: #fff;
 }
 
@@ -911,7 +911,7 @@ html {
   margin-top: 60px;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
 }
 /* ========================================
    BLOG SECTION STYLES
@@ -919,7 +919,7 @@ html {
 
 .blog-section {
   padding: 100px 0;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, #0d1b2a 0%, #122033 100%);
   position: relative;
   overflow: hidden;
 }
@@ -931,8 +931,8 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 50%, rgba(220, 38, 38, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(220, 38, 38, 0.05) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 50%, rgba(25, 118, 210, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(25, 118, 210, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -943,20 +943,20 @@ html {
 
 /* Blog Card */
 .blog-card {
-  background: #1e1e1e;
+  background: rgba(25, 118, 210, 0.05);
   border-radius: 15px;
   overflow: hidden;
   transition: all 0.4s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(66, 165, 245, 0.2);
 }
 
 .blog-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.3);
+  box-shadow: 0 20px 40px rgba(25, 118, 210, 0.3);
+  border-color: rgba(66, 165, 245, 0.5);
 }
 
 /* Blog Image */
@@ -1000,13 +1000,13 @@ html {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #dc2626;
+  color: #42a5f5;
   font-weight: 500;
 }
 
 .blog-date svg,
 .blog-duration svg {
-  color: #dc2626;
+  color: #42a5f5;
 }
 
 /* Blog Title */
@@ -1024,7 +1024,7 @@ html {
 }
 
 .blog-card:hover .blog-title {
-  color: #dc2626;
+  color: #42a5f5;
 }
 
 /* Blog Excerpt */
@@ -1044,7 +1044,7 @@ html {
 .blog-link {
   display: inline-flex;
   align-items: center;
-  color: #dc2626;
+  color: #42a5f5;
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
@@ -1053,7 +1053,7 @@ html {
 }
 
 .blog-link:hover {
-  color: #ff4444;
+  color: #64b5f6;
   gap: 8px;
 }
 

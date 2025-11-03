@@ -90,7 +90,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <li class="nav-item">
-                    <a href="../../../data/admin/instruktur/instruktur.php" class="nav-link <?php if ($current_page == 'pelatih.php') {
+                    <a href="../../../data/admin/instruktur/instruktur.php" class="nav-link <?php if ($current_page == 'instruktur.php') {
                                                                                                 echo 'active';
                                                                                             } ?>">
                         <i class="nav-icon fas fa-chalkboard-teacher"></i>

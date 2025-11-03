@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arena FIT - Gym and Class</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#home">
+        <span class="brand-box">AF</span>
+        <div>
+          <span class="brand-text">Arena FIT</span>
+          <span class="brand-subtitle">Gym and Class</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">Tentang Kami</a></li>
+          <li class="nav-item"><a class="nav-link" href="#classes">Kelas & Jadwal</a></li>
+          <li class="nav-item"><a class="nav-link" href="#membership">Membership</a></li>
+          <li class="nav-item"><a class="nav-link" href="#trainers">Instruktur</a></li>
+          <li class="nav-item"><a class="nav-link" href="#blog">Blog</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Kontak</a></li>
+        </ul>
+        <a href="registration.html" class="btn btn-danger ms-3">Daftar Member</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="text-white">Stay</span> <span class="text-danger">Strong</span>
+        <br>
+        <span class="text-white">Stay</span> <span class="text-danger">Healthy</span>
+      </h1>
+      <p>with Arena FIT</p>
+      <a href="#membership" class="btn btn-danger btn-lg">Join Now</a>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="features">
+    <div class="container">
+      <div class="row g-4">
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M2 12h20M6 6l12 12M18 6L6 18"/>
+              </svg>
+            </div>
+            <h5>Fasilitas Modern</h5>
+            <p>Peralatan gym terbaru dan lengkap untuk semua jenis latihan</p>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z"/>
+              </svg>
+            </div>
+            <h5>Kelas Variatif</h5>
+            <p>Berbagai pilihan kelas dari yoga hingga CrossFit untuk semua level</p>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </div>
+            <h5>Trainer Berpengalaman</h5>
+            <p>Instruktur profesional bersertifikat siap membimbing Anda</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <div class="row align-items-center">
+        
+        <!-- Teks -->
+        <div class="col-lg-6 mb-4 mb-lg-0">
+          <h1>
+            Tentang <span class="text-danger">Arena FIT</span>
+          </h1>
+
+          <p>
+            Arena FIT Gym and Class adalah pusat kebugaran modern yang berkomitmen untuk membantu Anda
+            mencapai tujuan kesehatan dan kebugaran Anda.
+          </p>
+
+          <p>
+            Dengan fasilitas terlengkap, instruktur berpengalaman, dan berbagai pilihan kelas, kami siap mendampingi perjalanan transformasi tubuh Anda.
+          </p>
+
+          <p>
+            Bergabunglah dengan komunitas kami dan rasakan pengalaman fitness yang berbeda!
+          </p>
+        </div>
+
+        <!-- Gambar -->
+        <div class="col-lg-6">
+          <div class="about-images">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=350&fit=crop" 
+                 class="about-img" alt="Training">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=350&fit=crop" 
+                 class="about-img" alt="Gym Equipment">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY SECTION -->
+  <section id="gallery" class="gallery-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <h1 class="section-title">Galeri <span class="text-danger">Foto</span></h1>
+        <p class="section-subtitle">Lihat suasana dan fasilitas Arena FIT</p>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div class="row g-3">
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=350&fit=crop" alt="Modern Gym Facility">
+            <div class="gallery-overlay">
+              <h5>Modern Gym Facility</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&h=350&fit=crop" alt="Group Fitness Classes">
+            <div class="gallery-overlay">
+              <h5>Group Fitness Classes</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f?w=500&h=350&fit=crop" alt="Yoga Sessions">
+            <div class="gallery-overlay">
+              <h5>Yoga Sessions</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=350&fit=crop" alt="CrossFit Training">
+            <div class="gallery-overlay">
+              <h5>CrossFit Training</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1623874228601-f4193c7b1818?w=500&h=350&fit=crop" alt="Strength Equipment">
+            <div class="gallery-overlay">
+              <h5>Strength Equipment</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=500&h=350&fit=crop" alt="Dance Fitness">
+            <div class="gallery-overlay">
+              <h5>Dance Fitness</h5>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL SECTION -->
+  <section id="testimonial" class="testimonial-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <h1 class="section-title">Testimoni <span class="text-danger">Member</span></h1>
+        <p class="section-subtitle">Dengar cerita sukses dari member kami</p>
+      </div>
+
+      <!-- Testimonial Card -->
+      <div class="testimonial-wrapper">
+        <div class="testimonial-card">
+          <!-- Stars -->
+          <div class="testimonial-stars mb-3">
+            <i class="star-icon">★</i>
+            <i class="star-icon">★</i>
+            <i class="star-icon">★</i>
+            <i class="star-icon">★</i>
+            <i class="star-icon">★</i>
+          </div>
+
+          <!-- Quote -->
+          <p class="testimonial-quote">
+            "Arena FIT benar-benar mengubah hidup saya! Instruktur yang profesional dan 
+            fasilitas yang lengkap membuat saya termotivasi setiap hari. Dalam 6 bulan, 
+            saya berhasil menurunkan 15kg!"
+          </p>
+
+          <!-- Author -->
+          <div class="testimonial-author">
+            <img src="https://i.pravatar.cc/100?img=12" alt="Andi Wijaya" class="author-img">
+            <div>
+              <h5 class="author-name">Andi Wijaya</h5>
+              <p class="author-role">Member sejak 2023</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Dots -->
+        <div class="testimonial-nav">
+          <button class="nav-dot active"></button>
+          <button class="nav-dot"></button>
+          <button class="nav-dot"></button>
+        </div>
+
+        <!-- Arrow Navigation -->
+        <div class="testimonial-arrows">
+          <button class="arrow-btn prev">‹</button>
+          <button class="arrow-btn next">›</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CLASSES SECTION -->
+  <section id="classes" class="classes-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <h1 class="section-title">Kelas & <span class="text-danger">Jadwal</span></h1>
+        <p class="section-subtitle">Pilih kelas favorit Anda dan bergabunglah dengan kami</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="class-tabs text-center mb-5">
+        <button class="tab-btn active">Kelas Populer</button>
+        <button class="tab-btn">Semua Kelas</button>
+      </div>
+
+      <!-- Class Cards -->
+      <div class="row g-4">
+
+        <!-- Yoga -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f?w=500&h=300&fit=crop" alt="Yoga">
+              <div class="class-overlay">
+                <h3 class="class-name">Yoga</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Meningkatkan fleksibilitas dan ketenangan pikiran</p>
+              <p class="class-schedule">Semua Level</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zumba -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop" alt="Zumba">
+              <div class="class-overlay">
+                <h3 class="class-name">Zumba</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Olahraga kardio yang menyenangkan dengan musik</p>
+              <p class="class-schedule">Pemula - Mahir</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Combat -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=500&h=300&fit=crop" alt="Body Combat">
+              <div class="class-overlay">
+                <h3 class="class-name">Body Combat</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Latihan kardio dengan gerakan bela diri</p>
+              <p class="class-schedule">Menengah - Lanjut</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strength Training -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=300&fit=crop" alt="Strength Training">
+              <div class="class-overlay">
+                <h3 class="class-name">Strength Training</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Membangun dan menguatkan otot tubuh</p>
+              <p class="class-schedule">Semua Level</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilates -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop" alt="Pilates">
+              <div class="class-overlay">
+                <h3 class="class-name">Pilates</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Meningkatkan kekuatan inti dan postur tubuh</p>
+              <p class="class-schedule">Pemula - Menengah</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CrossFit -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop" alt="CrossFit">
+              <div class="class-overlay">
+                <h3 class="class-name">CrossFit</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Latihan intensitas tinggi untuk hasil maksimal</p>
+              <p class="class-schedule">Lanjut</p>
+              <button class="btn-booking">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+ <!-- MEMBERSHIP SECTION -->
+<section id="membership" class="membership-section">
+  <div class="container">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h1 class="section-title">Paket <span class="text-danger">Membership</span></h1>
+      <p class="section-subtitle">Pilih paket yang sesuai dengan kebutuhan Anda</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="row g-4 justify-content-center">
+
+      <!-- Paket Harian -->
+      <div class="col-lg-4 col-md-6">
+        <div class="pricing-card">
+          <h3 class="pricing-title">Harian</h3>
+          <div class="pricing-price">
+            <span class="price-currency">Rp</span>
+            <span class="price-amount">50.000</span>
+            <span class="price-period">per hari</span>
+          </div>
+
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Akses gym 1 hari</li>
+            <li><span class="check-icon">✓</span> Akses semua peralatan</li>
+            <li><span class="check-icon">✓</span> Loker gratis</li>
+            <li><span class="check-icon">✓</span> Handuk gratis</li>
+          </ul>
+
+        <a href="registration.html" class="btn btn-danger">Daftar Sekarang</a>
+        </div>
+      </div>
+
+      <!-- Paket Bulanan (Popular) -->
+      <div class="col-lg-4 col-md-6">
+        <div class="pricing-card popular">
+          <span class="popular-badge">Paling Populer</span>
+          <h3 class="pricing-title">Bulanan</h3>
+          <div class="pricing-price">
+            <span class="price-currency">Rp</span>
+            <span class="price-amount">500.000</span>
+            <span class="price-period">per bulan</span>
+          </div>
+
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Akses gym unlimited</li>
+            <li><span class="check-icon">✓</span> Akses semua peralatan</li>
+            <li><span class="check-icon">✓</span> 3 sesi personal trainer</li>
+            <li><span class="check-icon">✓</span> Loker pribadi</li>
+            <li><span class="check-icon">✓</span> Handuk gratis</li>
+            <li><span class="check-icon">✓</span> Free consultation</li>
+          </ul>
+
+       <a href="registration.html" class="btn btn-danger">Daftar Sekarang</a>
+        </div>
+      </div>
+
+      <!-- Paket Tahunan -->
+      <div class="col-lg-4 col-md-6">
+        <div class="pricing-card">
+          <h3 class="pricing-title">Tahunan</h3>
+          <div class="pricing-price">
+            <span class="price-currency">Rp</span>
+            <span class="price-amount">4.500.000</span>
+            <span class="price-period">per tahun</span>
+          </div>
+
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Akses gym unlimited</li>
+            <li><span class="check-icon">✓</span> Akses semua peralatan</li>
+            <li><span class="check-icon">✓</span> Kelas unlimited</li>
+            <li><span class="check-icon">✓</span> Loker pribadi</li>
+            <li><span class="check-icon">✓</span> Handuk gratis</li>
+            <li><span class="check-icon">✓</span> 2 sesi personal trainer</li>
+            <li><span class="check-icon">✓</span> Program nutrisi</li>
+            <li><span class="check-icon">✓</span> Diskon merchandise 20%</li>
+          </ul>
+
+       <a href="registration.html" class="btn btn-danger">Daftar Sekarang</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center mt-5">
+      <p class="pricing-note">Semua paket termasuk akses ke fasilitas shower, WiFi gratis, dan parkir</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRAINERS SECTION -->
+<section id="trainers" class="trainers-section">
+  <div class="container">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h1 class="section-title">Instruktur <span class="text-danger">Profesional</span></h1>
+      <p class="section-subtitle">Tim instruktur bersertifikat dan berpengalaman</p>
+    </div>
+
+    <!-- Trainers Grid -->
+    <div class="row g-4">
+
+      <!-- Trainer 1 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="trainer-card">
+          <div class="trainer-image">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop" alt="Sarah Johnson">
+          </div>
+          <div class="trainer-info">
+            <h3 class="trainer-name">Sarah Johnson</h3>
+            <div class="trainer-badges">
+              <span class="badge-specialty">Yoga</span>
+              <span class="badge-specialty">Pilates</span>
+            </div>
+            <p class="trainer-title">Jadwal Mengajar</p>
+            <p class="trainer-schedule">Sen, Rab, Jum</p>
+            <p class="trainer-desc">8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga.</p>
+            <div class="trainer-certs">
+              <p class="cert-title">Sertifikasi:</p>
+              <span class="cert-badge">RYT-500</span>
+              <span class="cert-badge">Pilates certified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trainer 2 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="trainer-card">
+          <div class="trainer-image">
+            <img src="https://images.unsplash.com/photo-1567598508481-65985588e295?w=400&h=500&fit=crop" alt="Mike Anderson">
+          </div>
+          <div class="trainer-info">
+            <h3 class="trainer-name">Mike Anderson</h3>
+            <div class="trainer-badges">
+              <span class="badge-specialty">Body Combat</span>
+            </div>
+            <p class="trainer-title">Jadwal Mengajar</p>
+            <p class="trainer-schedule">Sen, Rab, Sab</p>
+            <p class="trainer-desc">10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional.</p>
+            <div class="trainer-certs">
+              <p class="cert-title">Sertifikasi:</p>
+              <span class="cert-badge">NSCA-CPT</span>
+              <span class="cert-badge">CrossFit Level 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trainer 3 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="trainer-card">
+          <div class="trainer-image">
+            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop" alt="Lisa Martinez">
+          </div>
+          <div class="trainer-info">
+            <h3 class="trainer-name">Lisa Martinez</h3>
+            <div class="trainer-badges">
+              <span class="badge-specialty">Zumba</span>
+              <span class="badge-specialty">Dance Fitness</span>
+            </div>
+            <p class="trainer-title">Jadwal Mengajar</p>
+            <p class="trainer-schedule">Sel, Kam, Jum</p>
+            <p class="trainer-desc">6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!</p>
+            <div class="trainer-certs">
+              <p class="cert-title">Sertifikasi:</p>
+              <span class="cert-badge">Zumba B1 & B2</span>
+              <span class="cert-badge">AFAA Certified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trainer 4 -->
+      <div class="col-lg-3 col-md-6">
+        <div class="trainer-card">
+          <div class="trainer-image">
+            <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop" alt="David Chen">
+          </div>
+          <div class="trainer-info">
+            <h3 class="trainer-name">David Chen</h3>
+            <div class="trainer-badges">
+              <span class="badge-specialty">CrossFit</span>
+              <span class="badge-specialty">HIIT</span>
+            </div>
+            <p class="trainer-title">Jadwal Mengajar</p>
+            <p class="trainer-schedule">Sel, Kam, Sab</p>
+            <p class="trainer-desc">7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.</p>
+            <div class="trainer-certs">
+              <p class="cert-title">Sertifikasi:</p>
+              <span class="cert-badge">CrossFit L-2</span>
+              <span class="cert-badge">ACE Personal Trainer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+ <!-- BLOG SECTION -->
+  <section id="blog" class="blog-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <h1 class="section-title">Blog & <span class="text-danger">Artikel</span></h1>
+        <p class="section-subtitle">Tips, trik, dan informasi seputar fitness dan kesehatan</p>
+      </div>
+
+      <!-- Blog Grid -->
+      <div class="row g-4">
+
+        <!-- Blog Card 1 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=250&fit=crop" alt="Tips Diet Sehat">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  20 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  5 min
+                </span>
+              </div>
+              <h3 class="blog-title">Tips Diet Sehat untuk Pemula</h3>
+              <p class="blog-excerpt">Mulai perjalanan diet Anda dengan tips praktis yang mudah diterapkan dalam kehidupan sehari-hari</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Card 2 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=250&fit=crop" alt="Pola Latihan Efektif">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  18 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  7 min
+                </span>
+              </div>
+              <h3 class="blog-title">Pola Latihan Efektif untuk Pembentukan Otot</h3>
+              <p class="blog-excerpt">Panduan lengkap tentang program latihan yang efektif untuk meningkatkan massa otot dengan cepat dan aman</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Card 3 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop" alt="Motivasi Kebugaran">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  15 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  4 min
+                </span>
+              </div>
+              <h3 class="blog-title">Motivasi Kebugaran: Tetap Konsisten</h3>
+              <p class="blog-excerpt">Strategi mental dan tips praktis untuk menjaga motivasi kebugaran Anda tetap tinggi setiap hari</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Card 4 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop" alt="Nutrisi untuk Otot">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  12 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  6 min
+                </span>
+              </div>
+              <h3 class="blog-title">Nutrisi untuk Otot: Protein dan Suplemen</h3>
+              <p class="blog-excerpt">Pelajari tentang kebutuhan protein harian dan jenis suplemen terbaik untuk mendukung pertumbuhan otot</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Card 5 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=250&fit=crop" alt="Yoga untuk Pemulihan">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  10 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  5 min
+                </span>
+              </div>
+              <h3 class="blog-title">Yoga untuk Pemulihan dan Fleksibilitas</h3>
+              <p class="blog-excerpt">Manfaat yoga untuk pemulihan otot setelah latihan dan meningkatkan fleksibilitas tubuh</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Card 6 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="blog-card">
+            <div class="blog-image">
+              <img src="https://images.unsplash.com/photo-1549476464-37392f717541?w=400&h=250&fit=crop" alt="CrossFit Panduan">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span class="blog-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  8 Oktober 2025
+                </span>
+                <span class="blog-duration">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  8 min
+                </span>
+              </div>
+              <h3 class="blog-title">CrossFit: Panduan untuk Pemula</h3>
+              <p class="blog-excerpt">Memulai CrossFit dengan panduan lengkap untuk pemula, dari teknik dasar hingga tips keselamatan</p>
+              <a href="#" class="blog-link">Baca Selengkapnya →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+ <!-- CONTACT SECTION -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h1 class="section-title">Hubungi <span class="text-danger">Kami</span></h1>
+      <p class="section-subtitle">Kami siap membantu Anda memulai perjalanan fitness</p>
+    </div>
+
+    <!-- Contact Info Grid -->
+    <div class="row g-4 justify-content-center">
+
+      <!-- Alamat -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <h4 class="contact-title">Alamat</h4>
+          <p class="contact-text">Jl. Kebugaran No. 123, Jakarta Selatan 12345</p>
+        </div>
+      </div>
+
+      <!-- Telepon -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <h4 class="contact-title">Telepon</h4>
+          <a href="tel:+6281234567890" class="contact-text contact-link">+62 812-3456-7890</a>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <h4 class="contact-title">Email</h4>
+          <a href="mailto:info@arenafit.com" class="contact-text contact-link">info@arenafit.com</a>
+        </div>
+      </div>
+
+      <!-- Jam Buka -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h4 class="contact-title">Jam Buka</h4>
+          <p class="contact-text">Senin - Minggu<br>05:00 - 22:00</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Instagram CTA -->
+    <div class="instagram-cta">
+      <h3 class="instagram-title">Ikuti Kami di Instagram</h3>
+      <p class="instagram-subtitle">Lihat update terbaru, tips fitness, dan cerita inspiratif dari member kami</p>
+      <a href="https://www.instagram.com/arenafitclubjember?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="btn-instagram">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        @arenafitclubjember
+      </a>
+    </div>
+
+<!-- Map -->
+<div class="contact-map">
+  <iframe 
+    src="https://maps.app.goo.gl/5iK7z18jjnPrwrLC6?g_st=aw" 
+    width="100%" 
+    height="400" 
+    style="border:0; border-radius: 15px;" 
+    allowfullscreen="" 
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+</div>
+  </div>
+</section>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

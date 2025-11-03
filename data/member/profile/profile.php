@@ -29,8 +29,8 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
 ?>
 
 <!-- Tambahan CSS -->
-<link rel="stylesheet" href="../../../assets/assets_member/css/custom-program.css">
-
+<link rel="stylesheet" href="../../../assets/assets_member/css/custom-profile.css">
+<script src="../../../assets/assets_member/js/custom-profile.js"></script>
 <!-- Konten -->
 <div class="content-wrapper">
     <!-- Header Halaman -->
@@ -38,7 +38,7 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
         <div class="container">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-primary"><i class="fas fa-user-circle"></i> Profil Member</h1>
+                    <h1 class="m-0"><i class="fas fa-user-circle"></i> Profil Member</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -85,7 +85,7 @@ if (!file_exists($foto_path) || empty($data['foto'])) {
 
                                 <!-- Konten Detail Informasi -->
                                 <div class="col-md-8 profile-content">
-                                    <h4 class="text-light mb-4"><i class="fas fa-info-circle text-primary me-2"></i>Informasi Profil</h4>
+                                    <h4 class="text-dark mb-4"><i class="fas fa-info-circle text-primary me-2"></i>Informasi Profil</h4>
                                     
                                     <table class="detail-table">
                                         <tr>

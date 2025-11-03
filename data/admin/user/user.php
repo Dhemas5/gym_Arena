@@ -42,7 +42,7 @@ $queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
                             <i class="fas fa-plus"></i> Tambah User
                         </button>
                         <div class="table-responsive rounded">
-                            <table id="tabelpelatih" class="table table-bordered table-striped table-hover">
+                            <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>

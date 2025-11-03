@@ -119,9 +119,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <!-- Added Reports section -->
                 <li class="nav-header">TRANSAKSI</li>
                 <li class="nav-item">
-                    <a href="../../../data/admin/transaksi/tambah_transaksi.php" class="nav-link <?php if ($current_page == 'tambah_transaksi.php') {
-                                                                                                        echo 'active';
-                                                                                                    } ?>">
+                    <a href="../../../data/admin/transaksi/transaksi.php" class="nav-link <?php if ($current_page == 'transaksi.php') {
+                                                                                                echo 'active';
+                                                                                            } ?>">
                         <i class="nav-icon fas fa-cash-register"></i>
                         <p>Transaksi</p>
                     </a>

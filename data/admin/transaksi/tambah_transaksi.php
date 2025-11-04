@@ -117,35 +117,40 @@ include '../../../view/master/sidebar.php';
                             <span class="badge bg-light text-primary">Langkah 2</span>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-5 form-group floating-label">
-                                    <select class="form-control select2" id="id_paket" required>
-                                        <option value="">-- Pilih Paket --</option>
-                                        <?php foreach ($pakets as $p): ?>
-                                            <option value="<?= $p['id_paket'] ?>"
-                                                data-harga="<?= $p['harga'] ?>"
-                                                data-nama="<?= htmlspecialchars($p['nama_paket']) ?>">
-                                                <?= htmlspecialchars($p['nama_paket']) ?> (Rp <?= number_format($p['harga'], 0, ',', '.') ?>)
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label>Pilih Paket</label>
-                                </div>
-                                <div class="col-md-2 form-group floating-label">
-                                    <input type="number" class="form-control" id="qty" min="1" value="1" placeholder=" ">
-                                    <label>Qty</label>
-                                </div>
-                                <div class="col-md-3 form-group floating-label">
-                                    <input type="number" class="form-control" id="diskon_item" min="0" value="0" step="0.01" placeholder=" ">
-                                    <label>Diskon Item (Rp)</label>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="button" class="btn btn-info btn-block" id="btnHitung">
-                                        <i class="fas fa-calculator mr-1"></i> Hitung
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+  <div class="row align-items-end">
+    <div class="col-md-5 form-group">
+      <label for="id_paket" class="font-weight-bold mb-1 text-primary">Pilih Paket</label>
+      <select class="select2 form-control" id="id_paket" required style="width: 100%; height: 42px;">
+        <option value="">-- Pilih Paket --</option>
+        <?php foreach ($pakets as $p): ?>
+          <option value="<?= $p['id_paket'] ?>"
+            data-harga="<?= $p['harga'] ?>"
+            data-nama="<?= htmlspecialchars($p['nama_paket']) ?>">
+            <?= htmlspecialchars($p['nama_paket']) ?> (Rp <?= number_format($p['harga'], 0, ',', '.') ?>)
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="col-md-2 form-group floating-label">
+      <input type="number" class="form-control" id="qty" min="1" value="1" placeholder=" ">
+      <label for="qty">Qty</label>
+    </div>
+
+    <div class="col-md-3 form-group floating-label">
+      <input type="number" class="form-control" id="diskon_item" min="0" value="0" step="0.01" placeholder=" ">
+      <label for="diskon_item">Diskon Item (Rp)</label>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="button" class="btn btn-info btn-block" id="btnHitung">
+        <i class="fas fa-calculator mr-1"></i> Hitung
+      </button>
+    </div>
+  </div>
+</div>
+
+
                     </div>
 
                     <!-- Info Paket Dipilih -->
@@ -251,20 +256,20 @@ include '../../../view/master/sidebar.php';
                         </div>
                         <div class="card-body small">
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Sub Total</span> 
+                                <span>Sub Total</span>
                                 <span id="sub_total_display" class="font-weight-bold">Rp 0</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Diskon Item</span> 
+                                <span>Diskon Item</span>
                                 <span id="diskon_item_display" class="text-danger">- Rp 0</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Diskon Global</span> 
+                                <span>Diskon Global</span>
                                 <input type="number" class="form-control form-control-sm text-right w-50" id="diskon_global" value="0" min="0">
                             </div>
                             <hr class="my-2">
                             <div class="d-flex justify-content-between text-success font-weight-bold">
-                                <span>Grand Total</span> 
+                                <span>Grand Total</span>
                                 <span id="grand_total_display2">Rp 0</span>
                             </div>
                         </div>
@@ -360,14 +365,14 @@ include '../../../view/master/sidebar.php';
             const kembalian = dibayar - final_total;
             $('#kembalian').text(formatRupiah(kembalian > 0 ? kembalian : 0));
         }
-        
+
         // Update step indicator
         if ($('#id_paket').val()) {
             $('.step').eq(1).addClass('active');
         } else {
             $('.step').eq(1).removeClass('active');
         }
-        
+
         if ($('#metode_pembayaran').val()) {
             $('.step').eq(2).addClass('active');
         } else {
@@ -376,11 +381,8 @@ include '../../../view/master/sidebar.php';
     }
 
     $(document).ready(function() {
-        // Inisialisasi Select2
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            placeholder: '-- Pilih Paket --'
-        });
+
+
 
         // Inisialisasi DataTables untuk modal member
         $('#tblMember').DataTable({
@@ -404,7 +406,7 @@ include '../../../view/master/sidebar.php';
             $('#id_member_hidden').val($(this).data('id'));
             $('#nama_member_display').val($(this).data('nama'));
             $('#modalCariMember').modal('hide');
-            
+
             // Update step indicator
             $('.step').eq(0).addClass('active');
         });
@@ -564,7 +566,7 @@ include '../../../view/master/sidebar.php';
                 if (r.isConfirmed) location.reload();
             });
         });
-        
+
         // Floating label functionality
         $('.floating-label .form-control').on('focus', function() {
             $(this).siblings('label').addClass('active');
@@ -573,7 +575,7 @@ include '../../../view/master/sidebar.php';
                 $(this).siblings('label').removeClass('active');
             }
         });
-        
+
         // Initialize floating labels for pre-filled values
         $('.floating-label .form-control').each(function() {
             if ($(this).val()) {

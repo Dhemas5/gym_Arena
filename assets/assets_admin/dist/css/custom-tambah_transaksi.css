@@ -14,6 +14,12 @@
     --gradient-paket: linear-gradient(135deg, #000b58 0%, #003161 100%);
 }
 
+.select2-hidden-accessible {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f5f7fb;

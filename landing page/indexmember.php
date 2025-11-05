@@ -34,13 +34,13 @@ $user_data = [
 </head>
 <body>
 
-  <?php include 'header.php'; ?>
+  <?php include 'headermember.php'; ?>
 
   <main>
     <?php
     // Include semua section dari folder sectionsmember
     include 'sectionsmember/welcome.php';
-    include 'sectionsmember/classes.php';
+    include 'sectionsmember/classesmember.php';
     include 'sectionsmember/bookings.php';
     ?>
   </main>

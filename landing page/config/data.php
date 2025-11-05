@@ -222,38 +222,46 @@ $contact_info = [
     'instagram' => 'arenafitclubjember'
 ];
 
-// Fungsi helper
-function format_currency($amount) {
-    return 'Rp ' . number_format($amount, 0, ',', '.');
+// CEK APAKAH FUNGSI SUDAH ADA SEBELUM DIDEKLARASIKAN
+if (!function_exists('format_currency')) {
+    function format_currency($amount) {
+        return 'Rp ' . number_format($amount, 0, ',', '.');
+    }
 }
 
-function get_class_by_id($class_id) {
-    global $classes;
-    foreach ($classes as $class) {
-        if ($class['id'] == $class_id) {
-            return $class;
+if (!function_exists('get_class_by_id')) {
+    function get_class_by_id($class_id) {
+        global $classes;
+        foreach ($classes as $class) {
+            if ($class['id'] == $class_id) {
+                return $class;
+            }
         }
+        return null;
     }
-    return null;
 }
 
-function get_trainer_by_id($trainer_id) {
-    global $trainers;
-    foreach ($trainers as $trainer) {
-        if ($trainer['id'] == $trainer_id) {
-            return $trainer;
+if (!function_exists('get_trainer_by_id')) {
+    function get_trainer_by_id($trainer_id) {
+        global $trainers;
+        foreach ($trainers as $trainer) {
+            if ($trainer['id'] == $trainer_id) {
+                return $trainer;
+            }
         }
+        return null;
     }
-    return null;
 }
 
-function get_schedule_by_id($schedule_id) {
-    global $schedules;
-    foreach ($schedules as $schedule) {
-        if ($schedule['id'] == $schedule_id) {
-            return $schedule;
+if (!function_exists('get_schedule_by_id')) {
+    function get_schedule_by_id($schedule_id) {
+        global $schedules;
+        foreach ($schedules as $schedule) {
+            if ($schedule['id'] == $schedule_id) {
+                return $schedule;
+            }
         }
+        return null;
     }
-    return null;
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 // Include data classes dengan path yang benar
-include '../config/data.php';
+include 'config/data.php';
 ?>
 
 <!-- CLASSES SECTION -->

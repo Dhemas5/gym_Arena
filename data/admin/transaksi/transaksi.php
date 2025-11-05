@@ -50,6 +50,8 @@ require "../../../setting/koneksi.php";
         background: #e9f7ef !important;
         font-weight: bold;
     }
+
+    
 </style>
 
 <!-- Content Header -->

@@ -1,3 +1,26 @@
+<?php
+// Data untuk membership options
+$membership_options = [
+    ['value' => 'bulanan-umum', 'name' => 'Bulanan Umum', 'price' => 285000, 'period' => 'per bulan'],
+    ['value' => 'bulanan-pelajar', 'name' => 'Bulanan Pelajar', 'price' => 200000, 'period' => 'per bulan'],
+    ['value' => '3bulan-umum', 'name' => '3 Bulan Umum', 'price' => 675000, 'period' => '3 bulan'],
+    ['value' => '3bulan-pelajar', 'name' => '3 Bulan Pelajar', 'price' => 550000, 'period' => '3 bulan'],
+    ['value' => '6bulan-umum', 'name' => '6 Bulan Umum', 'price' => 1250000, 'period' => '6 bulan'],
+    ['value' => '6bulan-pelajar', 'name' => '6 Bulan Pelajar', 'price' => 1000000, 'period' => '6 bulan'],
+    ['value' => 'tahunan-umum', 'name' => '1 Tahun Umum', 'price' => 2300000, 'period' => 'per tahun'],
+    ['value' => 'tahunan-pelajar', 'name' => '1 Tahun Pelajar', 'price' => 1850000, 'period' => 'per tahun']
+];
+
+// Data untuk class options
+$class_options = [
+    ['value' => 'zumba', 'name' => 'Zumba / Aero BL / Strong Nation', 'price' => 20000],
+    ['value' => 'body-shape', 'name' => 'CID / Body Shape / Senam BL', 'price' => 25000],
+    ['value' => 'boxing', 'name' => 'Boxing / Kapha Yoga', 'price' => 30000],
+    ['value' => 'boxing-bulanan', 'name' => 'Boxing (Paket 1 Bulan)', 'price' => 300000],
+    ['value' => 'trainer', 'name' => 'Program Trainer (10x Pertemuan + Gym 1 Bulan + Boxing 4x)', 'price' => 1500000]
+];
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -216,246 +239,16 @@
       </div>
     </div>
 
-    <!-- Step 1: Pilih Membership -->
-    <div id="step1" class="section-card">
-      <h2 class="section-title">Pilih Paket Membership</h2>
-      <div class="membership-grid">
-        <div class="membership-option" onclick="selectMembership('bulanan-umum', 285000)">
-          <input type="radio" name="membership" value="bulanan-umum">
-          <div class="membership-name">Bulanan Umum</div>
-          <div class="membership-price">Rp 285.000</div>
-          <div class="membership-period">per bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('bulanan-pelajar', 200000)">
-          <input type="radio" name="membership" value="bulanan-pelajar">
-          <div class="membership-name">Bulanan Pelajar</div>
-          <div class="membership-price">Rp 200.000</div>
-          <div class="membership-period">per bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('3bulan-umum', 675000)">
-          <input type="radio" name="membership" value="3bulan-umum">
-          <div class="membership-name">3 Bulan Umum</div>
-          <div class="membership-price">Rp 675.000</div>
-          <div class="membership-period">3 bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('3bulan-pelajar', 550000)">
-          <input type="radio" name="membership" value="3bulan-pelajar">
-          <div class="membership-name">3 Bulan Pelajar</div>
-          <div class="membership-price">Rp 550.000</div>
-          <div class="membership-period">3 bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('6bulan-umum', 1250000)">
-          <input type="radio" name="membership" value="6bulan-umum">
-          <div class="membership-name">6 Bulan Umum</div>
-          <div class="membership-price">Rp 1.250.000</div>
-          <div class="membership-period">6 bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('6bulan-pelajar', 1000000)">
-          <input type="radio" name="membership" value="6bulan-pelajar">
-          <div class="membership-name">6 Bulan Pelajar</div>
-          <div class="membership-price">Rp 1.000.000</div>
-          <div class="membership-period">6 bulan</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('tahunan-umum', 2300000)">
-          <input type="radio" name="membership" value="tahunan-umum">
-          <div class="membership-name">1 Tahun Umum</div>
-          <div class="membership-price">Rp 2.300.000</div>
-          <div class="membership-period">per tahun</div>
-        </div>
-
-        <div class="membership-option" onclick="selectMembership('tahunan-pelajar', 1850000)">
-          <input type="radio" name="membership" value="tahunan-pelajar">
-          <div class="membership-name">1 Tahun Pelajar</div>
-          <div class="membership-price">Rp 1.850.000</div>
-          <div class="membership-period">per tahun</div>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" onclick="nextStep(2)" id="btnStep1" disabled>Lanjut ke Pilih Kelas</button>
-    </div>
-
-    <!-- Step 2: Pilih Kelas -->
-    <div id="step2" class="section-card hidden">
-      <h2 class="section-title">Pilih Kelas (Opsional)</h2>
-      <div class="alert">
-        💡 Pilih kelas tambahan yang ingin Anda ikuti. Anda bisa melewati langkah ini jika hanya ingin gym biasa.
-      </div>
-
-      <div class="class-grid">
-        <div class="class-option" onclick="toggleClass('zumba', 20000)">
-          <input type="checkbox" name="class" value="zumba">
-          <div class="class-name">Zumba / Aero BL / Strong Nation</div>
-          <div class="class-price">Rp 20.000</div>
-        </div>
-
-        <div class="class-option" onclick="toggleClass('body-shape', 25000)">
-          <input type="checkbox" name="class" value="body-shape">
-          <div class="class-name">CID / Body Shape / Senam BL</div>
-          <div class="class-price">Rp 25.000</div>
-        </div>
-
-        <div class="class-option" onclick="toggleClass('boxing', 30000)">
-          <input type="checkbox" name="class" value="boxing">
-          <div class="class-name">Boxing / Kapha Yoga</div>
-          <div class="class-price">Rp 30.000</div>
-        </div>
-
-        <div class="class-option" onclick="toggleClass('boxing-bulanan', 300000)">
-          <input type="checkbox" name="class" value="boxing-bulanan">
-          <div class="class-name">Boxing (Paket 1 Bulan)</div>
-          <div class="class-price">Rp 300.000</div>
-        </div>
-
-        <div class="class-option" onclick="toggleClass('trainer', 1500000)">
-          <input type="checkbox" name="class" value="trainer">
-          <div class="class-name">Program Trainer (10x Pertemuan + Gym 1 Bulan + Boxing 4x)</div>
-          <div class="class-price">Rp 1.500.000</div>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 15px;">
-        <button class="btn btn-primary" onclick="nextStep(1)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
-        <button class="btn btn-primary" onclick="nextStep(3)">Lanjut ke Data Diri</button>
-      </div>
-    </div>
-
-    <!-- Step 3: Data Diri & Ringkasan -->
-    <div id="step3" class="section-card hidden">
-      <h2 class="section-title">Data Diri</h2>
-      
-      <form id="registrationForm">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">Nama Lengkap *</label>
-              <input type="text" class="form-control" id="fullname" required placeholder="Masukkan nama lengkap">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="contoh@email.com">
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">No. Telepon</label>
-              <input type="tel" class="form-control" id="phone" placeholder="08xxxxxxxxxx">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">Tanggal Lahir</label>
-              <input type="date" class="form-control" id="birthdate">
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Alamat</label>
-          <textarea class="form-control" id="address" rows="3" placeholder="Masukkan alamat lengkap"></textarea>
-        </div>
-
-        <h2 class="section-title" style="margin-top: 30px;">Ringkasan Pembayaran</h2>
-        <div class="summary-card">
-          <div class="summary-row">
-            <span class="summary-label">Paket Membership:</span>
-            <span class="summary-value" id="summaryMembership">-</span>
-          </div>
-          <div class="summary-row" id="summaryClassRow" style="display: none;">
-            <span class="summary-label">Kelas Tambahan:</span>
-            <span class="summary-value" id="summaryClasses">-</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Total Pembayaran:</span>
-            <span class="summary-value total-value" id="summaryTotal">Rp 0</span>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 15px;">
-          <button type="button" class="btn btn-primary" onclick="nextStep(2)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
-          <button type="submit" class="btn btn-primary">Lanjut ke Pembayaran</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Step 4: Pembayaran -->
-    <div id="step4" class="section-card hidden">
-      <h2 class="section-title">Pembayaran</h2>
-      
-      <div class="payment-instructions">
-        <h3>📋 Instruksi Pembayaran</h3>
-        <ul>
-          <li>Total pembayaran: <strong id="paymentTotal">Rp 0</strong></li>
-          <li>Pilih salah satu metode pembayaran di bawah</li>
-          <li>Setelah pembayaran, upload bukti transfer</li>
-          <li>Klik "Konfirmasi Pembayaran" untuk menyelesaikan pendaftaran</li>
-        </ul>
-      </div>
-
-      <div class="payment-options">
-        <h3>💳 QRIS</h3>
-        <p>Scan kode QR berikut menggunakan aplikasi banking atau e-wallet Anda:</p>
-        <img src="https://via.placeholder.com/200x200?text=QRIS+Arena+FIT" alt="QRIS Arena FIT" style="width: 200px; height: 200px; border-radius: 10px; margin: 15px 0;">
-        <p><strong>Jumlah: <span id="qrisAmount">Rp 0</span></strong></p>
-
-        <h3 style="margin-top: 30px;">🏦 Transfer Bank</h3>
-        <div style="background: rgba(25, 118, 210, 0.05); padding: 20px; border-radius: 10px; margin: 15px 0;">
-          <p style="margin: 8px 0;"><strong>Bank:</strong> BCA</p>
-          <p style="margin: 8px 0;"><strong>Nomor Rekening:</strong> 1234567890</p>
-          <p style="margin: 8px 0;"><strong>Atas Nama:</strong> Arena FIT</p>
-        </div>
-      </div>
-
-      <!-- Upload Bukti Pembayaran -->
-      <div class="upload-section" id="uploadSection">
-        <h3 style="color: #fff; margin-bottom: 15px;">📎 Upload Bukti Pembayaran</h3>
-        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px;">Upload screenshot atau foto bukti transfer Anda</p>
-        
-        <div class="file-input-wrapper">
-          <label for="paymentProof" class="btn-upload">
-            📁 Pilih File
-          </label>
-          <input type="file" id="paymentProof" accept="image/*" onchange="handleFileSelect(event)">
-        </div>
-        
-        <div id="filePreview" class="file-preview" style="display: none;">
-          ✅ <span id="fileName"></span>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 15px; margin-top: 30px;">
-        <button class="btn btn-primary" onclick="nextStep(3)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
-        <button class="btn btn-primary" onclick="confirmPayment()" id="btnConfirmPayment" disabled>Konfirmasi Pembayaran</button>
-      </div>
-    </div>
+    <!-- Include semua section -->
+    <?php include 'sections/step1_membership.php'; ?>
+    <?php include 'sections/step2_classes.php'; ?>
+    <?php include 'sections/step3_personal_data.php'; ?>
+    <?php include 'sections/step4_payment.php'; ?>
 
   </div>
 
-  <!-- Modal Konfirmasi Pembayaran -->
-  <div class="payment-modal" id="paymentModal">
-    <div class="payment-modal-content">
-      <div class="payment-modal-icon">✓</div>
-      <h2 class="payment-modal-title">Pembayaran Berhasil!</h2>
-      <p class="payment-modal-text">
-        Terima kasih telah bergabung dengan Arena FIT. Pendaftaran Anda telah berhasil dan sedang dalam proses verifikasi.
-      </p>
-      <p class="payment-modal-text">
-        Anda akan menerima konfirmasi melalui email/WhatsApp dalam 1x24 jam.
-      </p>
-      <p class="payment-modal-redirect">Mengarahkan ke Dashboard Member dalam <span id="countdown">5</span> detik...</p>
-      <button class="btn-confirm-payment" onclick="goToDashboard()">Ke Dashboard Sekarang</button>
-    </div>
-  </div>
+  <!-- Include modal -->
+  <?php include 'modal/payment_modal.php'; ?>
 
   <script>
     let selectedMembership = null;

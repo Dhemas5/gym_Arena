@@ -114,7 +114,6 @@ include '../../../view/master/sidebar.php';
                     <div class="card mt-4 animate-fade-in" style="animation-delay: 0.1s;">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h3 class="card-title"><i class="fas fa-box-open mr-2"></i> Pilih Paket</h3>
-                            <span class="badge bg-light text-primary">Langkah 2</span>
                         </div>
                         <div class="card-body">
   <div class="row align-items-end">
@@ -157,7 +156,6 @@ include '../../../view/master/sidebar.php';
                     <div class="card mt-3 bg-gradient-success text-white" id="cardPaketInfo" style="display:none;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title"><i class="fas fa-info-circle mr-2"></i> Detail Paket Dipilih</h3>
-                            <span class="badge bg-light text-success">Detail</span>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -189,7 +187,6 @@ include '../../../view/master/sidebar.php';
                     <div class="card mt-4 animate-fade-in" style="animation-delay: 0.2s;">
                         <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                             <h3 class="card-title"><i class="fas fa-credit-card mr-2"></i> Pembayaran</h3>
-                            <span class="badge bg-light text-info">Langkah 3</span>
                         </div>
                         <div class="card-body">
                             <div class="row">

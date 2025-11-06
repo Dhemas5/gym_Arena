@@ -474,3 +474,44 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* Tombol Logout */
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white !important;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    color: white !important;
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+}
+
+.btn-logout span {
+    font-size: 1.1rem;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 991px) {
+    .btn-logout {
+        margin-left: 0;
+        margin-top: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -5,47 +5,50 @@ require "../../../setting/session.php";
 blockLoginPageIfLoggedIn(); // Jika sudah login, tidak bisa akses halaman ini lagi
 require "../../../setting/koneksi.php";
 
-// Pastikan koneksi database aktif
+// Pastikan koneksi aktif
 if ($con->connect_error) {
     die("Koneksi gagal: " . $con->connect_error);
 }
 
 $error = "";
+$success = "";
 
 // Jika tombol login ditekan
 if (isset($_POST['loginbtn'])) {
     $username = trim(htmlspecialchars($_POST['username']));
     $password = trim(htmlspecialchars($_POST['password']));
-    $password_md5 = md5($password); // hashing md5 (disesuaikan dengan database)
+    $password_md5 = md5($password); // sesuaikan dengan hash di database
 
-    // Cek username/email di tabel admin
-    $query = $con->prepare("SELECT * FROM tbl_user WHERE username = ? OR email = ? LIMIT 1");
-    $query->bind_param("ss", $username, $username);
-    $query->execute();
-    $result = $query->get_result();
+    // Query untuk cari user
+    $sql = "SELECT * FROM tbl_user WHERE username = ? OR email = ? LIMIT 1";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("ss", $username, $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    // Jika ditemukan
     if ($result && $result->num_rows === 1) {
-        $admin = $result->fetch_assoc();
+        $user = $result->fetch_assoc();
 
         // Cek password
-        if ($password_md5 === $admin['password']) {
-            // Simpan data ke sesi
+        if ($password_md5 === $user['password']) {
+            // Simpan ke session
             $_SESSION['login'] = true;
+            $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['user_type'] = 'admin';
-            $_SESSION['id_admin'] = $admin['id_admin'];
-            $_SESSION['username'] = $admin['username'];
-            $_SESSION['email'] = $admin['email'];
-            $_SESSION['nama'] = $admin['nama'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
 
-            // Arahkan ke dashboard admin
-            header("Location: ../dashboard/index.php");
-            exit;
+            $success = "Login berhasil! Selamat datang, " . htmlspecialchars($user['nama_lengkap']) . "!";
         } else {
-            $error = "❌ Kata sandi salah! Pastikan benar.";
+            $error = "Kata sandi salah! Pastikan benar.";
         }
     } else {
-        $error = "⚠️ Username atau email admin tidak ditemukan!";
+        $error = "Username atau email tidak ditemukan!";
     }
+
+    $stmt->close();
 }
 ?>
 
@@ -64,28 +67,33 @@ if (isset($_POST['loginbtn'])) {
     <link rel="stylesheet" href="../../../assets/assets_admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/custom-login.css" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .login-box {
+            transition: all 0.4s ease;
+        }
+    </style>
 </head>
 
 <body class="hold-transition login-page">
     <div class="login-box">
         <!-- Card Login -->
-        <div class="card card-outline card-primary">
+        <div class="card card-outline shadow">
             <div class="card-header text-center">
                 <a href="#">
-                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid" style="max-height:60px;">
+                    <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Logo" class="img-fluid"
+                        style="max-height:60px;">
                 </a>
             </div>
 
             <div class="card-body">
                 <p class="login-box-msg">Login Admin Dashboard</p>
 
-                <!-- Tampilkan pesan error jika ada -->
-                <?php if (!empty($error)) : ?>
-                    <div class="alert alert-danger text-center"><?= $error; ?></div>
-                <?php endif; ?>
-
                 <!-- Form login -->
-                <form action="" method="POST">
+                <form action="" method="POST" id="loginForm">
                     <div class="input-group mb-3">
                         <input name="username" type="text" class="form-control" placeholder="Email / Username" required
                             value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" />
@@ -107,7 +115,9 @@ if (isset($_POST['loginbtn'])) {
 
                     <div class="row">
                         <div class="col-12">
-                            <button type="submit" name="loginbtn" class="btn btn-primary btn-block">Login</button>
+                            <button type="submit" name="loginbtn" class="btn btn-primary btn-block">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -125,21 +135,40 @@ if (isset($_POST['loginbtn'])) {
     <script src="../../../assets/assets_admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../../../assets/assets_admin/dist/js/adminlte.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Efek loading tombol
-            $('form').on('submit', function() {
-                $('button[name="loginbtn"]').addClass('btn-loading').text('Memproses...');
+    <!-- SweetAlert Handler -->
+    <?php if (!empty($error)) : ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Gagal',
+                text: '<?= $error; ?>',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Coba Lagi',
+                didOpen: () => {
+                    document.querySelector('.login-box').style.transform = 'translateY(0)';
+                }
             });
+        </script>
+    <?php endif; ?>
 
-            // Efek fokus input
-            $('.form-control').on('focus', function() {
-                $(this).parent().css('box-shadow', '0 0 0 0.2rem rgba(0, 123, 255, 0.25)');
-            }).on('blur', function() {
-                $(this).parent().css('box-shadow', 'none');
+    <?php if (!empty($success)) : ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Login',
+                text: '<?= $success; ?>',
+                showConfirmButton: false,
+                timer: 1800,
+                timerProgressBar: true,
+                didOpen: () => {
+                    document.querySelector('.login-box').style.transform = 'translateY(0)';
+                },
+                didClose: () => {
+                    window.location.href = "../../../data/admin/dashboard/index.php";
+                }
             });
-        });
-    </script>
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

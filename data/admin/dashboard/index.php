@@ -1,6 +1,6 @@
 <?php
 require "../../../setting/session.php";
-checkSession("admin"); // hanya admin boleh masuk 
+checkSession("admin"); // hanya admin boleh masuk
 ?>
 <?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/sidebar.php'; ?>
@@ -8,6 +8,9 @@ checkSession("admin"); // hanya admin boleh masuk
 <?php
 require "../../../setting/koneksi.php";
 require "../../../setting/session.php";
+
+// Ambil data user yang login
+$username = $_SESSION['username'] ?? 'User';
 
 // Jumlah kategori gym
 $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori");
@@ -46,7 +49,6 @@ $jumlahJadwal = mysqli_num_rows($queryJadwal);
         </div>
     </div>
 </section>
-
 <!-- Main content -->
 <section class="content">
     <div class="container-fluid">

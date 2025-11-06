@@ -90,8 +90,8 @@
                 paging: true,
                 lengthChange: true,
                 lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "Semua"]
+                    [6, 25, 50, -1],
+                    [6, 25, 50, "Semua"]
                 ],
                 searching: true,
                 ordering: true,

@@ -21,10 +21,16 @@ if (isset($_POST['loginbtn'])) {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
+        // Cek status akun
+        if ($user['status'] === 'nonaktif') {
+            $error = "Akun Anda dinonaktifkan! Hubungi admin.";
+        }
         // Cek verifikasi email
-        if ($user['is_verified'] == 0) {
+        elseif ($user['is_verified'] == 0) {
             $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
-        } elseif (password_verify($password, $user['password'])) {
+        }
+        // Cek password
+        elseif (password_verify($password, $user['password'])) {
             $_SESSION['login'] = true;
             $_SESSION['user_type'] = 'member';
             $_SESSION['id_member'] = $user['id_member'];
@@ -41,10 +47,8 @@ if (isset($_POST['loginbtn'])) {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
 }
-
-
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pendaftaran - Arena FIT</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  
+  <!-- Link ke CSS terpisah -->
+  <link rel="stylesheet" href="member/css/registration.css">
+  <style>
+    .membership-option.selected, .class-option.selected {
+      background-color: rgba(66, 165, 245, 0.4);
+      border: 2px solid #42a5f5;
+    }
+
+    /* Modal Konfirmasi Pembayaran */
+    .payment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .payment-modal.active {
+      display: flex;
+    }
+
+    .payment-modal-content {
+      background: #0d1b2a;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      border: 1px solid rgba(66, 165, 245, 0.3);
+      text-align: center;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .payment-modal-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(34, 197, 94, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 3rem;
+    }
+
+    .payment-modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    .payment-modal-text {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .payment-modal-redirect {
+      color: #22c55e;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+
+    .btn-confirm-payment {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-confirm-payment:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(25, 118, 210, 0.5);
+    }
+
+    .upload-section {
+      background: rgba(25, 118, 210, 0.05);
+      border: 2px dashed rgba(66, 165, 245, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .upload-section.dragover {
+      border-color: #42a5f5;
+      background: rgba(25, 118, 210, 0.1);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .btn-upload {
+      background: rgba(25, 118, 210, 0.2);
+      border: 1px solid rgba(66, 165, 245, 0.3);
+      padding: 10px 25px;
+      border-radius: 8px;
+      color: #42a5f5;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-upload:hover {
+      background: rgba(25, 118, 210, 0.3);
+      border-color: #42a5f5;
+    }
+
+    .file-preview {
+      margin-top: 15px;
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .payment-instructions {
+      background: rgba(66, 165, 245, 0.1);
+      border-left: 4px solid #42a5f5;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .payment-instructions h3 {
+      color: #42a5f5;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    .payment-instructions ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .payment-instructions li {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 8px 0;
+      display: flex;
+      align-items: start;
+    }
+
+    .payment-instructions li:before {
+      content: "✓";
+      color: #22c55e;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="registration-container">
+    <!-- Header -->
+    <div class="header-section">
+      <h1>Pendaftaran <span class="text-primary">Membership</span></h1>
+      <p style="color: rgba(255, 255, 255, 0.7);">Lengkapi formulir berikut untuk bergabung dengan Arena FIT</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step active" id="step1-indicator">
+        <div class="step-circle">1</div>
+        <span>Paket</span>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step" id="step2-indicator">
+        <div class="step-circle">2</div>
+        <span>Kelas</span>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step" id="step3-indicator">
+        <div class="step-circle">3</div>
+        <span>Data Diri</span>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step" id="step4-indicator">
+        <div class="step-circle">4</div>
+        <span>Pembayaran</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Pilih Membership -->
+    <div id="step1" class="section-card">
+      <h2 class="section-title">Pilih Paket Membership</h2>
+      <div class="membership-grid">
+        <div class="membership-option" onclick="selectMembership('bulanan-umum', 285000)">
+          <input type="radio" name="membership" value="bulanan-umum">
+          <div class="membership-name">Bulanan Umum</div>
+          <div class="membership-price">Rp 285.000</div>
+          <div class="membership-period">per bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('bulanan-pelajar', 200000)">
+          <input type="radio" name="membership" value="bulanan-pelajar">
+          <div class="membership-name">Bulanan Pelajar</div>
+          <div class="membership-price">Rp 200.000</div>
+          <div class="membership-period">per bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('3bulan-umum', 675000)">
+          <input type="radio" name="membership" value="3bulan-umum">
+          <div class="membership-name">3 Bulan Umum</div>
+          <div class="membership-price">Rp 675.000</div>
+          <div class="membership-period">3 bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('3bulan-pelajar', 550000)">
+          <input type="radio" name="membership" value="3bulan-pelajar">
+          <div class="membership-name">3 Bulan Pelajar</div>
+          <div class="membership-price">Rp 550.000</div>
+          <div class="membership-period">3 bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('6bulan-umum', 1250000)">
+          <input type="radio" name="membership" value="6bulan-umum">
+          <div class="membership-name">6 Bulan Umum</div>
+          <div class="membership-price">Rp 1.250.000</div>
+          <div class="membership-period">6 bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('6bulan-pelajar', 1000000)">
+          <input type="radio" name="membership" value="6bulan-pelajar">
+          <div class="membership-name">6 Bulan Pelajar</div>
+          <div class="membership-price">Rp 1.000.000</div>
+          <div class="membership-period">6 bulan</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('tahunan-umum', 2300000)">
+          <input type="radio" name="membership" value="tahunan-umum">
+          <div class="membership-name">1 Tahun Umum</div>
+          <div class="membership-price">Rp 2.300.000</div>
+          <div class="membership-period">per tahun</div>
+        </div>
+
+        <div class="membership-option" onclick="selectMembership('tahunan-pelajar', 1850000)">
+          <input type="radio" name="membership" value="tahunan-pelajar">
+          <div class="membership-name">1 Tahun Pelajar</div>
+          <div class="membership-price">Rp 1.850.000</div>
+          <div class="membership-period">per tahun</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="nextStep(2)" id="btnStep1" disabled>Lanjut ke Pilih Kelas</button>
+    </div>
+
+    <!-- Step 2: Pilih Kelas -->
+    <div id="step2" class="section-card hidden">
+      <h2 class="section-title">Pilih Kelas (Opsional)</h2>
+      <div class="alert">
+        💡 Pilih kelas tambahan yang ingin Anda ikuti. Anda bisa melewati langkah ini jika hanya ingin gym biasa.
+      </div>
+
+      <div class="class-grid">
+        <div class="class-option" onclick="toggleClass('zumba', 20000)">
+          <input type="checkbox" name="class" value="zumba">
+          <div class="class-name">Zumba / Aero BL / Strong Nation</div>
+          <div class="class-price">Rp 20.000</div>
+        </div>
+
+        <div class="class-option" onclick="toggleClass('body-shape', 25000)">
+          <input type="checkbox" name="class" value="body-shape">
+          <div class="class-name">CID / Body Shape / Senam BL</div>
+          <div class="class-price">Rp 25.000</div>
+        </div>
+
+        <div class="class-option" onclick="toggleClass('boxing', 30000)">
+          <input type="checkbox" name="class" value="boxing">
+          <div class="class-name">Boxing / Kapha Yoga</div>
+          <div class="class-price">Rp 30.000</div>
+        </div>
+
+        <div class="class-option" onclick="toggleClass('boxing-bulanan', 300000)">
+          <input type="checkbox" name="class" value="boxing-bulanan">
+          <div class="class-name">Boxing (Paket 1 Bulan)</div>
+          <div class="class-price">Rp 300.000</div>
+        </div>
+
+        <div class="class-option" onclick="toggleClass('trainer', 1500000)">
+          <input type="checkbox" name="class" value="trainer">
+          <div class="class-name">Program Trainer (10x Pertemuan + Gym 1 Bulan + Boxing 4x)</div>
+          <div class="class-price">Rp 1.500.000</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px;">
+        <button class="btn btn-primary" onclick="nextStep(1)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Lanjut ke Data Diri</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Data Diri & Ringkasan -->
+    <div id="step3" class="section-card hidden">
+      <h2 class="section-title">Data Diri</h2>
+      
+      <form id="registrationForm">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap *</label>
+              <input type="text" class="form-control" id="fullname" required placeholder="Masukkan nama lengkap">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="contoh@email.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">No. Telepon</label>
+              <input type="tel" class="form-control" id="phone" placeholder="08xxxxxxxxxx">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir</label>
+              <input type="date" class="form-control" id="birthdate">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alamat</label>
+          <textarea class="form-control" id="address" rows="3" placeholder="Masukkan alamat lengkap"></textarea>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 30px;">Ringkasan Pembayaran</h2>
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Paket Membership:</span>
+            <span class="summary-value" id="summaryMembership">-</span>
+          </div>
+          <div class="summary-row" id="summaryClassRow" style="display: none;">
+            <span class="summary-label">Kelas Tambahan:</span>
+            <span class="summary-value" id="summaryClasses">-</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Total Pembayaran:</span>
+            <span class="summary-value total-value" id="summaryTotal">Rp 0</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+          <button type="button" class="btn btn-primary" onclick="nextStep(2)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
+          <button type="submit" class="btn btn-primary">Lanjut ke Pembayaran</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 4: Pembayaran -->
+    <div id="step4" class="section-card hidden">
+      <h2 class="section-title">Pembayaran</h2>
+      
+      <div class="payment-instructions">
+        <h3>📋 Instruksi Pembayaran</h3>
+        <ul>
+          <li>Total pembayaran: <strong id="paymentTotal">Rp 0</strong></li>
+          <li>Pilih salah satu metode pembayaran di bawah</li>
+          <li>Setelah pembayaran, upload bukti transfer</li>
+          <li>Klik "Konfirmasi Pembayaran" untuk menyelesaikan pendaftaran</li>
+        </ul>
+      </div>
+
+      <div class="payment-options">
+        <h3>💳 QRIS</h3>
+        <p>Scan kode QR berikut menggunakan aplikasi banking atau e-wallet Anda:</p>
+        <img src="https://via.placeholder.com/200x200?text=QRIS+Arena+FIT" alt="QRIS Arena FIT" style="width: 200px; height: 200px; border-radius: 10px; margin: 15px 0;">
+        <p><strong>Jumlah: <span id="qrisAmount">Rp 0</span></strong></p>
+
+        <h3 style="margin-top: 30px;">🏦 Transfer Bank</h3>
+        <div style="background: rgba(25, 118, 210, 0.05); padding: 20px; border-radius: 10px; margin: 15px 0;">
+          <p style="margin: 8px 0;"><strong>Bank:</strong> BCA</p>
+          <p style="margin: 8px 0;"><strong>Nomor Rekening:</strong> 1234567890</p>
+          <p style="margin: 8px 0;"><strong>Atas Nama:</strong> Arena FIT</p>
+        </div>
+      </div>
+
+      <!-- Upload Bukti Pembayaran -->
+      <div class="upload-section" id="uploadSection">
+        <h3 style="color: #fff; margin-bottom: 15px;">📎 Upload Bukti Pembayaran</h3>
+        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px;">Upload screenshot atau foto bukti transfer Anda</p>
+        
+        <div class="file-input-wrapper">
+          <label for="paymentProof" class="btn-upload">
+            📁 Pilih File
+          </label>
+          <input type="file" id="paymentProof" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+        
+        <div id="filePreview" class="file-preview" style="display: none;">
+          ✅ <span id="fileName"></span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <button class="btn btn-primary" onclick="nextStep(3)" style="background: rgba(66, 165, 245, 0.2);">← Kembali</button>
+        <button class="btn btn-primary" onclick="confirmPayment()" id="btnConfirmPayment" disabled>Konfirmasi Pembayaran</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Konfirmasi Pembayaran -->
+  <div class="payment-modal" id="paymentModal">
+    <div class="payment-modal-content">
+      <div class="payment-modal-icon">✓</div>
+      <h2 class="payment-modal-title">Pembayaran Berhasil!</h2>
+      <p class="payment-modal-text">
+        Terima kasih telah bergabung dengan Arena FIT. Pendaftaran Anda telah berhasil dan sedang dalam proses verifikasi.
+      </p>
+      <p class="payment-modal-text">
+        Anda akan menerima konfirmasi melalui email/WhatsApp dalam 1x24 jam.
+      </p>
+      <p class="payment-modal-redirect">Mengarahkan ke Dashboard Member dalam <span id="countdown">5</span> detik...</p>
+      <button class="btn-confirm-payment" onclick="goToDashboard()">Ke Dashboard Sekarang</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedMembership = null;
+    let selectedMembershipPrice = 0;
+    let selectedClasses = [];
+    let selectedClassesPrice = 0;
+    let uploadedFile = null;
+
+    function selectMembership(type, price) {
+      selectedMembership = type;
+      selectedMembershipPrice = price;
+      document.querySelectorAll('.membership-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      const selectedOption = document.querySelector(`input[value="${type}"]`).parentElement;
+      selectedOption.classList.add('selected');
+      document.querySelectorAll('.membership-option input[type="radio"]').forEach(radio => {
+        radio.checked = radio.value === type;
+      });
+      document.getElementById('btnStep1').disabled = false;
+      updateSummary();
+    }
+
+    function toggleClass(className, price) {
+      const checkbox = document.querySelector(`input[value="${className}"]`);
+      checkbox.checked = !checkbox.checked;
+      const option = checkbox.parentElement;
+      if (checkbox.checked) {
+        option.classList.add('selected');
+        selectedClasses.push({ name: className, price });
+      } else {
+        option.classList.remove('selected');
+        selectedClasses = selectedClasses.filter(c => c.name !== className);
+      }
+      selectedClassesPrice = selectedClasses.reduce((total, c) => total + c.price, 0);
+      updateSummary();
+    }
+
+    function nextStep(step) {
+      document.querySelectorAll('.section-card').forEach(card => card.classList.add('hidden'));
+      document.getElementById(`step${step}`).classList.remove('hidden');
+
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step${step}-indicator`).classList.add('active');
+    }
+
+    function updateSummary() {
+      if (selectedMembership) {
+        const membershipName = document.querySelector(`input[value="${selectedMembership}"]`).parentElement.querySelector('.membership-name').textContent;
+        const membershipPrice = formatCurrency(selectedMembershipPrice);
+        document.getElementById('summaryMembership').textContent = `${membershipName} - ${membershipPrice}`;
+      }
+
+      if (selectedClasses.length > 0) {
+        const classesNames = selectedClasses.map(c => {
+          return document.querySelector(`input[value="${c.name}"]`).parentElement.querySelector('.class-name').textContent;
+        }).join(', ');
+        const classesPrice = formatCurrency(selectedClassesPrice);
+        document.getElementById('summaryClasses').textContent = `${classesNames} - ${classesPrice}`;
+        document.getElementById('summaryClassRow').style.display = 'block';
+      } else {
+        document.getElementById('summaryClassRow').style.display = 'none';
+      }
+
+      const total = selectedMembershipPrice + selectedClassesPrice;
+      document.getElementById('summaryTotal').textContent = formatCurrency(total);
+    }
+
+    function updatePayment() {
+      const total = selectedMembershipPrice + selectedClassesPrice;
+      document.getElementById('paymentTotal').textContent = formatCurrency(total);
+      document.getElementById('qrisAmount').textContent = formatCurrency(total);
+    }
+
+    function formatCurrency(amount) {
+      return `Rp ${amount.toLocaleString('id-ID')}`;
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        uploadedFile = file;
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('filePreview').style.display = 'block';
+        document.getElementById('btnConfirmPayment').disabled = false;
+      }
+    }
+
+    function confirmPayment() {
+      // Simpan data pendaftaran
+      const formData = {
+        fullname: document.getElementById('fullname').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        birthdate: document.getElementById('birthdate').value,
+        address: document.getElementById('address').value,
+        membership: selectedMembership,
+        classes: selectedClasses.map(c => c.name),
+        total: selectedMembershipPrice + selectedClassesPrice,
+        paymentProof: uploadedFile ? uploadedFile.name : null,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Data Pendaftaran:', formData);
+      
+      // Tampilkan modal konfirmasi
+      document.getElementById('paymentModal').classList.add('active');
+      
+      // Countdown redirect
+      let countdown = 5;
+      const countdownElement = document.getElementById('countdown');
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          goToDashboard();
+        }
+      }, 1000);
+    }
+
+    function goToDashboard() {
+      // Redirect ke member dashboard
+      window.location.href = 'indexmember.html';
+    }
+
+    // Handle form submission
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      updatePayment();
+      nextStep(4);
+    });
+
+    // Drag and drop support
+    const uploadSection = document.getElementById('uploadSection');
+    
+    uploadSection.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadSection.classList.add('dragover');
+    });
+    
+    uploadSection.addEventListener('dragleave', () => {
+      uploadSection.classList.remove('dragover');
+    });
+    
+    uploadSection.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadSection.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        uploadedFile = file;
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('filePreview').style.display = 'block';
+        document.getElementById('btnConfirmPayment').disabled = false;
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arena FIT - Dashboard Member</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+  <!-- Custom CSS dari file awal -->
+<link rel="stylesheet" href="../../member/css/style.css">
+  
+  <!-- Member Dashboard CSS - File Terpisah -->
+  <link rel="stylesheet" href="../../member/css/stylemember.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#home">
+        <span class="brand-box">AF</span>
+        <div>
+          <span class="brand-text">Arena FIT</span>
+          <span class="brand-subtitle">Gym and Class</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#classes">Kelas & Jadwal</a></li>
+          <li class="nav-item"><a class="nav-link" href="#my-bookings">Booking Saya</a></li>
+        </ul>
+        <div class="user-info">
+          <img src="https://i.pravatar.cc/100?img=33" alt="User" class="user-avatar">
+          <div>
+            <p class="user-name">Andi Setiawan</p>
+            <p class="user-status">Member Premium</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- WELCOME SECTION (Ganti Hero untuk Member) -->
+  <section id="home" class="member-welcome">
+    <div class="container">
+      <div class="welcome-card">
+        <h1 class="welcome-title">Selamat Datang Kembali, <span class="text-danger">Andi!</span></h1>
+        <p class="welcome-subtitle">Siap untuk latihan hari ini? Booking kelas favoritmu sekarang!</p>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">12</div>
+            <div class="stat-label">Kelas Diikuti</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="activeBookings">0</div>
+            <div class="stat-label">Booking Aktif</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">45</div>
+            <div class="stat-label">Hari Berlatih</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">8.5</div>
+            <div class="stat-label">Kg Turun</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASSES SECTION (Sama persis dengan index.html, hanya tambah onclick) -->
+  <section id="classes" class="classes-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <h1 class="section-title">Kelas & <span class="text-danger">Jadwal</span></h1>
+        <p class="section-subtitle">Pilih kelas favorit Anda dan bergabunglah dengan kami</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="class-tabs text-center mb-5">
+        <button class="tab-btn active">Kelas Populer</button>
+        <button class="tab-btn">Semua Kelas</button>
+      </div>
+
+      <!-- Class Cards -->
+      <div class="row g-4">
+
+        <!-- Yoga -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f?w=500&h=300&fit=crop" alt="Yoga">
+              <div class="class-overlay">
+                <h3 class="class-name">Yoga</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Meningkatkan fleksibilitas dan ketenangan pikiran</p>
+              <p class="class-schedule">Semua Level</p>
+              <button class="btn-booking" onclick="openBooking('Yoga', 1)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zumba -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop" alt="Zumba">
+              <div class="class-overlay">
+                <h3 class="class-name">Zumba</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Olahraga kardio yang menyenangkan dengan musik</p>
+              <p class="class-schedule">Pemula - Mahir</p>
+              <button class="btn-booking" onclick="openBooking('Zumba', 2)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Combat -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=500&h=300&fit=crop" alt="Body Combat">
+              <div class="class-overlay">
+                <h3 class="class-name">Body Combat</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Latihan kardio dengan gerakan bela diri</p>
+              <p class="class-schedule">Menengah - Lanjut</p>
+              <button class="btn-booking" onclick="openBooking('Body Combat', 3)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strength Training -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=300&fit=crop" alt="Strength Training">
+              <div class="class-overlay">
+                <h3 class="class-name">Strength Training</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Membangun dan menguatkan otot tubuh</p>
+              <p class="class-schedule">Semua Level</p>
+              <button class="btn-booking" onclick="openBooking('Strength Training', 4)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilates -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop" alt="Pilates">
+              <div class="class-overlay">
+                <h3 class="class-name">Pilates</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Meningkatkan kekuatan inti dan postur tubuh</p>
+              <p class="class-schedule">Pemula - Menengah</p>
+              <button class="btn-booking" onclick="openBooking('Pilates', 5)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CrossFit -->
+        <div class="col-lg-4 col-md-6">
+          <div class="class-card">
+            <div class="class-image">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop" alt="CrossFit">
+              <div class="class-overlay">
+                <h3 class="class-name">CrossFit</h3>
+              </div>
+            </div>
+            <div class="class-body">
+              <p class="class-desc">Latihan intensitas tinggi untuk hasil maksimal</p>
+              <p class="class-schedule">Lanjut</p>
+              <button class="btn-booking" onclick="openBooking('CrossFit', 6)">Booking Kelas</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MY BOOKINGS SECTION -->
+  <section id="my-bookings" class="my-bookings-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h1 class="section-title">Booking <span class="text-danger">Saya</span></h1>
+        <p class="section-subtitle">Kelola jadwal latihan Anda</p>
+      </div>
+      <div class="booking-list" id="bookingList">
+        <!-- Bookings akan ditampilkan di sini -->
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING MODAL -->
+  <div class="booking-modal" id="bookingModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeBookingModal()">×</button>
+      <h2 class="modal-title" id="modalClassName">Booking Kelas</h2>
+      
+      <div class="form-group">
+        <label class="form-label">Pilih Instruktur</label>
+        <div class="trainer-grid" id="trainerGrid"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pilih Jadwal</label>
+        <div class="schedule-grid" id="scheduleGrid"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Catatan Tambahan (Opsional)</label>
+        <textarea class="form-input" id="bookingNotes" rows="3" placeholder="Tambahkan catatan untuk instruktur..."></textarea>
+      </div>
+
+      <button class="btn-confirm" id="confirmBooking" disabled>Konfirmasi Booking</button>
+      <div class="success-message" id="successMessage">
+        ✓ Booking berhasil! Kelas Anda telah terdaftar.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Member Dashboard JavaScript -->
+  <script>
+    // Data Instruktur
+    const trainers = [
+      { id: 1, name: 'Sarah Johnson', specialty: 'Yoga & Pilates', image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=100&h=100&fit=crop' },
+      { id: 2, name: 'Mike Anderson', specialty: 'Body Combat', image: 'https://images.unsplash.com/photo-1567598508481-65985588e295?w=100&h=100&fit=crop' },
+      { id: 3, name: 'Lisa Martinez', specialty: 'Zumba & Dance', image: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=100&h=100&fit=crop' },
+      { id: 4, name: 'David Chen', specialty: 'CrossFit & HIIT', image: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=100&h=100&fit=crop' }
+    ];
+
+    // Data Jadwal
+    const schedules = [
+      { id: 1, day: 'Senin', time: '06:00' },
+      { id: 2, day: 'Senin', time: '18:00' },
+      { id: 3, day: 'Rabu', time: '06:00' },
+      { id: 4, day: 'Rabu', time: '18:00' },
+      { id: 5, day: 'Jumat', time: '06:00' },
+      { id: 6, day: 'Jumat', time: '18:00' },
+      { id: 7, day: 'Sabtu', time: '08:00' },
+      { id: 8, day: 'Sabtu', time: '16:00' }
+    ];
+
+    let myBookings = [];
+    let currentClass = { name: '', id: null };
+    let selectedTrainer = null;
+    let selectedSchedule = null;
+
+    // Fungsi membuka modal booking
+    function openBooking(className, classId) {
+      currentClass = { name: className, id: classId };
+      document.getElementById('modalClassName').textContent = `Booking ${className}`;
+      document.getElementById('bookingModal').classList.add('active');
+      
+      // Load trainers
+      const trainerGrid = document.getElementById('trainerGrid');
+      trainerGrid.innerHTML = trainers.map(t => `
+        <div class="trainer-option" data-trainer-id="${t.id}">
+          <img src="${t.image}" alt="${t.name}" class="trainer-avatar-modal">
+          <div class="trainer-name-modal">${t.name}</div>
+          <div class="trainer-specialty-modal">${t.specialty}</div>
+        </div>
+      `).join('');
+      
+      // Load schedules
+      const scheduleGrid = document.getElementById('scheduleGrid');
+      scheduleGrid.innerHTML = schedules.map(s => `
+        <div class="schedule-option" data-schedule-id="${s.id}">
+          <div class="schedule-day">${s.day}</div>
+          <div class="schedule-time">${s.time}</div>
+        </div>
+      `).join('');
+      
+      // Event listeners untuk trainer selection
+      document.querySelectorAll('.trainer-option').forEach(el => {
+        el.addEventListener('click', function() {
+          document.querySelectorAll('.trainer-option').forEach(e => e.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedTrainer = trainers.find(t => t.id == this.dataset.trainerId);
+          updateConfirmButton();
+        });
+      });
+      
+      // Event listeners untuk schedule selection
+      document.querySelectorAll('.schedule-option').forEach(el => {
+        el.addEventListener('click', function() {
+          document.querySelectorAll('.schedule-option').forEach(e => e.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedSchedule = schedules.find(s => s.id == this.dataset.scheduleId);
+          updateConfirmButton();
+        });
+      });
+      
+      selectedTrainer = null;
+      selectedSchedule = null;
+      document.getElementById('bookingNotes').value = '';
+      document.getElementById('successMessage').classList.remove('show');
+      updateConfirmButton();
+    }
+
+    // Fungsi menutup modal
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+    }
+
+    // Update status tombol confirm
+    function updateConfirmButton() {
+      const btn = document.getElementById('confirmBooking');
+      btn.disabled = !(selectedTrainer && selectedSchedule);
+    }
+
+    // Konfirmasi booking
+    document.getElementById('confirmBooking').addEventListener('click', function() {
+      const notes = document.getElementById('bookingNotes').value;
+      const booking = {
+        id: Date.now(),
+        class: currentClass,
+        trainer: selectedTrainer,
+        schedule: selectedSchedule,
+        notes: notes,
+        date: new Date().toLocaleDateString('id-ID')
+      };
+      
+      myBookings.push(booking);
+      loadMyBookings();
+      updateActiveBookings();
+      
+      // Tampilkan pesan sukses
+      document.getElementById('successMessage').classList.add('show');
+      this.disabled = true;
+      
+      setTimeout(() => {
+        closeBookingModal();
+      }, 2000);
+    });
+
+    // Load daftar booking
+    function loadMyBookings() {
+      const list = document.getElementById('bookingList');
+      
+      if (myBookings.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <h3>Belum Ada Booking</h3>
+            <p>Mulai booking kelas favorit Anda sekarang!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      list.innerHTML = myBookings.map(booking => `
+        <div class="booking-item">
+          <div class="booking-icon">🏋️</div>
+          <div class="booking-details">
+            <h4>${booking.class.name}</h4>
+            <p>👨‍🏫 Instruktur: ${booking.trainer.name}</p>
+            <p>📅 ${booking.schedule.day}, ${booking.schedule.time}</p>
+            <p>📝 Terdaftar: ${booking.date}</p>
+            ${booking.notes ? `<p>💬 ${booking.notes}</p>` : ''}
+          </div>
+          <button class="btn-cancel" onclick="cancelBooking(${booking.id})">Batal</button>
+        </div>
+      `).join('');
+    }
+
+    // Batalkan booking
+    function cancelBooking(bookingId) {
+      if (confirm('Apakah Anda yakin ingin membatalkan booking ini?')) {
+        myBookings = myBookings.filter(b => b.id !== bookingId);
+        loadMyBookings();
+        updateActiveBookings();
+      }
+    }
+
+    // Update jumlah booking aktif
+    function updateActiveBookings() {
+      document.getElementById('activeBookings').textContent = myBookings.length;
+    }
+
+    // Initialize
+    loadMyBookings();
+    updateActiveBookings();
+  </script>
+</body>
+</html>

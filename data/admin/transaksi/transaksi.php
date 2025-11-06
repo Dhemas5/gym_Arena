@@ -1,129 +1,162 @@
 <?php
+$body_class = 'sidebar-collapse';
 require "../../../setting/session.php";
 checkSession("admin");
 require "../../../setting/koneksi.php";
-?>
-<?php include '../../../view/master/header.php'; ?>
-<?php include '../../../view/master/sidebar.php'; ?>
 
-<!-- Tambahkan CSS Modern -->
+date_default_timezone_set('Asia/Jakarta');
+
+// Default rentang tanggal (hari ini)
+$tgl_awal = $_GET['tgl_awal'] ?? date('Y-m-d');
+$tgl_akhir = $_GET['tgl_akhir'] ?? date('Y-m-d');
+
+$stmt = $con->prepare("
+    SELECT th.*, 
+           m.nama AS nama_member, 
+           u.username AS nama_kasir 
+    FROM tbl_transaksi_header th
+    LEFT JOIN tbl_member m ON th.id_member = m.id_member
+    LEFT JOIN tbl_user u ON th.id_user_kasir = u.id_user
+    WHERE DATE(th.tgl_transaksi) BETWEEN ? AND ?
+    ORDER BY th.tgl_transaksi DESC
+");
+$stmt->bind_param('ss', $tgl_awal, $tgl_akhir);
+$stmt->execute();
+$data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+include '../../../view/master/header.php';
+include '../../../view/master/sidebar.php';
+?>
+
 <style>
     body {
         font-family: 'Poppins', sans-serif;
+        background: #f4f6f9;
     }
 
-    .card {
-        border-radius: 15px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s;
+    .card-glass {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     }
 
-    .card:hover {
-        transform: translateY(-5px);
+    .btn-glass {
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: #333;
+        transition: all 0.2s;
     }
 
-    .btn {
+    .btn-glass:hover {
+        background: rgba(255, 255, 255, 0.6);
+    }
+
+    .badge-metode {
+        font-size: 12px;
+        padding: 6px 10px;
         border-radius: 8px;
     }
 
-    .dataTables_wrapper .dataTables_filter input {
-        border-radius: 8px;
-        padding: 8px 15px;
+    .badge-tunai {
+        background: #28a745;
     }
 
-    .dataTables_wrapper .dataTables_length select {
-        border-radius: 8px;
+    .badge-transfer {
+        background: #007bff;
     }
 
-    .badge {
-        font-size: 0.9em;
-        padding: 6px 12px;
-        border-radius: 50px;
+    .badge-qris {
+        background: #ff5722;
     }
 
-    .table th {
-        background: #f8f9fa;
-        font-weight: 600;
-    }
-
-    .total-row {
-        background: #e9f7ef !important;
-        font-weight: bold;
+    .modal-content.card-glass {
+        border-radius: 20px;
     }
 </style>
 
-<!-- Content Header -->
 <section class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Data Transaksi Penjualan</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Beranda</a></li>
-                    <li class="breadcrumb-item active">Transaksi</li>
-                </ol>
-            </div>
-        </div>
+        <h1 class="mb-1">Data Transaksi</h1>
+        <p class="text-muted">Lihat, filter, dan cek detail transaksi</p>
     </div>
 </section>
 
-<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title"><i class="fas fa-receipt"></i> Daftar Transaksi</h3>
+        <div class="card card-glass p-3">
+            <form method="get" class="mb-3">
+                <div class="row align-items-end">
+                    <div class="col-md-3">
+                        <label>Dari Tanggal</label>
+                        <input type="date" name="tgl_awal" value="<?= $tgl_awal ?>" class="form-control">
                     </div>
-                    <div class="card-body">
-                        <!-- Filter Tanggal -->
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label>Dari Tanggal</label>
-                                <input type="date" id="tanggal_awal" class="form-control" value="<?= date('Y-m-d') ?>">
-                            </div>
-                            <div class="col-md-3">
-                                <label>Sampai Tanggal</label>
-                                <input type="date" id="tanggal_akhir" class="form-control" value="<?= date('Y-m-d') ?>">
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button id="btnFilter" class="btn btn-success btn-block">
-                                    <i class="fas fa-search"></i> Tampilkan
-                                </button>
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button id="btnReset" class="btn btn-secondary btn-block">
-                                    <i class="fas fa-sync"></i> Reset
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Tabel Transaksi -->
-                        <div class="table-responsive">
-                            <table id="tabelPelatih" class="table table-bordered table-hover" style="width:100%">
-                                <thead class="bg-gradient-primary text-white">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>No. Transaksi</th>
-                                        <th>Tanggal</th>
-                                        <th>Kasir</th>
-                                        <th>Member</th>
-                                        <th>Metode</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataTransaksi">
-                                    <!-- Data akan diisi via AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="col-md-3">
+                        <label>Sampai Tanggal</label>
+                        <input type="date" name="tgl_akhir" value="<?= $tgl_akhir ?>" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-block mt-2">
+                            <i class="fas fa-filter mr-1"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="data_transaksi.php" class="btn btn-secondary btn-block mt-2">
+                            <i class="fas fa-sync-alt mr-1"></i> Reset
+                        </a>
                     </div>
                 </div>
+            </form>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-bordered table-striped table-hover" id="tabelPelatih">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal</th>
+                            <th>Member</th>
+                            <th>Kasir</th>
+                            <th>Metode</th>
+                            <th>Total</th>
+                            <th width="10%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($data) === 0): ?>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Tidak ada transaksi.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php $no = 1;
+                            foreach ($data as $row): ?>
+                                <tr>
+                                    <td><?= $no++ ?></td>
+                                    <td><strong><?= htmlspecialchars($row['id_transaksi']) ?></strong></td>
+                                    <td><?= date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) ?></td>
+                                    <td><?= $row['nama_member'] ? htmlspecialchars($row['nama_member']) : '<em>Umum</em>' ?></td>
+                                    <td><?= htmlspecialchars($row['nama_kasir'] ?? '-') ?></td>
+                                    <td>
+                                        <?php
+                                        $met = strtolower($row['metode_pembayaran']);
+                                        if ($met == 'tunai') echo '<span class="badge badge-metode badge-tunai">Tunai</span>';
+                                        elseif ($met == 'transfer') echo '<span class="badge badge-metode badge-transfer">Transfer</span>';
+                                        else echo '<span class="badge badge-metode badge-qris">QRIS</span>';
+                                        ?>
+                                    </td>
+                                    <td class="text-right">Rp <?= number_format($row['grand_total'], 0, ',', '.') ?></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info btn-detail" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
+                                            <i class="fas fa-eye"></i> Detail
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -131,14 +164,14 @@ require "../../../setting/koneksi.php";
 
 <!-- Modal Detail Transaksi -->
 <div class="modal fade" id="modalDetail" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title">Detail Transaksi</h5>
-                <button type="button" class="close text-white" data-dismiss="modal">×</button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content card-glass">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-receipt mr-2"></i> Detail Transaksi</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body" id="detailContent">
-                <!-- Detail akan di-load via AJAX -->
+                <div class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>
             </div>
         </div>
     </div>
@@ -146,200 +179,8 @@ require "../../../setting/koneksi.php";
 
 <?php include '../../../view/master/footer.php'; ?>
 
-<!-- Script: DataTables, SweetAlert, AJAX -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
-
+<!-- Library -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        let table;
-
-        // Format Rupiah
-        function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR'
-            }).format(angka);
-        }
-
-        // Load Data Transaksi
-        function loadTransaksi(tglAwal = '', tglAkhir = '') {
-            $.ajax({
-                url: 'proses_transaksi_data.php',
-                type: 'GET',
-                data: {
-                    action: 'get_transaksi',
-                    tgl_awal: tglAwal,
-                    tgl_akhir: tglAkhir
-                },
-                dataType: 'json',
-                beforeSend: () => {
-                    $('#dataTransaksi').html('<tr><td colspan="9" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
-                },
-                success: function(res) {
-                    if (res.status === 'success') {
-                        let html = '';
-                        let no = 1;
-
-                        if (res.data.length === 0) {
-                            html = '<tr><td colspan="9" class="text-center text-muted">Tidak ada transaksi pada periode ini.</td></tr>';
-                        } else {
-                            res.data.forEach(trx => {
-                                const badgeMetode = trx.metode_pembayaran === 'Tunai' ? 'badge-success' :
-                                    trx.metode_pembayaran === 'Transfer' ? 'badge-info' : 'badge-warning';
-
-                                html += `
-                                <tr>
-                                    <td>${no++}</td>
-                                    <td><strong>${trx.id_transaksi}</strong></td>
-                                    <td>${trx.tanggal}</td>
-                                    <td>${trx.kasir}</td>
-                                    <td>${trx.member || '<em class="text-muted">Umum</em>'}</td>
-                                    <td><span class="badge ${badgeMetode}">${trx.metode_pembayaran}</span></td>
-                                    <td class="text-right font-weight-bold">${formatRupiah(trx.grand_total)}</td>
-                                    <td><span class="badge badge-success">Sukses</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info btn-detail" data-id="${trx.id_transaksi}">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>`;
-                            });
-                        }
-
-                        $('#dataTransaksi').html(html);
-
-                        // Inisialisasi ulang DataTables jika belum
-                        if ($.fn.DataTable.isDataTable('#tabelTransaksi')) {
-                            $('#tabelTransaksi').DataTable().destroy();
-                        }
-
-                        table = $('#tabelTransaksi').DataTable({
-                            "pageLength": 10,
-                            "lengthMenu": [10, 25, 50, 100],
-                            "language": {
-                                "search": "Cari:",
-                                "lengthMenu": "Tampilkan _MENU_ data",
-                                "info": "Menampilkan _START_ - _END_ dari _TOTAL_ transaksi",
-                                "paginate": {
-                                    "previous": "Sebelumnya",
-                                    "next": "Berikutnya"
-                                }
-                            }
-                        });
-                    } else {
-                        Swal.fire('Error', res.message, 'error');
-                    }
-                },
-                error: () => {
-                    Swal.fire('Error', 'Gagal memuat data transaksi.', 'error');
-                }
-            });
-        }
-
-        // Event: Filter Tanggal
-        $('#btnFilter').click(function() {
-            const awal = $('#tanggal_awal').val();
-            const akhir = $('#tanggal_akhir').val();
-
-            if (!awal || !akhir) {
-                Swal.fire('Peringatan', 'Pilih rentang tanggal terlebih dahulu!', 'warning');
-                return;
-            }
-
-            if (new Date(awal) > new Date(akhir)) {
-                Swal.fire('Error', 'Tanggal awal tidak boleh lebih besar dari tanggal akhir!', 'error');
-                return;
-            }
-
-            loadTransaksi(awal, akhir);
-        });
-
-        // Reset Filter
-        $('#btnReset').click(function() {
-            $('#tanggal_awal').val('<?= date('Y-m-d') ?>');
-            $('#tanggal_akhir').val('<?= date('Y-m-d') ?>');
-            loadTransaksi();
-        });
-
-        // Lihat Detail
-        $(document).on('click', '.btn-detail', function() {
-            const id = $(this).data('id');
-
-            $.ajax({
-                url: 'proses_transaksi_data.php',
-                type: 'GET',
-                data: {
-                    action: 'get_detail',
-                    id: id
-                },
-                dataType: 'json',
-                beforeSend: () => {
-                    $('#detailContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat detail...</div>');
-                    $('#modalDetail').modal('show');
-                },
-                success: function(res) {
-                    if (res.status === 'success') {
-                        let items = '';
-                        res.detail.forEach(d => {
-                            items += `
-                            <tr>
-                                <td>${d.nama_paket}</td>
-                                <td class="text-center">${d.qty}</td>
-                                <td class="text-right">${formatRupiah(d.harga_satuan)}</td>
-                                <td class="text-right">${formatRupiah(d.potongan_diskon_item)}</td>
-                                <td class="text-right font-weight-bold">${formatRupiah(d.total_item)}</td>
-                            </tr>`;
-                        });
-
-                        $('#detailContent').html(`
-                        <div class="row">
-                            <div class="col-md-6">
-                                <table class="table table-sm">
-                                    <tr><th>No. Transaksi</th><td><strong>${res.header.id_transaksi}</strong></td></tr>
-                                    <tr><th>Tanggal</th><td>${res.header.tanggal}</td></tr>
-                                    <tr><th>Kasir</th><td>${res.header.kasir}</td></tr>
-                                    <tr><th>Member</th><td>${res.header.member || '<em>Umum</em>'}</td></tr>
-                                    <tr><th>Metode</th><td><span class="badge badge-primary">${res.header.metode_pembayaran}</span></td></tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6 text-right">
-                                <h5>Sub Total: <strong>${formatRupiah(res.header.sub_total)}</strong></h5>
-                                <h5>Diskon Item: <strong>${formatRupiah(res.header.potongan_diskon_global)}</strong></h5>
-                                <h3 class="text-success">Grand Total: <strong>${formatRupiah(res.header.grand_total)}</strong></h3>
-                                ${res.header.jumlah_dibayar_tunai ? `<small>Kembalian: <strong>${formatRupiah(res.header.jumlah_kembalian)}</strong></small>` : ''}
-                            </div>
-                        </div>
-                        <hr>
-                        <h6>Detail Item:</h6>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th>Paket</th>
-                                        <th>Qty</th>
-                                        <th>Harga</th>
-                                        <th>Diskon</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${items}</tbody>
-                            </table>
-                        </div>
-                        ${res.header.keterangan ? `<p><strong>Catatan:</strong> ${res.header.keterangan}</p>` : ''}
-                    `);
-                    } else {
-                        $('#detailContent').html('<div class="alert alert-danger">Gagal memuat detail.</div>');
-                    }
-                }
-            });
-        });
-
-        // Load data saat halaman dibuka
-        loadTransaksi($('#tanggal_awal').val(), $('#tanggal_akhir').val());
-    });
-</script>

@@ -36,17 +36,13 @@ $queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title"><i class="fas fa-table mr-2"></i>Data User</h3>
-<<<<<<< HEAD
-                        
-=======
->>>>>>> origin/main
                     </div>
                     <div class="card-body">
                         <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
                             <i class="fas fa-plus"></i> Tambah User
                         </button>
                         <div class="table-responsive rounded">
-                            <table id="tabelpelatih" class="table table-bordered table-striped table-hover">
+                            <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>
@@ -190,100 +186,3 @@ if (mysqli_num_rows($queryUser) > 0) {
 ?>
 
 <?php include '../../../view/master/footer.php'; ?>
-
-<!-- Script AJAX + SweetAlert -->
-<script>
-    $(document).ready(function() {
-        // Inisialisasi DataTable
-        $('#tabelPelatih').DataTable({
-            "paging": true,
-            "lengthChange": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-        });
-
-        // 1. Tambah User (Simpan)
-        $('#formTambah').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: 'proses_user.php', // Targetkan file proses_user.php
-                type: 'POST',
-                data: $(this).serialize() + '&action=simpan',
-                dataType: 'json',
-                success: function(res) {
-                    if (res.status == 'success') {
-                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Gagal!', res.message, 'error');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire('Error!', 'Terjadi kesalahan saat menghubungi server.', 'error');
-                }
-            });
-        });
-
-        // 2. Edit User (Update)
-        $('.formEdit').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: 'proses_user.php', // Targetkan file proses_user.php
-                type: 'POST',
-                data: $(this).serialize() + '&action=update',
-                dataType: 'json',
-                success: function(res) {
-                    if (res.status == 'success') {
-                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Gagal!', res.message, 'error');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire('Error!', 'Terjadi kesalahan saat menghubungi server.', 'error');
-                }
-            });
-        });
-
-        // 3. Hapus User
-        $('.btn-hapus').click(function(e) {
-            e.preventDefault();
-            const id = $(this).data('id');
-            const nama = $(this).data('nama');
-            Swal.fire({
-                title: 'Konfirmasi Hapus',
-                text: `Apakah yakin ingin menghapus user "${nama}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'proses_user.php', // Targetkan file proses_user.php
-                        type: 'GET',
-                        data: {
-                            action: 'hapus',
-                            id: id
-                        },
-                        dataType: 'json',
-                        success: function(res) {
-                            if (res.status == 'success') {
-                                Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
-                            } else {
-                                Swal.fire('Gagal!', res.message, 'error');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire('Error!', 'Terjadi kesalahan saat menghubungi server.', 'error');
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script>

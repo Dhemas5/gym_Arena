@@ -44,7 +44,7 @@ if (!function_exists('redirectByType')) {
         if ($type === 'admin') {
             header("Location: ../../../data/admin/dashboard/index.php");
         } elseif ($type === 'member') {
-            header("Location: ../../../data/member/landingpage/index.html");
+            header("Location: ../../../data/member/landingpage/indexmember.html");
         } else {
             session_unset();
             session_destroy();

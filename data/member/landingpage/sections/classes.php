@@ -20,38 +20,38 @@
       $classes = [
         [
           'image' => 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=500&h=300&fit=crop',
-          'name' => 'Yoga',
+          'name' => 'Senam BL',
           'desc' => 'Meningkatkan fleksibilitas dan ketenangan pikiran',
           'schedule' => 'Semua Level'
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop',
-          'name' => 'Zumba',
-          'desc' => 'Olahraga kardio yang menyenangkan dengan musik',
+          'name' => 'Zumba Zin Ira',
+          'desc' => 'Membakar kalori dan meningkatkan energi dengan tarian ritmis',
           'schedule' => 'Pemula - Mahir'
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=500&h=300&fit=crop',
-          'name' => 'Body Combat',
-          'desc' => 'Latihan kardio dengan gerakan bela diri',
+          'name' => 'Boxing',
+          'desc' => 'Meningkatkan kekuatan, ketahanan, dan refleks tubuh',
           'schedule' => 'Menengah - Lanjut'
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=300&fit=crop',
-          'name' => 'Strength Training',
-          'desc' => 'Membangun dan menguatkan otot tubuh',
+          'name' => 'Body Shape',
+          'desc' => 'Membentuk dan mengencangkan otot tubuh secara proporsional',
           'schedule' => 'Semua Level'
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=300&fit=crop',
-          'name' => 'Pilates',
-          'desc' => 'Meningkatkan kekuatan inti dan postur tubuh',
+          'name' => 'Kapha Yoga',
+          'desc' => 'Menyeimbangkan tubuh dan pikiran melalui gerakan serta pernapasan',
           'schedule' => 'Pemula - Menengah'
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop',
-          'name' => 'CrossFit',
-          'desc' => 'Latihan intensitas tinggi untuk hasil maksimal',
+          'name' => 'Aero BL',
+          'desc' => 'Melatih daya tahan dan koordinasi dengan gerakan dinamis',
           'schedule' => 'Lanjut'
         ]
       ];

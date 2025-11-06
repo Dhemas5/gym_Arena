@@ -14,33 +14,33 @@
       $trainers = [
         [
           'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop',
-          'name' => 'Sarah Johnson',
-          'specialties' => ['Yoga', 'Pilates'],
-          'schedule' => 'Sen, Rab, Jum',
+          'name' => 'Coach Fitri',
+          'specialties' => ['Senam BL'],
+          'schedule' => 'Sen, Jum',
           'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga.',
           'certifications' => ['RYT-500', 'Pilates certified']
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1567598508481-65985588e295?w=400&h=500&fit=crop',
-          'name' => 'Mike Anderson',
-          'specialties' => ['Body Combat'],
-          'schedule' => 'Sen, Rab, Sab',
+          'name' => 'Coach Mieke',
+          'specialties' => ['Body Shape'],
+          'schedule' => 'Rab, kam',
           'desc' => '10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional.',
           'certifications' => ['NSCA-CPT', 'CrossFit Level 2']
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop',
-          'name' => 'Lisa Martinez',
-          'specialties' => ['Zumba', 'Dance Fitness'],
-          'schedule' => 'Sel, Kam, Jum',
+          'name' => 'Coach Nana',
+          'specialties' => ['Kapha Yoga', 'Trampoline'],
+          'schedule' => 'Rab, Jum, Ming',
           'desc' => '6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!',
           'certifications' => ['Zumba B1 & B2', 'AFAA Certified']
         ],
         [
           'image' => 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop',
-          'name' => 'David Chen',
-          'specialties' => ['CrossFit', 'HIIT'],
-          'schedule' => 'Sel, Kam, Sab',
+          'name' => 'Coach Wiwik',
+          'specialties' => ['Aero BL'],
+          'schedule' => 'Kam, Ming',
           'desc' => '7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.',
           'certifications' => ['CrossFit L-2', 'ACE Personal Trainer']
         ]

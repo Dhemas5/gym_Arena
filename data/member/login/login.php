@@ -327,7 +327,7 @@ if (isset($_POST['loginbtn'])) {
 </head>
 <body>
     <div class="login-container">
-        <a href="../halamanutama/index.html" class="btn-back-home">
+        <a href="../landingpage/index.html" class="btn-back-home">
             ← Kembali ke Beranda
         </a>
 

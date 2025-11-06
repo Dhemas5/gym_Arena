@@ -43,18 +43,11 @@ require "../../../setting/koneksi.php";
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <!-- TARO DI SINI: TAMPILKAN TABEL DARI ARRAY -->
                         <tbody>
                             <?php
-                            // === AMBIL DATA SEKALI, SIMPAN KE ARRAY ===
                             $members = [];
-                            $query = $con->query("
-                                SELECT m.*, p.nama_paket 
-                                FROM tbl_member m 
-                                LEFT JOIN tbl_paket p ON m.id_paket_aktif = p.id_paket 
-                                ORDER BY m.id_member ASC
-                            ");
-                            if ($query->num_rows > 0) {
+                            $query = $con->query("SELECT * FROM vw_member_status ORDER BY id_member ASC");
+                            if ($query && $query->num_rows > 0) {
                                 while ($row = $query->fetch_assoc()) {
                                     $members[] = $row;
                                 }
@@ -62,37 +55,58 @@ require "../../../setting/koneksi.php";
 
                             if (empty($members)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center">Tidak ada data</td>
+                                    <td colspan="8" class="text-center">Tidak ada data member</td>
                                 </tr>
                             <?php else: ?>
                                 <?php $no = 1;
                                 foreach ($members as $m): ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
-                                        <td><?= htmlspecialchars($m['nama']) ?></td>
-                                        <td><?= htmlspecialchars($m['email']) ?></td>
+                                        <td><?= htmlspecialchars($m['nama'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($m['email'] ?? '-') ?></td>
                                         <td><?= htmlspecialchars($m['no_hp'] ?? '-') ?></td>
                                         <td>
-                                            <?= $m['status_akun'] == 'aktif'
+                                            <?= ($m['status_akun'] ?? 'nonaktif') === 'aktif'
                                                 ? '<span class="badge badge-success">Aktif</span>'
                                                 : '<span class="badge badge-secondary">Nonaktif</span>'
                                             ?>
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                            $membership = $m['status_membership'] ?? 'Tidak Aktif';
-                                            if ($membership == 'Aktif') {
-                                                echo '<span class="badge badge-success">Aktif</span><br>
-                                                      <small><strong>' . htmlspecialchars($m['nama_paket'] ?? '—') . '</strong><br>
-                                                      ' . ($m['tgl_kedaluwarsa'] ? date('d/m/Y', strtotime($m['tgl_kedaluwarsa'])) : '-') . '</small>';
-                                            } elseif ($membership == 'Expired') {
-                                                echo '<span class="badge badge-danger">Expired</span>';
-                                            } else {
-                                                echo '<span class="badge badge-light">Tidak Aktif</span>';
+                                            $sisa_teks = "-";
+                                            $badge = '<span class="badge badge-light">Tidak Aktif</span>';
+
+                                            if (!empty($m['tgl_berakhir'])) {
+                                                $end = new DateTime($m['tgl_berakhir']);
+                                                $now = new DateTime();
+                                                $interval = $now->diff($end);
+                                                if ($now < $end) {
+                                                    // hitung sisa jam dan hari
+                                                    $sisa_hari = $interval->days;
+                                                    $sisa_jam = $interval->h + ($sisa_hari * 24);
+                                                    if ($sisa_hari > 0) {
+                                                        $sisa_teks = "{$sisa_hari} hari";
+                                                    } else {
+                                                        $sisa_teks = "{$sisa_jam} jam";
+                                                    }
+                                                    $badge = '<span class="badge badge-success">Aktif</span>';
+                                                } else {
+                                                    $sisa_teks = "Expired";
+                                                    $badge = '<span class="badge badge-danger">Expired</span>';
+                                                }
                                             }
                                             ?>
+                                            <?= $badge ?><br>
+                                            <small>
+                                                <strong><?= htmlspecialchars($m['nama_paket'] ?? '-') ?></strong><br>
+                                                <?= $sisa_teks ?><br>
+                                                <?php if (!empty($m['tgl_berakhir'])): ?>
+                                                    Sampai: <?= date('d/m/Y H:i', strtotime($m['tgl_berakhir'])) ?>
+                                                <?php endif; ?>
+                                            </small>
                                         </td>
-                                        <td><?= date('d M Y', strtotime($m['tanggal_daftar'])) ?></td>
+
+                                        <td><?= !empty($m['tanggal_daftar']) ? date('d M Y', strtotime($m['tanggal_daftar'])) : '-' ?></td>
                                         <td class="text-center">
                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $m['id_member'] ?>">
                                                 <i class="fas fa-edit"></i>
@@ -115,176 +129,124 @@ require "../../../setting/koneksi.php";
     </div>
 </section>
 
-<!-- TARO DI SINI: MODAL EDIT & DETAIL (SETELAH TABEL) -->
-<?php foreach ($members as $m): ?>
-    <!-- MODAL EDIT -->
-    <div class="modal fade" id="modalEdit<?= $m['id_member'] ?>">
-        <div class="modal-dialog">
-            <form class="formEdit" data-id="<?= $m['id_member'] ?>">
+<!-- =========================
+     MODAL EDIT & DETAIL
+========================= -->
+<?php if (!empty($members)): ?>
+    <?php foreach ($members as $m): ?>
+        <!-- MODAL DETAIL -->
+        <div class="modal fade" id="modalDetail<?= $m['id_member'] ?>">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title">Edit Member</h5>
-                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">Detail Member: <?= htmlspecialchars($m['nama'] ?? '—') ?></h5>
+                        <button type="button" class="close text-white" data-dismiss="modal">×</button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="id_member" value="<?= $m['id_member'] ?>">
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" class="form-control" name="nama" value="<?= htmlspecialchars($m['nama']) ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($m['email']) ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Password Baru</label>
-                            <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak diubah">
-                        </div>
-                        <div class="form-group">
-                            <label>No. HP</label>
-                            <input type="text" class="form-control" name="no_hp" value="<?= htmlspecialchars($m['no_hp'] ?? '') ?>">
-                        </div>
-                        <div class="form-group">
-                            <label>Alamat</label>
-                            <textarea class="form-control" name="alamat" rows="2"><?= htmlspecialchars($m['alamat'] ?? '') ?></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Status Akun</label>
-                            <select class="form-control" name="status_akun">
-                                <option value="aktif" <?= $m['status_akun'] == 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                                <option value="nonaktif" <?= $m['status_akun'] == 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-warning">Update</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL DETAIL -->
-    <div class="modal fade" id="modalDetail<?= $m['id_member'] ?>">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">Detail Member: <?= htmlspecialchars($m['nama']) ?></h5>
-                    <button type="button" class="close text-white" data-dismiss="modal">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-sm table-bordered">
-                                <tr>
-                                    <th>ID</th>
-                                    <td><?= $m['id_member'] ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Nama</th>
-                                    <td><?= htmlspecialchars($m['nama']) ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Email</th>
-                                    <td><?= htmlspecialchars($m['email']) ?></td>
-                                </tr>
-                                <tr>
-                                    <th>No. HP</th>
-                                    <td><?= htmlspecialchars($m['no_hp'] ?? '-') ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Alamat</th>
-                                    <td><?= nl2br(htmlspecialchars($m['alamat'] ?? '-')) ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Tgl Daftar</th>
-                                    <td><?= date('d M Y H:i', strtotime($m['tanggal_daftar'])) ?></td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-sm table-bordered">
-                                <tr>
-                                    <th>Status Akun</th>
-                                    <td>
-                                        <?= $m['status_akun'] == 'aktif'
-                                            ? '<span class="badge badge-success">Aktif</span>'
-                                            : '<span class="badge badge-secondary">Nonaktif</span>'
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Membership</th>
-                                    <td>
-                                        <?php
-                                        if ($m['status_membership'] == 'Aktif') {
-                                            echo '<span class="badge badge-success">Aktif</span><br>
-                                              <strong>' . htmlspecialchars($m['nama_paket'] ?? '—') . '</strong><br>
-                                              <small>Mulai: ' . ($m['tgl_mulai_aktif'] ? date('d/m/Y', strtotime($m['tgl_mulai_aktif'])) : '-') . '<br>
-                                              Berakhir: ' . ($m['tgl_kedaluwarsa'] ? date('d/m/Y', strtotime($m['tgl_kedaluwarsa'])) : '-') . '</small>';
-                                        } elseif ($m['status_membership'] == 'Expired') {
-                                            echo '<span class="badge badge-danger">Expired</span>';
-                                        } else {
-                                            echo '<span class="badge badge-light">Tidak Aktif</span>';
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                            </table>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <th>ID</th>
+                                        <td><?= $m['id_member'] ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Nama</th>
+                                        <td><?= htmlspecialchars($m['nama'] ?? '-') ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td><?= htmlspecialchars($m['email'] ?? '-') ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>No. HP</th>
+                                        <td><?= htmlspecialchars($m['no_hp'] ?? '-') ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Alamat</th>
+                                        <td><?= nl2br(htmlspecialchars($m['alamat'] ?? '-')) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tgl Daftar</th>
+                                        <td><?= date('d M Y H:i', strtotime($m['tanggal_daftar'])) ?></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm table-bordered">
+                                    <tr>
+                                        <th>Status Akun</th>
+                                        <td><?= ($m['status_akun'] ?? 'nonaktif') === 'aktif'
+                                                ? '<span class="badge badge-success">Aktif</span>'
+                                                : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Membership</th>
+                                        <td>
+                                            <?php if (!empty($m['tgl_berakhir'])): ?>
+                                                <?php
+                                                $end = new DateTime($m['tgl_berakhir']);
+                                                $now = new DateTime();
+                                                if ($now < $end) {
+                                                    $interval = $now->diff($end);
+                                                    $jam_total = $interval->days * 24 + $interval->h;
+                                                    echo '<span class="badge badge-success">Aktif</span><br>';
+                                                    echo "<strong>{$m['nama_paket']}</strong><br>";
+                                                    if ($interval->days > 0) {
+                                                        echo "Sisa: {$interval->days} hari";
+                                                    } else {
+                                                        echo "Sisa: {$jam_total} jam";
+                                                    }
+                                                    echo "<br>Sampai: " . date('d/m/Y H:i', strtotime($m['tgl_berakhir']));
+                                                } else {
+                                                    echo '<span class="badge badge-danger">Expired</span>';
+                                                }
+                                                ?>
+                                            <?php else: ?>
+                                                <span class="badge badge-light">Tidak Aktif</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-<?php endforeach; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <?php include '../../../view/master/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        // Edit
-        $('.formEdit').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: 'proses_member.php',
-                type: 'POST',
-                data: $(this).serialize() + '&action=update',
-                dataType: 'json',
-                success: function(res) {
-                    Swal.fire(res.status == 'success' ? 'Sukses!' : 'Gagal', res.message, res.status == 'success' ? 'success' : 'error')
-                        .then(() => {
-                            if (res.status == 'success') location.reload();
-                        });
-                }
-            });
-        });
-
-        // Hapus
-        $('.btn-hapus').click(function() {
+        $('.btn-hapus').on('click', function() {
             const id = $(this).data('id');
             const nama = $(this).data('nama');
             Swal.fire({
                 title: 'Hapus Member?',
-                text: `Yakin hapus "${nama}"?`,
+                text: `Yakin ingin menghapus "${nama}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal'
-            }).then(r => {
-                if (r.isConfirmed) {
+            }).then(result => {
+                if (result.isConfirmed) {
                     $.get('proses_member.php', {
                         action: 'hapus',
-                        id: id
+                        id
                     }, function(res) {
                         const data = JSON.parse(res);
-                        Swal.fire(data.status == 'success' ? 'Sukses!' : 'Gagal', data.message, data.status == 'success' ? 'success' : 'error')
-                            .then(() => {
-                                if (data.status == 'success') location.reload();
-                            });
-                    });
+                        Swal.fire({
+                            title: data.status === 'success' ? 'Sukses!' : 'Gagal!',
+                            text: data.message,
+                            icon: data.status === 'success' ? 'success' : 'error'
+                        }).then(() => {
+                            if (data.status === 'success') location.reload();
+                        });
+                    }).fail(() => Swal.fire('Error', 'Gagal menghubungi server.', 'error'));
                 }
             });
         });

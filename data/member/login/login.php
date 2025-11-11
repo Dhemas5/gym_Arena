@@ -32,7 +32,7 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['no_hp'] = $user['no_hp'];
 
-            header("Location: ../landingpage/indexmember.html");
+            header("Location: ../landingpage/indexmemberr.php");
             exit;
         } else {
             $error = "❌ Kata sandi salah!";

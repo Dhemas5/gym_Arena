@@ -3,14 +3,12 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 
+// Import PHPMailer di bagian paling atas
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
 require '../../../vendor/autoload.php';
 
-date_default_timezone_set('Asia/Jakarta');
-
-// Cek apakah ada email yang perlu diverifikasi
+// Cek apakah user sudah di halaman verifikasi
 if (!isset($_SESSION['verify_email'])) {
     header("Location: register.php");
     exit();
@@ -20,75 +18,83 @@ $email = $_SESSION['verify_email'];
 $error = "";
 $success = "";
 
-// Proses verifikasi
+// Proses verifikasi kode
 if (isset($_POST['verifybtn'])) {
-    $code = trim(htmlspecialchars($_POST['verification_code']));
-
-    if (empty($code)) {
-        $error = "Kode verifikasi harus diisi!";
-    } else {
-        // Cek kode verifikasi dan expiry
-        $stmt = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND code_expiry > NOW()");
-        $stmt->bind_param("ss", $email, $code);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 1) {
-            // Update is_verified menjadi 1
-            $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL WHERE email = ?");
-            $update->bind_param("s", $email);
+    $input_code = trim(htmlspecialchars($_POST['verification_code']));
+    
+    // Cek kode verifikasi di database
+    $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND code_expiry > NOW() AND is_verified = 0");
+    $query->bind_param("ss", $email, $input_code);
+    $query->execute();
+    $result = $query->get_result();
+    
+    if ($result->num_rows === 1) {
+        // Update status verifikasi
+        $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL WHERE email = ?");
+        $update->bind_param("s", $email);
+        
+        if ($update->execute()) {
+            // Hapus session verifikasi
+            unset($_SESSION['verify_email']);
+            unset($_SESSION['registration_step']);
             
-            if ($update->execute()) {
-                $success = "Email berhasil diverifikasi! Lanjutkan ke pembayaran...";
-                
-                // Simpan email untuk pembayaran
-                $_SESSION['payment_email'] = $email;
-                unset($_SESSION['verify_email']);
-                
-                // Redirect ke halaman pembayaran setelah 2 detik
-                header("refresh:2;url=payment.php");
-            } else {
-                $error = "Terjadi kesalahan. Silakan coba lagi!";
-            }
-        } else {
-            $error = "Kode verifikasi salah atau sudah kadaluarsa!";
+            // Set session untuk menampilkan pesan sukses di halaman login
+            $_SESSION['verification_success'] = true;
+            $_SESSION['verified_email'] = $email;
+            
+            // Redirect ke halaman login
+            header("Location: login.php");
+            exit();
         }
+    } else {
+        $error = "❌ Kode verifikasi salah atau sudah kadaluarsa!";
     }
 }
 
-// Resend kode verifikasi
+// Kirim ulang kode verifikasi
 if (isset($_POST['resendbtn'])) {
-    $verification_code = sprintf("%06d", mt_rand(1, 999999));
-    $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+    // Generate kode baru
+    $new_code = sprintf("%06d", mt_rand(1, 999999));
+    $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
     
+    // Update kode di database
     $update = $con->prepare("UPDATE tbl_member SET verification_code = ?, code_expiry = ? WHERE email = ?");
-    $update->bind_param("sss", $verification_code, $code_expiry, $email);
-    $update->execute();
+    $update->bind_param("sss", $new_code, $new_expiry, $email);
+    
+    if ($update->execute()) {
+        // Ambil nama user
+        $user_query = $con->prepare("SELECT nama FROM tbl_member WHERE email = ?");
+        $user_query->bind_param("s", $email);
+        $user_query->execute();
+        $user = $user_query->get_result()->fetch_assoc();
+        $nama = $user['nama'];
+        
+        // Kirim email
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'valhidayat01@gmail.com';
+            $mail->Password   = 'ecbnikaaznxaujbk';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port       = 587;
 
-    // Kirim email
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'valhidayat01@gmail.com';
-        $mail->Password   = 'ecbnikaaznxaujbk';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
+            $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
+            $mail->addAddress($email);
 
-        $mail->setFrom('valhidayat01@gmail.com', 'Gym Arena');
-        $mail->addAddress($email);
+            $mail->isHTML(true);
+            $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
+            $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
+                              Kode verifikasi baru Anda adalah: <h2 style='color: #1976d2;'>$new_code</h2><br>
+                              Kode ini berlaku selama 1 jam.<br><br>
+                              Silakan masukkan kode ini pada halaman verifikasi.";
 
-        $mail->isHTML(true);
-        $mail->Subject = 'Kode Verifikasi Registrasi Gym Arena';
-        $mail->Body    = "Halo,<br><br>
-                          Kode verifikasi baru Anda adalah: <h2>$verification_code</h2><br>
-                          Kode ini berlaku selama 1 jam.";
-
-        $mail->send();
-        $success = "Kode verifikasi baru telah dikirim ke email Anda!";
-    } catch (Exception $e) {
-        $error = "Gagal mengirim email. Error: " . $mail->ErrorInfo;
+            $mail->send();
+            $success = "✅ Kode verifikasi baru telah dikirim ke email Anda!";
+        } catch (Exception $e) {
+            $error = "❌ Gagal mengirim email. Error: " . $mail->ErrorInfo;
+        }
     }
 }
 ?>
@@ -150,9 +156,9 @@ if (isset($_POST['resendbtn'])) {
             max-width: 500px;
             border: 1px solid rgba(66, 165, 245, 0.2);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.5s ease-out;
             position: relative;
             z-index: 1;
-            animation: slideIn 0.5s ease-out;
         }
 
         @keyframes slideIn {
@@ -179,90 +185,11 @@ if (isset($_POST['resendbtn'])) {
             border: 2px solid rgba(66, 165, 245, 0.3);
         }
 
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(25, 118, 210, 0.2);
-            border: 2px solid rgba(66, 165, 245, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .step.active .step-circle {
-            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-            border-color: #42a5f5;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(66, 165, 245, 0.4);
-        }
-
-        .step.completed .step-circle {
-            background: rgba(34, 197, 94, 0.2);
-            border-color: #22c55e;
-            color: #22c55e;
-        }
-
-        .step span {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .step.active span {
-            color: #42a5f5;
-        }
-
-        .step.completed span {
-            color: #22c55e;
-        }
-
-        .step-arrow {
-            color: rgba(66, 165, 245, 0.3);
-            font-size: 1.2rem;
-            margin: 0 5px;
-        }
-
-        .icon-wrapper {
-            width: 100px;
-            height: 100px;
-            background: rgba(66, 165, 245, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 25px;
-            border: 2px solid rgba(66, 165, 245, 0.3);
-        }
-
-        .icon-wrapper::before {
-            content: '✉️';
-            font-size: 3.5rem;
-        }
-
         .logo-section h1 {
             font-size: 2rem;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .logo-section .text-primary {
@@ -272,25 +199,30 @@ if (isset($_POST['resendbtn'])) {
             background-clip: text;
         }
 
-        .info-box {
+        .logo-section p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .email-info {
             background: rgba(66, 165, 245, 0.1);
             border: 1px solid rgba(66, 165, 245, 0.3);
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 25px;
+            padding: 15px;
             text-align: center;
+            margin-bottom: 25px;
         }
 
-        .info-box p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.95rem;
-            margin: 0;
-            line-height: 1.6;
+        .email-info p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
         }
 
-        .info-box strong {
+        .email-info strong {
             color: #42a5f5;
-            font-weight: 600;
+            font-size: 1.05rem;
+            display: block;
         }
 
         .alert {
@@ -299,7 +231,6 @@ if (isset($_POST['resendbtn'])) {
             font-size: 0.9rem;
             margin-bottom: 25px;
             animation: shake 0.5s ease-in-out;
-            border: none;
         }
 
         .alert-danger {
@@ -322,7 +253,6 @@ if (isset($_POST['resendbtn'])) {
 
         .form-group {
             margin-bottom: 24px;
-            position: relative;
         }
 
         .form-label {
@@ -333,16 +263,30 @@ if (isset($_POST['resendbtn'])) {
             font-size: 0.95rem;
         }
 
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(66, 165, 245, 0.6);
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+
         .form-control {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px 16px 14px 48px;
             background: rgba(25, 118, 210, 0.05);
             border: 1px solid rgba(66, 165, 245, 0.2);
             border-radius: 12px;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 12px;
             text-align: center;
             transition: all 0.3s ease;
         }
@@ -357,6 +301,7 @@ if (isset($_POST['resendbtn'])) {
         .form-control::placeholder {
             color: rgba(255, 255, 255, 0.4);
             letter-spacing: normal;
+            font-size: 1rem;
         }
 
         .btn-verify {
@@ -384,7 +329,7 @@ if (isset($_POST['resendbtn'])) {
 
         .btn-resend {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: rgba(66, 165, 245, 0.1);
             border: 1px solid rgba(66, 165, 245, 0.3);
             border-radius: 12px;
@@ -393,40 +338,15 @@ if (isset($_POST['resendbtn'])) {
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .btn-resend:hover {
             background: rgba(66, 165, 245, 0.2);
-            border-color: #42a5f5;
+            transform: translateY(-1px);
         }
 
-        .divider {
-            text-align: center;
-            margin: 25px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 100%;
-            height: 1px;
-            background: rgba(66, 165, 245, 0.2);
-        }
-
-        .divider span {
-            background: rgba(13, 27, 42, 0.9);
-            padding: 0 15px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 1;
+        .btn-resend:active {
+            transform: translateY(0);
         }
 
         .links {
@@ -438,8 +358,8 @@ if (isset($_POST['resendbtn'])) {
             color: #42a5f5;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
             font-size: 0.95rem;
+            transition: color 0.3s ease;
         }
 
         .links a:hover {
@@ -447,16 +367,26 @@ if (isset($_POST['resendbtn'])) {
             text-decoration: underline;
         }
 
-        .timer-info {
-            text-align: center;
+        .links p {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
-            margin-top: 15px;
+            margin: 12px 0;
+            font-size: 0.95rem;
         }
 
-        .timer-info .timer {
-            color: #fbbf24;
-            font-weight: 600;
+        .info-box {
+            background: rgba(66, 165, 245, 0.05);
+            border: 1px solid rgba(66, 165, 245, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .info-box p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.6;
         }
 
         @media (max-width: 576px) {
@@ -468,13 +398,9 @@ if (isset($_POST['resendbtn'])) {
                 font-size: 1.6rem;
             }
 
-            .icon-wrapper {
-                width: 80px;
-                height: 80px;
-            }
-
-            .icon-wrapper::before {
-                font-size: 2.5rem;
+            .form-control {
+                font-size: 1.2rem;
+                letter-spacing: 8px;
             }
         }
     </style>
@@ -483,34 +409,13 @@ if (isset($_POST['resendbtn'])) {
     <div class="verify-container">
         <div class="logo-section">
             <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Arena FIT Logo">
-
-            <!-- Step Indicator -->
-            <div class="step-indicator">
-                <div class="step completed">
-                    <div class="step-circle">✓</div>
-                    <span>Data Diri</span>
-                </div>
-                <span class="step-arrow">→</span>
-                <div class="step active">
-                    <div class="step-circle">2</div>
-                    <span>Verifikasi</span>
-                </div>
-                <span class="step-arrow">→</span>
-                <div class="step">
-                    <div class="step-circle">3</div>
-                    <span>Pembayaran</span>
-                </div>
-            </div>
-
-            <div class="icon-wrapper"></div>
             <h1>Verifikasi <span class="text-primary">Email</span></h1>
+            <p>Masukkan kode 6 digit yang dikirim ke email Anda</p>
         </div>
 
-        <div class="info-box">
-            <p>
-                Kami telah mengirimkan kode verifikasi 6 digit ke<br>
-                <strong><?= htmlspecialchars($email); ?></strong>
-            </p>
+        <div class="email-info">
+            <p>Kode verifikasi dikirim ke:</p>
+            <strong><?= htmlspecialchars($email); ?></strong>
         </div>
 
         <?php if (!empty($error)) : ?>
@@ -524,52 +429,56 @@ if (isset($_POST['resendbtn'])) {
         <form method="POST">
             <div class="form-group">
                 <label class="form-label">Kode Verifikasi</label>
-                <input 
-                    name="verification_code" 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="000000"
-                    required 
-                    maxlength="6" 
-                    pattern="[0-9]{6}" 
-                    title="Masukkan 6 digit angka"
-                    autocomplete="off"
-                    inputmode="numeric"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">🔐</span>
+                    <input 
+                        type="text" 
+                        name="verification_code" 
+                        class="form-control" 
+                        placeholder="000000" 
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        required
+                        autofocus
+                    >
+                </div>
             </div>
 
             <button type="submit" name="verifybtn" class="btn-verify">
-                Verifikasi & Lanjut ke Pembayaran
+                ✓ Verifikasi Email
             </button>
         </form>
 
-        <div class="timer-info">
-            <p>Kode berlaku selama <span class="timer">1 jam</span></p>
+        <form method="POST" style="margin-top: 15px;">
+            <button type="submit" name="resendbtn" class="btn-resend">
+                🔄 Kirim Ulang Kode
+            </button>
+        </form>
+
+        <div class="info-box">
+            <p>💡 Kode verifikasi berlaku selama 1 jam. Jika tidak menerima email, periksa folder spam atau klik tombol kirim ulang.</p>
         </div>
 
-        <div class="divider"><span>atau</span></div>
-
-        <form method="POST">
-            <button type="submit" name="resendbtn" class="btn-resend">
-                <span>🔄</span> Kirim Ulang Kode
-            </button>
-        </form>
-
         <div class="links">
-            <p><a href="register.php">← Kembali ke Pendaftaran</a></p>
+            <p><a href="register.php">← Kembali ke Registrasi</a></p>
         </div>
     </div>
 
     <script>
-        window.addEventListener('load', function() {
-            const input = document.querySelector('input[name="verification_code"]');
-            if (input) {
-                input.focus();
-            }
+        // Auto format input kode verifikasi (hanya angka)
+        const codeInput = document.querySelector('input[name="verification_code"]');
+        
+        codeInput.addEventListener('input', function(e) {
+            // Hanya izinkan angka
+            this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        document.querySelector('input[name="verification_code"]').addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9]/g, '');
+        // Auto submit ketika 6 digit sudah diisi (optional)
+        codeInput.addEventListener('input', function(e) {
+            if (this.value.length === 6) {
+                // Auto focus ke tombol verify (opsional)
+                // document.querySelector('.btn-verify').focus();
+            }
         });
     </script>
 

@@ -69,22 +69,22 @@ if (isset($_POST['registerbtn'])) {
                     $mail->SMTPSecure = 'tls';
                     $mail->Port       = 587;
 
-                    $mail->setFrom('valhidayat01@gmail.com', 'Gym Arena');
+                    $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
                     $mail->addAddress($email);
 
                     $mail->isHTML(true);
-                    $mail->Subject = 'Kode Verifikasi Registrasi Gym Arena';
+                    $mail->Subject = 'Kode Verifikasi Registrasi Arena FIT';
                     $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
-                                      Terima kasih telah mendaftar di Gym Arena!<br><br>
-                                      Kode verifikasi Anda adalah: <h2>$verification_code</h2><br>
+                                      Terima kasih telah mendaftar di Arena FIT!<br><br>
+                                      Kode verifikasi Anda adalah: <h2 style='color: #1976d2;'>$verification_code</h2><br>
                                       Kode ini berlaku selama 1 jam.<br><br>
-                                      Silakan masukkan kode ini pada halaman verifikasi.";
+                                      Silakan masukkan kode ini pada halaman verifikasi untuk melanjutkan.";
 
                     $mail->send();
                     
                     // Redirect ke halaman verifikasi
                     $_SESSION['verify_email'] = $email;
-                    $_SESSION['registration_step'] = 'verify'; // Tandai bahwa user baru dari registrasi
+                    $_SESSION['registration_step'] = 'verify';
                     header("Location: verify.php");
                     exit();
                     
@@ -118,11 +118,37 @@ if (isset($_POST['registerbtn'])) {
             background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
             min-height: 100vh;
             padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(66, 165, 245, 0.15) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
+            border-radius: 50%;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(25, 118, 210, 0.1) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            border-radius: 50%;
         }
 
         .registration-container {
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .header-section {
@@ -152,6 +178,11 @@ if (isset($_POST['registerbtn'])) {
             background-clip: text;
         }
 
+        .header-section p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -159,6 +190,9 @@ if (isset($_POST['registerbtn'])) {
             gap: 15px;
             margin-bottom: 40px;
             flex-wrap: wrap;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .step {
@@ -375,10 +409,10 @@ if (isset($_POST['registerbtn'])) {
         <div class="header-section">
             <img src="../../../assets/assets_admin/dist/img/logo.jpg" alt="Arena FIT Logo">
             <h1>Pendaftaran <span class="text-primary">Member</span></h1>
-            <p style="color: rgba(255, 255, 255, 0.7);">Daftar sekarang dan mulai perjalanan fitness Anda</p>
+            <p>Daftar sekarang dan mulai perjalanan fitness Anda</p>
         </div>
 
-        <!-- Step Indicator -->
+        <!-- Step Indicator - Hanya 2 Step -->
         <div class="step-indicator">
             <div class="step active">
                 <div class="step-circle">1</div>
@@ -387,12 +421,7 @@ if (isset($_POST['registerbtn'])) {
             <span class="step-arrow">→</span>
             <div class="step">
                 <div class="step-circle">2</div>
-                <span>Verifikasi</span>
-            </div>
-            <span class="step-arrow">→</span>
-            <div class="step">
-                <div class="step-circle">3</div>
-                <span>Pembayaran</span>
+                <span>Verifikasi Email</span>
             </div>
         </div>
 
@@ -401,7 +430,7 @@ if (isset($_POST['registerbtn'])) {
             <h2 class="section-title">Data Diri</h2>
 
             <div class="alert alert-info">
-                💡 Setelah mengisi data diri, kami akan mengirimkan kode verifikasi ke email Anda
+                💡 Setelah mengisi data diri, kami akan mengirimkan kode verifikasi ke email Anda. Setelah verifikasi berhasil, Anda langsung dapat mengakses dashboard member.
             </div>
 
             <?php if (!empty($error)) : ?>

@@ -82,7 +82,7 @@
         
         echo '
             </ul>
-            <a href="registration.php" class="btn btn-danger">Daftar Sekarang</a>
+            <a href="../login/register.php" class="btn btn-danger">Daftar Sekarang</a>
           </div>
         </div>';
       }

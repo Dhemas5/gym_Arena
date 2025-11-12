@@ -59,7 +59,7 @@ if (isset($_POST['loginbtn'])) {
 </head>
 <body>
     <div class="login-container">
-        <a href="../../../landingpage/index.php" class="btn-back-home">
+        <a href="../../../data/member/landingpage" class="btn-back-home">
             <i class="fas fa-arrow-left"></i> Kembali ke Beranda
         </a>
 

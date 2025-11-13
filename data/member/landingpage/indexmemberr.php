@@ -830,7 +830,7 @@ $class_prices = [
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="indexmemberr.php">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="riwayat_transaksi.php">Transaksi</a></li>
+          <li class="nav-item"><a class="nav-link" href="transaksi.php">Transaksi</a></li>
           <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
         </ul>
         

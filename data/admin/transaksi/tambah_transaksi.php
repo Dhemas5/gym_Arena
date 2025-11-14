@@ -81,6 +81,10 @@ include '../../../view/master/sidebar.php';
                         </div>
                     </div>
 
+                    <!-- Pilih Paket -->
+                    <div class="card mt-4 animate-fade-in" style="animation-delay: 0.1s;">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-box-open mr-2"></i> Pilih Paket</h3>
                     <!-- STEP 2: PILIH PAKET -->
                     <div class="card card-outline card-primary step-card d-none" id="step2">
                         <div class="card-header">
@@ -102,6 +106,54 @@ include '../../../view/master/sidebar.php';
                                 </select>
                             </div>
 
+    <div class="col-md-2 form-group floating-label">
+      <input type="number" class="form-control" id="qty" min="1" value="1" placeholder=" ">
+      <label for="qty">Qty</label>
+    </div>
+
+    <div class="col-md-3 form-group floating-label">
+      <input type="number" class="form-control" id="diskon_item" min="0" value="0" step="0.01" placeholder=" ">
+      <label for="diskon_item">Diskon Item (Rp)</label>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="button" class="btn btn-info btn-block" id="btnHitung">
+        <i class="fas fa-calculator mr-1"></i> Hitung
+      </button>
+    </div>
+  </div>
+</div>
+
+
+                    </div>
+
+                    <!-- Info Paket Dipilih -->
+                    <div class="card mt-3 bg-gradient-success text-white" id="cardPaketInfo" style="display:none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-info-circle mr-2"></i> Detail Paket Dipilih</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label>Paket</label>
+                                    <input type="text" class="form-control bg-white text-dark" id="info_nama" readonly>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Harga</label>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_harga" readonly>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Qty</label>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_qty" readonly>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Diskon Item</label>
+                                    <input type="text" class="form-control bg-white text-dark text-right" id="info_diskon" readonly>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Sub Total</label>
+                                    <input type="text" class="form-control bg-white text-dark text-right font-weight-bold" id="info_subtotal" readonly>
+                                </div>
                             <div class="form-group">
                                 <label>Diskon Item (Rp)</label>
                                 <input type="number" class="form-control" id="diskon_item" name="potongan_diskon_item" value="0" min="0">
@@ -113,6 +165,10 @@ include '../../../view/master/sidebar.php';
                         </div>
                     </div>
 
+                    <!-- Pembayaran -->
+                    <div class="card mt-4 animate-fade-in" style="animation-delay: 0.2s;">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><i class="fas fa-credit-card mr-2"></i> Pembayaran</h3>
                     <!-- STEP 3: PEMBAYARAN -->
                     <div class="card card-outline card-primary step-card d-none" id="step3">
                         <div class="card-header">

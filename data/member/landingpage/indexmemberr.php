@@ -91,6 +91,19 @@ $class_prices = [
         'id' => 'kelas_30k'
     ]
 ];
+
+// Data hari dalam bahasa Indonesia
+$days = [
+    1 => 'Senin',
+    2 => 'Selasa', 
+    3 => 'Rabu',
+    4 => 'Kamis',
+    5 => 'Jumat',
+    6 => 'Sabtu',
+    7 => 'Minggu'
+];
+
+$current_day = date('N');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -102,714 +115,8 @@ $class_prices = [
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
-      min-height: 100vh;
-    }
-
-    /* Navbar Styles */
-    .navbar {
-      background: rgba(13, 27, 42, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(66, 165, 245, 0.2);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: white;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .brand-box {
-      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-      width: 45px;
-      height: 45px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: white;
-    }
-
-    .nav-link {
-      color: rgba(255, 255, 255, 0.8) !important;
-      font-weight: 500;
-      margin: 0 10px;
-      transition: all 0.3s;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      color: #42a5f5 !important;
-    }
-
-    .member-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .member-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    
-    .welcome-text .member-name {
-      font-weight: 700;
-      color: #42a5f5;
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 70vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 100px 20px 50px;
-    }
-
-    .hero h1 {
-      font-size: 3.5rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: white;
-    }
-
-    .hero p {
-      font-size: 1.3rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 40px;
-    }
-
-    .text-danger {
-      color: #42a5f5;
-    }
-
-    /* Features/Stats Section */
-    .features {
-      padding: 80px 0;
-      background: rgba(13, 27, 42, 0.5);
-    }
-
-    .feature-box {
-      background: rgba(13, 27, 42, 0.9);
-      border: 1px solid rgba(66, 165, 245, 0.2);
-      border-radius: 20px;
-      padding: 40px 30px;
-      text-align: center;
-      transition: all 0.3s;
-      height: 100%;
-    }
-
-    .feature-box:hover {
-      transform: translateY(-10px);
-      border-color: #42a5f5;
-      box-shadow: 0 15px 40px rgba(66, 165, 245, 0.3);
-    }
-
-    .feature-icon {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 25px;
-      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-    }
-
-    .feature-box h3 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #42a5f5;
-      margin-bottom: 10px;
-    }
-
-    .feature-box p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 1rem;
-      margin: 0;
-    }
-
-    /* Price List Section */
-    .pricelist-section {
-      padding: 80px 0;
-      background: rgba(13, 27, 42, 0.5);
-    }
-
-    .pricelist-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .pricelist-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 15px;
-    }
-
-    .pricelist-title .highlight {
-      color: #ffc107;
-    }
-
-    .pricelist-subtitle {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 1.1rem;
-    }
-
-    .price-category-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 30px;
-      padding-left: 20px;
-      border-left: 5px solid #ffc107;
-    }
-
-    /* Gym Packages Grid */
-    .gym-packages-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      margin-bottom: 60px;
-    }
-
-    .gym-package-card {
-      background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.4) 100%);
-      border: 2px solid rgba(255, 193, 7, 0.3);
-      border-radius: 20px;
-      padding: 30px;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .gym-package-card:hover {
-      transform: translateY(-5px);
-      border-color: #ffc107;
-      box-shadow: 0 15px 40px rgba(255, 193, 7, 0.3);
-    }
-
-    .gym-package-card.featured {
-      border-color: #ffc107;
-      box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
-    }
-
-    .package-badge {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-      color: #1b263b;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-    }
-
-    .gift-icon {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      font-size: 2rem;
-    }
-
-    .gym-package-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #ffc107;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
-
-    .price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .price-row:hover {
-      background: rgba(255, 193, 7, 0.1);
-      transform: translateX(5px);
-    }
-
-    .price-label {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.9rem;
-    }
-
-    .price-value {
-      color: white;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    .btn-buy-package {
-      background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-      border: none;
-      color: #1b263b;
-      padding: 12px 25px;
-      border-radius: 10px;
-      font-weight: 700;
-      text-decoration: none;
-      display: block;
-      text-align: center;
-      transition: all 0.3s;
-      width: 100%;
-      margin-top: 15px;
-      cursor: pointer;
-    }
-
-    .btn-buy-package:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(255, 193, 7, 0.4);
-      color: #1b263b;
-    }
-
-    /* Class Prices Grid */
-    .class-prices-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .class-price-card {
-      background: linear-gradient(135deg, rgba(139, 69, 19, 0.25) 0%, rgba(101, 67, 33, 0.35) 100%);
-      border: 2px solid rgba(255, 193, 7, 0.25);
-      border-radius: 15px;
-      padding: 25px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .class-price-card:hover {
-      transform: translateY(-3px);
-      border-color: #ffc107;
-      box-shadow: 0 10px 25px rgba(255, 193, 7, 0.2);
-    }
-
-    .class-price-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 15px;
-    }
-
-    .class-price-amount {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #ffc107;
-    }
-
-    .class-price-label {
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-top: 5px;
-      margin-bottom: 15px;
-    }
-
-    /* Monthly Class Package */
-    .monthly-class-box {
-      background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.15) 100%);
-      border: 2px solid #ffc107;
-      border-radius: 20px;
-      padding: 30px;
-      margin-bottom: 60px;
-      text-align: center;
-    }
-
-    .monthly-class-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #ffc107;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-
-    .monthly-class-subtitle {
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 20px;
-    }
-
-    .monthly-class-price {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 10px;
-    }
-
-    /* Trainer Program Box */
-    .trainer-program-box {
-      background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(211, 47, 47, 0.25) 100%);
-      border: 3px solid #f44336;
-      border-radius: 25px;
-      padding: 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .trainer-program-box::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(244, 67, 54, 0.1) 0%, transparent 70%);
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-
-    .trainer-badge {
-      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-      color: white;
-      padding: 10px 25px;
-      border-radius: 25px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      display: inline-block;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      position: relative;
-      z-index: 1;
-    }
-
-    .trainer-program-box h3 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 15px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .trainer-price {
-      font-size: 3rem;
-      font-weight: 700;
-      color: #ffc107;
-      margin-bottom: 15px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .trainer-details {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 1.1rem;
-      margin-bottom: 25px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .note-box {
-      background: rgba(255, 193, 7, 0.15);
-      border-left: 4px solid #ffc107;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: left;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 20px;
-    }
-
-    .note-title {
-      font-weight: 700;
-      color: #ffc107;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-    }
-
-    .note-text {
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.6;
-    }
-
-    .contact-box {
-      text-align: center;
-      padding: 30px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      margin-top: 40px;
-    }
-
-    .contact-box h3 {
-      color: #ffc107;
-      margin-bottom: 15px;
-      font-size: 1.5rem;
-    }
-
-    .contact-box p {
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 10px;
-      line-height: 1.8;
-    }
-
-    /* Kelas Section */
-    .kelas-section {
-      padding: 80px 0;
-      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 50px;
-    }
-
-    .section-title .text-primary {
-      color: #42a5f5;
-    }
-
-    /* Schedule Styles */
-    .schedule-container {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-    }
-
-    .day-schedule {
-      background: rgba(13, 27, 42, 0.8);
-      border: 2px solid rgba(66, 165, 245, 0.2);
-      border-radius: 20px;
-      padding: 30px;
-      transition: all 0.3s;
-    }
-
-    .day-schedule:hover {
-      border-color: #42a5f5;
-      box-shadow: 0 10px 30px rgba(66, 165, 245, 0.2);
-    }
-
-    .day-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #ffc107;
-      margin-bottom: 25px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .schedule-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 15px;
-    }
-
-    .schedule-item {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(66, 165, 245, 0.2);
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: all 0.3s;
-    }
-
-    .schedule-item:hover {
-      transform: translateY(-3px);
-      border-color: #42a5f5;
-      background: rgba(66, 165, 245, 0.1);
-      box-shadow: 0 5px 15px rgba(66, 165, 245, 0.2);
-    }
-
-    .schedule-item.studio1 {
-      border-left: 4px solid #ffc107;
-    }
-
-    .schedule-item.studio2 {
-      border-left: 4px solid #42a5f5;
-    }
-
-    .schedule-item .time {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #42a5f5;
-    }
-
-    .schedule-item .studio-badge {
-      display: inline-block;
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffc107;
-      padding: 4px 12px;
-      border-radius: 15px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      width: fit-content;
-      text-transform: uppercase;
-    }
-
-    .schedule-item.studio2 .studio-badge {
-      background: rgba(66, 165, 245, 0.2);
-      color: #42a5f5;
-    }
-
-    .schedule-item .class-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: white;
-      text-transform: uppercase;
-    }
-
-    .schedule-item .instructor {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.6);
-      font-style: italic;
-    }
-
-    /* Modal Styles */
-    .modal-content {
-      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
-      border: 2px solid rgba(66, 165, 245, 0.3);
-      border-radius: 20px;
-    }
-
-    .modal-header {
-      border-bottom: 1px solid rgba(66, 165, 245, 0.2);
-    }
-
-    .modal-title {
-      color: #ffc107;
-      font-weight: 700;
-    }
-
-    .modal-body {
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .form-label {
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 600;
-    }
-
-    .form-control, .form-select {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(66, 165, 245, 0.3);
-      color: white;
-      border-radius: 10px;
-    }
-
-    .form-control:focus, .form-select:focus {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: #42a5f5;
-      color: white;
-      box-shadow: 0 0 0 0.25rem rgba(66, 165, 245, 0.25);
-    }
-
-    .form-select option {
-      background: #1b263b;
-      color: white;
-    }
-
-    .btn-close {
-      filter: invert(1);
-    }
-
-    .payment-summary {
-      background: rgba(255, 193, 7, 0.1);
-      border: 2px solid rgba(255, 193, 7, 0.3);
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .summary-row:last-child {
-      border-bottom: none;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #ffc107;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-      border: none;
-      padding: 12px 30px;
-      font-weight: 600;
-      border-radius: 10px;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(66, 165, 245, 0.4);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 12px 30px;
-      font-weight: 600;
-      border-radius: 10px;
-    }
-
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .member-info {
-        margin-top: 15px;
-      }
-      .pricelist-title {
-        font-size: 1.8rem;
-      }
-      .price-category-title {
-        font-size: 1.5rem;
-      }
-      .trainer-price {
-        font-size: 2.5rem;
-      }
-      .gym-packages-grid,
-      .class-prices-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/stylemember.css">
 </head>
 <body>
 
@@ -841,39 +148,37 @@ $class_prices = [
           <span class="welcome-text">
             <span class="member-name"><?php echo htmlspecialchars($nama_member); ?></span>
           </span>
-          <a href="../login/logout.php" class="btn btn-danger ms-2">Logout</a>
+          <a href="../login/logout.php" class="btn-logout">
+            <span>🚪</span> Logout
+          </a>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- HERO SECTION -->
-  <section id="home" class="hero">
-    <div class="hero-content">
-      <h1>
-        <span style="color: white;">Selamat Datang,</span>
-        <br>
-        <span class="text-danger"><?php echo htmlspecialchars($nama_member); ?>!</span>
-      </h1>
-      <p>Mulai perjalanan fitness Anda dengan kami</p>
-    </div>
-  </section>
-
-  <!-- DASHBOARD STATS -->
-  <section class="features">
+  <!-- MEMBER WELCOME SECTION -->
+  <section class="member-welcome">
     <div class="container">
-      <div class="row g-4 justify-content-center">
-        <div class="col-lg-4 col-md-6">
-          <div class="feature-box">
-            <div class="feature-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-              </svg>
-            </div>
-            <h3>Active</h3>
-            <p>Status Member</p>
+      <div class="welcome-card">
+        <h1 class="welcome-title">Selamat Datang, <?php echo htmlspecialchars($nama_member); ?>!</h1>
+        <p class="welcome-subtitle">Mulai perjalanan fitness Anda dengan kami dan raih tujuan kesehatan Anda</p>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">Active</div>
+            <div class="stat-label">Status Member</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Kelas Diikuti</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Sesi Gym</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Progress</div>
           </div>
         </div>
       </div>
@@ -895,9 +200,7 @@ $class_prices = [
         <?php foreach($gym_packages as $package): ?>
         <div class="gym-package-card <?php echo $package['featured'] ? 'featured' : ''; ?>">
           <?php if($package['featured']): ?>
-          <div class="gift-icon">🎁</div>
           <?php endif; ?>
-          <div class="package-badge"><?php echo $package['badge']; ?></div>
           <div class="gym-package-name"><?php echo $package['nama']; ?></div>
           
           <?php if($package['harga_pelajar']): ?>
@@ -916,9 +219,9 @@ $class_prices = [
             </div>
           <?php endif; ?>
           
-          <a href="checkout.php?package_id=<?php echo $package['id']; ?>&type=custom&member_type=umum" class="btn-buy-package">
+          <button class="btn-buy-package" onclick="openPaymentModal('<?php echo $package['id']; ?>', '<?php echo $package['nama']; ?>', <?php echo $package['harga_umum']; ?>, 'umum', '<?php echo $package['durasi']; ?>')">
             Beli Paket Ini
-          </a>
+          </button>
         </div>
         <?php endforeach; ?>
       </div>
@@ -992,272 +295,646 @@ $class_prices = [
     <div class="container">
       <h2 class="section-title">Jadwal <span class="text-primary">Kelas Mingguan</span></h2>
       
+      <!-- Schedule Filters -->
+      <div class="schedule-filters">
+        <button class="filter-btn active" data-filter="all">Semua Kelas</button>
+        <button class="filter-btn" data-filter="studio1">Studio 1</button>
+        <button class="filter-btn" data-filter="studio2">Studio 2</button>
+        <button class="filter-btn" data-filter="boxing">Boxing</button>
+      </div>
+      
       <!-- Jadwal per Hari -->
       <div class="schedule-container">
         
         <!-- SENIN -->
-        <div class="day-schedule">
-          <h3 class="day-title">SENIN</h3>
+        <div class="day-schedule <?php echo $current_day == 1 ? 'current-day' : ''; ?>" data-day="senin">
+          <div class="day-header">
+            <h3 class="day-title">SENIN</h3>
+            <span class="day-date">Hari Pertama Semangat</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item studio1">
-              <span class="time">07:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">SENAM BL</span>
-              <span class="instructor">COACH FITRI</span>
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">07:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">SENAM BL</span>
+                <span class="class-type">Low Impact</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH FITRI</span>
+                <span class="studio-badge"><span class="studio-icon">🎯</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item">
-              <span class="time">08:00</span>
-              <span class="class-name">BOXING</span>
+
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">08:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN IRA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN IRA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">08:30</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">BODY SHAPE</span>
-              <span class="instructor">COACH MIEKE</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">08:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BODY SHAPE</span>
+                <span class="class-type">Strength Training</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH MIEKE</span>
+                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:15</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN SARI</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:15</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN SARI</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item">
-              <span class="time">19:00</span>
-              <span class="class-name">BOXING</span>
+
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- SELASA -->
-        <div class="day-schedule">
-          <h3 class="day-title">SELASA</h3>
+        <div class="day-schedule <?php echo $current_day == 2 ? 'current-day' : ''; ?>" data-day="selasa">
+          <div class="day-header">
+            <h3 class="day-title">SELASA</h3>
+            <span class="day-date">Burn Fat Day</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item studio1">
-              <span class="time">08:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN NILA</span>
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN NILA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">08:15</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">CID ROCKER</span>
-              <span class="instructor">SISKA</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">08:15</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">CID ROCKER</span>
+                <span class="class-type">Cardio Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">SISKA</span>
+                <span class="studio-badge"><span class="studio-icon">⚡</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:15</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:15</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">STRONG NATION</span>
-              <span class="instructor">SYNC NOVA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">STRONG NATION</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">SYNC NOVA</span>
+                <span class="studio-badge"><span class="studio-icon">🔥</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN SACTA</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN SACTA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item">
-              <span class="time">19:00</span>
-              <span class="class-name">BOXING</span>
+
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- RABU -->
-        <div class="day-schedule">
-          <h3 class="day-title">RABU</h3>
+        <div class="day-schedule <?php echo $current_day == 3 ? 'current-day' : ''; ?>" data-day="rabu">
+          <div class="day-header">
+            <h3 class="day-title">RABU</h3>
+            <span class="day-date">Midweek Energy Boost</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item">
-              <span class="time">08:00</span>
-              <span class="class-name">BOXING</span>
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">08:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN IRA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN IRA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">BODY SHAPE</span>
-              <span class="instructor">COACH MIEKE</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BODY SHAPE</span>
+                <span class="class-type">Strength Training</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH MIEKE</span>
+                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">18:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">KAPHA YOGA</span>
-              <span class="instructor">COACH NANA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">18:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">KAPHA YOGA</span>
+                <span class="class-type">Mind & Body</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH NANA</span>
+                <span class="studio-badge"><span class="studio-icon">🧘</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">CID ROCKER</span>
-              <span class="instructor">SISKA</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">CID ROCKER</span>
+                <span class="class-type">Cardio Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">SISKA</span>
+                <span class="studio-badge"><span class="studio-icon">⚡</span> STUDIO 2</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- KAMIS -->
-        <div class="day-schedule">
-          <h3 class="day-title">KAMIS</h3>
+        <div class="day-schedule <?php echo $current_day == 4 ? 'current-day' : ''; ?>" data-day="kamis">
+          <div class="day-header">
+            <h3 class="day-title">KAMIS</h3>
+            <span class="day-date">Full Body Workout</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item">
-              <span class="time">08:00</span>
-              <span class="class-name">BOXING</span>
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">08:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">BODY SHAPE</span>
-              <span class="instructor">COACH MIEKE</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BODY SHAPE</span>
+                <span class="class-type">Strength Training</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH MIEKE</span>
+                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">AERO BL</span>
-              <span class="instructor">COACH WIWIK</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">AERO BL</span>
+                <span class="class-type">Cardio Blast</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH WIWIK</span>
+                <span class="studio-badge"><span class="studio-icon">💨</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN SACTA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN SACTA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item">
-              <span class="time">19:00</span>
-              <span class="class-name">BOXING</span>
-            </div>
-            <div class="schedule-item studio2">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">POUNDFIT PP</span>
-              <span class="instructor">NILA</span>
+
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- JUM'AT -->
-        <div class="day-schedule">
-          <h3 class="day-title">JUM'AT</h3>
+        <!-- JUMAT -->
+        <div class="day-schedule <?php echo $current_day == 5 ? 'current-day' : ''; ?>" data-day="jumat">
+          <div class="day-header">
+            <h3 class="day-title">JUMAT</h3>
+            <span class="day-date">Weekend Warm-up</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item studio1">
-              <span class="time">07:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">SENAM BL</span>
-              <span class="instructor">COACH FITRI</span>
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">07:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">SENAM BL</span>
+                <span class="class-type">Low Impact</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH FITRI</span>
+                <span class="studio-badge"><span class="studio-icon">🎯</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">07:45</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">POUNDFIT</span>
-              <span class="instructor">BERNI</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">07:45</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">POUNDFIT</span>
+                <span class="class-type">Rhythm Workout</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">BERNI</span>
+                <span class="studio-badge"><span class="studio-icon">🥁</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">KAPHA YOGA</span>
-              <span class="instructor">COACH NANA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">KAPHA YOGA</span>
+                <span class="class-type">Mind & Body</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH NANA</span>
+                <span class="studio-badge"><span class="studio-icon">🧘</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">POUNDFIT PP</span>
-              <span class="instructor">NILA</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">POUNDFIT PP</span>
+                <span class="class-type">Rhythm Workout</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">NILA</span>
+                <span class="studio-badge"><span class="studio-icon">🥁</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">18:30</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">TRAMPOLINE</span>
-              <span class="instructor">COACH NANA</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">18:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">TRAMPOLINE</span>
+                <span class="class-type">Fun Cardio</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH NANA</span>
+                <span class="studio-badge"><span class="studio-icon">🤸</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">19:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item">
-              <span class="time">19:00</span>
-              <span class="class-name">BOXING</span>
+
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">19:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- SABTU -->
-        <div class="day-schedule">
-          <h3 class="day-title">SABTU</h3>
+        <div class="day-schedule <?php echo $current_day == 6 ? 'current-day' : ''; ?>" data-day="sabtu">
+          <div class="day-header">
+            <h3 class="day-title">SABTU</h3>
+            <span class="day-date">Weekend Energy</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item">
-              <span class="time">08:00</span>
-              <span class="class-name">BOXING</span>
+            <div class="schedule-item boxing" data-studio="boxing">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">90 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">BOXING</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH PROFESIONAL</span>
+                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">08:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio2">
-              <span class="time">16:00</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN SARI</span>
+
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">16:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN SARI</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">16:15</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">STRONG NATION</span>
-              <span class="instructor">SYNC NOVA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">16:15</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">STRONG NATION</span>
+                <span class="class-type">High Intensity</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">SYNC NOVA</span>
+                <span class="studio-badge"><span class="studio-icon">🔥</span> STUDIO 1</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- MINGGU -->
-        <div class="day-schedule">
-          <h3 class="day-title">MINGGU</h3>
+        <div class="day-schedule <?php echo $current_day == 7 ? 'current-day' : ''; ?>" data-day="minggu">
+          <div class="day-header">
+            <h3 class="day-title">MINGGU</h3>
+            <span class="day-date">Sunday Funday</span>
+          </div>
           <div class="schedule-grid">
-            <div class="schedule-item studio2">
-              <span class="time">07:30</span>
-              <span class="studio-badge">STUDIO 2</span>
-              <span class="class-name">TRAMPOLINE</span>
-              <span class="instructor">COACH NANA</span>
+            <div class="schedule-item studio2" data-studio="studio2">
+              <div class="time-slot">
+                <span class="time">07:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">TRAMPOLINE</span>
+                <span class="class-type">Fun Cardio</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH NANA</span>
+                <span class="studio-badge"><span class="studio-icon">🤸</span> STUDIO 2</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">08:00</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">ZUMBA</span>
-              <span class="instructor">ZIN INA</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">08:00</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">ZUMBA</span>
+                <span class="class-type">Dance Fitness</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">ZIN INA</span>
+                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
+              </div>
             </div>
-            <div class="schedule-item studio1">
-              <span class="time">15:30</span>
-              <span class="studio-badge">STUDIO 1</span>
-              <span class="class-name">AERO BL</span>
-              <span class="instructor">COACH WIWIK</span>
+
+            <div class="schedule-item studio1" data-studio="studio1">
+              <div class="time-slot">
+                <span class="time">15:30</span>
+                <span class="duration">60 min</span>
+              </div>
+              <div class="class-info">
+                <span class="class-name">AERO BL</span>
+                <span class="class-type">Cardio Blast</span>
+              </div>
+              <div class="instructor-info">
+                <span class="instructor">COACH WIWIK</span>
+                <span class="studio-badge"><span class="studio-icon">💨</span> STUDIO 1</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1334,6 +1011,11 @@ $class_prices = [
     </div>
   </div>
 
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()">
+    ↑
+  </button>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -1399,6 +1081,104 @@ $class_prices = [
       document.getElementById('total_harga_input').value = price;
       document.getElementById('total_price_display').textContent = 'Rp ' + price.toLocaleString('id-ID');
       document.getElementById('summary_type').textContent = type === 'umum' ? 'Umum' : 'Pelajar/Mahasiswa';
+    }
+
+    // Enhanced JavaScript for modern features
+    document.addEventListener('DOMContentLoaded', function() {
+      // Schedule Filtering
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const scheduleItems = document.querySelectorAll('.schedule-item');
+      
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const filter = this.getAttribute('data-filter');
+          
+          // Update active button
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Filter schedule items
+          scheduleItems.forEach(item => {
+            const studio = item.getAttribute('data-studio');
+            
+            if (filter === 'all' || studio === filter) {
+              item.style.display = 'grid';
+              setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+              }, 50);
+            } else {
+              item.style.opacity = '0';
+              item.style.transform = 'translateY(20px)';
+              setTimeout(() => {
+                item.style.display = 'none';
+              }, 300);
+            }
+          });
+        });
+      });
+      
+      // Scroll to Top functionality
+      const scrollToTopBtn = document.querySelector('.scroll-to-top');
+      
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          scrollToTopBtn.classList.add('visible');
+        } else {
+          scrollToTopBtn.classList.remove('visible');
+        }
+        
+        // Parallax effect for welcome section
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.member-welcome');
+        if (parallax) {
+          parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+        }
+      });
+      
+      // Enhanced scroll animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+      
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+      
+      // Observe all schedule items and days
+      document.querySelectorAll('.day-schedule, .schedule-item, .gym-package-card, .class-price-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
+      
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    });
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   </script>
 </body>

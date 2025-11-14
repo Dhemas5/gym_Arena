@@ -13,34 +13,34 @@
       <?php
       $trainers = [
         [
-          'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop',
-          'name' => 'Coach Fitri',
-          'specialties' => ['Senam BL'],
-          'schedule' => 'Sen, Jum',
+          'image' => 'http://localhost/gym_Arena/img/alfian.jpg',
+          'name' => 'Coach Alfian',
+          'specialties' => ['GYM'],
+          'schedule' => '-',
           'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga.',
           'certifications' => ['RYT-500', 'Pilates certified']
         ],
         [
-          'image' => 'https://images.unsplash.com/photo-1567598508481-65985588e295?w=400&h=500&fit=crop',
-          'name' => 'Coach Mieke',
-          'specialties' => ['Body Shape'],
-          'schedule' => 'Rab, kam',
+          'image' => 'http://localhost/gym_Arena/img/ameliya.jpg',
+          'name' => 'Coach Ameylia',
+          'specialties' => ['GYM'],
+          'schedule' => '-',
           'desc' => '10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional.',
           'certifications' => ['NSCA-CPT', 'CrossFit Level 2']
         ],
         [
-          'image' => 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop',
-          'name' => 'Coach Nana',
-          'specialties' => ['Kapha Yoga', 'Trampoline'],
-          'schedule' => 'Rab, Jum, Ming',
+          'image' => 'http://localhost/gym_Arena/img/niken.jpg',
+          'name' => 'Coach Niken',
+          'specialties' => ['GYM'],
+          'schedule' => '-',
           'desc' => '6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!',
           'certifications' => ['Zumba B1 & B2', 'AFAA Certified']
         ],
         [
-          'image' => 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop',
-          'name' => 'Coach Wiwik',
-          'specialties' => ['Aero BL'],
-          'schedule' => 'Kam, Ming',
+          'image' => 'http://localhost/gym_Arena/img/ade.jpg',
+          'name' => 'Coach Ade',
+          'specialties' => ['GYM'],
+          'schedule' => '-',
           'desc' => '7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.',
           'certifications' => ['CrossFit L-2', 'ACE Personal Trainer']
         ]

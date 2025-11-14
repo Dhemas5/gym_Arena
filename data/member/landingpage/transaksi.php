@@ -26,6 +26,7 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Member - Arena FIT</title>
+    <link rel="stylesheet" href="assets/css/stylemember.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -284,39 +285,40 @@ $result = $stmt->get_result();
 </head>
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="indexmemberr.php">
-                <span class="brand-box">AF</span>
-                <div>
-                    <span style="font-size: 1.2rem;">Arena FIT</span>
-                </div>
-            </a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="indexmemberr.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="transaksi.php">Transaksi</a></li>
-                    <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
-                </ul>
-                
-                <div class="member-info ms-3">
-                    <div class="member-avatar">
-                        <?php echo strtoupper(substr($nama_member, 0, 1)); ?>
-                    </div>
-                    <span class="welcome-text">
-                        <span style="color: #42a5f5; font-weight: 700;"><?php echo htmlspecialchars($nama_member); ?></span>
-                    </span>
-                    <a href="../login/logout.php" class="btn btn-danger ms-2">Logout</a>
-                </div>
-            </div>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="indexmemberr.php">
+        <span class="brand-box">AF</span>
+        <div>
+          <span style="font-size: 1.2rem;">Arena FIT</span>
         </div>
-    </nav>
+      </a>
 
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="indexmemberr.php">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="transaksi.php">Transaksi</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
+        </ul>
+        
+        <div class="member-info ms-3">
+          <div class="member-avatar">
+            <?php echo strtoupper(substr($nama_member, 0, 1)); ?>
+          </div>
+          <span class="welcome-text">
+            <span class="member-name"><?php echo htmlspecialchars($nama_member); ?></span>
+          </span>
+          <a href="../login/logout.php" class="btn-logout">
+            <span>🚪</span> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
     <!-- MAIN CONTENT -->
     <div class="container container-main">
         <!-- Page Header -->

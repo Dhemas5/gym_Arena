@@ -1,3 +1,115 @@
+<?php
+// Koneksi ke database db_gym
+$host = 'localhost';
+$username = 'root'; // sesuaikan dengan username database Anda
+$password = ''; // sesuaikan dengan password database Anda
+$database = 'db_gym';
+
+$conn = new mysqli($host, $username, $password, $database);
+
+// Cek koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Query untuk mengambil data instruktur dari tabel tbl_instruktur
+$sql = "SELECT * FROM tbl_instruktur";
+$result = $conn->query($sql);
+
+$trainers = [];
+
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        // Handle foto dari database
+        $foto = '';
+        
+        if (!empty($row['foto'])) {
+            // Jika foto adalah path file
+            if (file_exists($row['foto'])) {
+                $foto = $row['foto'];
+            } 
+            // Jika foto adalah URL
+            elseif (filter_var($row['foto'], FILTER_VALIDATE_URL)) {
+                $foto = $row['foto'];
+            }
+            // Jika foto adalah binary data (BLOB)
+            elseif (strlen($row['foto']) > 100) { // Asumsi binary data
+                $foto = 'data:image/jpeg;base64,' . base64_encode($row['foto']);
+            }
+            // Jika foto adalah nama file saja
+            else {
+                $foto_path = '../../../data/admin/img/' . $row['foto'];
+                if (file_exists($foto_path)) {
+                    $foto = $foto_path;
+                }
+            }
+        }
+        
+        // Jika foto tidak ditemukan, gunakan default
+        if (empty($foto)) {
+            $foto = 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop';
+        }
+        
+        // Ambil deskripsi dari kolom catatan
+        $deskripsi = '';
+        
+        // Prioritas: 1. catatan, 2. deskripsi, 3. default
+        if (!empty($row['catatan'])) {
+            $deskripsi = $row['catatan'];
+        } elseif (!empty($row['deskripsi'])) {
+            $deskripsi = $row['deskripsi'];
+        } else {
+            $deskripsi = 'Instruktur profesional dengan pengalaman luas di bidang fitness dan kesehatan.';
+        }
+        
+        // Potong deskripsi jika terlalu panjang
+        if (strlen($deskripsi) > 150) {
+            $deskripsi = substr($deskripsi, 0, 147) . '...';
+        }
+        
+        $trainers[] = [
+            'id' => $row['id_instruktur'],
+            'image' => $foto,
+            'name' => $row['nama_instruktur'] ?? 'Instruktur',
+            'specialties' => !empty($row['spesialisasi']) ? explode(',', $row['spesialisasi']) : ['Fitness'],
+            'schedule' => $row['jadwal_mengajar'] ?? 'Belum diatur',
+            'desc' => $deskripsi,
+            'certifications' => !empty($row['sertifikasi']) ? explode(',', $row['sertifikasi']) : ['Certified Trainer'],
+            'pengalaman' => $row['pengalaman'] ?? null,
+            'rating' => $row['rating'] ?? null
+        ];
+    }
+} else {
+    // Data default jika tidak ada data di database
+    $trainers = [
+        [
+            'id' => 1,
+            'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop',
+            'name' => 'Coach Fitri',
+            'specialties' => ['Senam BL', 'Yoga'],
+            'schedule' => 'Senin, Jumat',
+            'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga dengan pendekatan holistik untuk kesehatan mental dan fisik.',
+            'certifications' => ['RYT-500', 'Pilates certified'],
+            'pengalaman' => '8 tahun',
+            'rating' => '4.9'
+        ],
+        [
+            'id' => 2,
+            'image' => 'https://images.unsplash.com/photo-1567598508481-65985588e295?w=400&h=500&fit=crop',
+            'name' => 'Coach Mieke',
+            'specialties' => ['Body Shape', 'Strength Training'],
+            'schedule' => 'Rabu, Kamis',
+            'desc' => '10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional dengan spesialisasi dalam program transformasi tubuh dan peningkatan performa atletik.',
+            'certifications' => ['NSCA-CPT', 'CrossFit Level 2'],
+            'pengalaman' => '10 tahun',
+            'rating' => '4.8'
+        ]
+    ];
+}
+
+$conn->close();
+?>
+
 <!-- TRAINERS SECTION -->
 <section id="trainers" class="trainers-section">
   <div class="container">
@@ -11,98 +123,51 @@
     <div class="trainers-carousel-container">
       <div class="trainers-carousel">
         <?php
-        $trainers = [
-          [
-            'image' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop',
-            'name' => 'Coach Fitri',
-            'specialties' => ['Senam BL'],
-            'schedule' => 'Sen, Jum',
-            'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga.',
-            'certifications' => ['RYT-500', 'Pilates certified']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1567598508481-65985588e295?w=400&h=500&fit=crop',
-            'name' => 'Coach Mieke',
-            'specialties' => ['Body Shape'],
-            'schedule' => 'Rab, kam',
-            'desc' => '10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional.',
-            'certifications' => ['NSCA-CPT', 'CrossFit Level 2']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop',
-            'name' => 'Coach Nana',
-            'specialties' => ['Kapha Yoga', 'Trampoline'],
-            'schedule' => 'Rab, Jum, Ming',
-            'desc' => '6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!',
-            'certifications' => ['Zumba B1 & B2', 'AFAA Certified']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop',
-            'name' => 'Coach Wiwik',
-            'specialties' => ['Aero BL'],
-            'schedule' => 'Kam, Ming',
-            'desc' => '7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.',
-            'certifications' => ['CrossFit L-2', 'ACE Personal Trainer']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop',
-            'name' => 'Coach Nana',
-            'specialties' => ['Kapha Yoga', 'Trampoline'],
-            'schedule' => 'Rab, Jum, Ming',
-            'desc' => '6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!',
-            'certifications' => ['Zumba B1 & B2', 'AFAA Certified']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop',
-            'name' => 'Coach Wiwik',
-            'specialties' => ['Aero BL'],
-            'schedule' => 'Kam, Ming',
-            'desc' => '7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.',
-            'certifications' => ['CrossFit L-2', 'ACE Personal Trainer']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=500&fit=crop',
-            'name' => 'Coach Nana',
-            'specialties' => ['Kapha Yoga', 'Trampoline'],
-            'schedule' => 'Rab, Jum, Ming',
-            'desc' => '6 tahun pengalaman mengajar Zumba dan dance fitness. Energik dan memotivasi!',
-            'certifications' => ['Zumba B1 & B2', 'AFAA Certified']
-          ],
-          [
-            'image' => 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=500&fit=crop',
-            'name' => 'Coach Wiwik',
-            'specialties' => ['Aero BL'],
-            'schedule' => 'Kam, Ming',
-            'desc' => '7 tahun melatih CrossFit dan functional training. Fokus pada teknik yang tepat.',
-            'certifications' => ['CrossFit L-2', 'ACE Personal Trainer']
-          ]
-        ];
-
         foreach ($trainers as $trainer) {
           echo '
           <div class="trainer-slide">
             <div class="trainer-card">
               <div class="trainer-image">
-                <img src="' . $trainer['image'] . '" alt="' . $trainer['name'] . '">
+                <img src="' . htmlspecialchars($trainer['image']) . '" alt="' . htmlspecialchars($trainer['name']) . '" onerror="this.src=\'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop\'">
+                <div class="image-overlay"></div>';
+          
+          // Tampilkan rating jika ada
+          if (!empty($trainer['rating'])) {
+            echo '<div class="trainer-rating">
+                    <span class="rating-star">⭐</span>
+                    <span class="rating-value">' . htmlspecialchars($trainer['rating']) . '</span>
+                  </div>';
+          }
+          
+          echo '
               </div>
               <div class="trainer-info">
-                <h3 class="trainer-name">' . $trainer['name'] . '</h3>
+                <h3 class="trainer-name">' . htmlspecialchars($trainer['name']) . '</h3>';
+          
+          // Tampilkan pengalaman jika ada
+          if (!empty($trainer['pengalaman'])) {
+            echo '<div class="trainer-experience">
+                    <span class="experience-badge">📅 ' . htmlspecialchars($trainer['pengalaman']) . ' Pengalaman</span>
+                  </div>';
+          }
+          
+          echo '
                 <div class="trainer-badges">';
           
           foreach ($trainer['specialties'] as $specialty) {
-            echo '<span class="badge-specialty">' . $specialty . '</span>';
+            echo '<span class="badge-specialty">' . trim(htmlspecialchars($specialty)) . '</span>';
           }
           
           echo '
                 </div>
                 <p class="trainer-title">Jadwal Mengajar</p>
-                <p class="trainer-schedule">' . $trainer['schedule'] . '</p>
-                <p class="trainer-desc">' . $trainer['desc'] . '</p>
+                <p class="trainer-schedule">' . htmlspecialchars($trainer['schedule']) . '</p>
+                <p class="trainer-desc">' . htmlspecialchars($trainer['desc']) . '</p>
                 <div class="trainer-certs">
                   <p class="cert-title">Sertifikasi:</p>';
           
           foreach ($trainer['certifications'] as $cert) {
-            echo '<span class="cert-badge">' . $cert . '</span>';
+            echo '<span class="cert-badge">' . trim(htmlspecialchars($cert)) . '</span>';
           }
           
           echo '
@@ -136,6 +201,7 @@
       </div>
     </div>
   </div>
+</section>
 </section>
 
 <style>

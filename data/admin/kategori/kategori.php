@@ -41,8 +41,9 @@ require "../../../setting/koneksi.php";
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>
-                                        <th style="width: 40%;">Nama Kategori</th>
-                                        <th style="width: 35%;">Deskripsi</th>
+                                        <th style="width: 15%;">Foto</th>
+                                        <th style="width: 30%;">Nama Kategori</th>
+                                        <th style="width: 30%;">Deskripsi</th>
                                         <th style="width: 20%;">Aksi</th>
                                     </tr>
                                 </thead>
@@ -50,13 +51,24 @@ require "../../../setting/koneksi.php";
                                     <?php
                                     $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori ASC");
                                     if (mysqli_num_rows($queryKategori) == 0) {
-                                        echo '<tr><td colspan="4" class="text-center">Tidak ada data kategori</td></tr>';
+                                        echo '<tr><td colspan="5" class="text-center">Tidak ada data kategori</td></tr>';
                                     } else {
                                         $no = 1;
                                         while ($data = mysqli_fetch_array($queryKategori)) {
                                     ?>
                                             <tr>
                                                 <td><?= $no ?></td>
+                                                <td class="text-center">
+                                                    <?php if (!empty($data['foto'])): ?>
+                                                        <img src="../../../data/admin/img/<?= $data['foto'] ?>" 
+                                                             alt="Foto Kategori" 
+                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                                    <?php else: ?>
+                                                        <img src="../../../data/admin/img/default.jpg" 
+                                                             alt="Default" 
+                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td><?= htmlspecialchars($data['nama_kategori']) ?></td>
                                                 <td><?= htmlspecialchars($data['deskripsi'] ?? '-') ?></td>
                                                 <td class="text-center align-middle">
@@ -92,7 +104,7 @@ require "../../../setting/koneksi.php";
 <!-- Modal Tambah -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="formTambah">
+        <form id="formTambah" enctype="multipart/form-data">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Tambah Kategori</h5>
@@ -106,6 +118,19 @@ require "../../../setting/koneksi.php";
                     <div class="form-group">
                         <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi" rows="3" placeholder="Opsional"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Foto Kategori</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="fotoTambah" name="foto" accept="image/*">
+                            <label class="custom-file-label" for="fotoTambah">Pilih file foto...</label>
+                        </div>
+                        <small class="form-text text-muted">Format: JPG, PNG, JPEG. Maksimal 5MB</small>
+                    </div>
+                    <div class="form-group text-center">
+                        <img id="previewTambah" src="../../../data/admin/img/default.jpg" 
+                             alt="Preview Foto" 
+                             style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -124,7 +149,7 @@ while ($data = mysqli_fetch_array($queryKategori)) {
 ?>
     <div class="modal fade" id="modalEdit<?= $data['id_kategori'] ?>" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="formEdit" data-id="<?= $data['id_kategori'] ?>">
+            <form class="formEdit" data-id="<?= $data['id_kategori'] ?>" enctype="multipart/form-data">
                 <div class="modal-content">
                     <div class="modal-header bg-warning text-dark">
                         <h5 class="modal-title">Edit Kategori</h5>
@@ -132,6 +157,7 @@ while ($data = mysqli_fetch_array($queryKategori)) {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="id_kategori" value="<?= $data['id_kategori'] ?>">
+                        <input type="hidden" name="foto_lama" value="<?= $data['foto'] ?>">
                         <div class="form-group">
                             <label>Nama Kategori</label>
                             <input type="text" class="form-control" name="nama_kategori" value="<?= htmlspecialchars($data['nama_kategori']) ?>" required>
@@ -139,6 +165,22 @@ while ($data = mysqli_fetch_array($queryKategori)) {
                         <div class="form-group">
                             <label>Deskripsi</label>
                             <textarea class="form-control" name="deskripsi" rows="3"><?= htmlspecialchars($data['deskripsi'] ?? '') ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Foto Kategori</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="fotoEdit<?= $data['id_kategori'] ?>" name="foto" accept="image/*">
+                                <label class="custom-file-label" for="fotoEdit<?= $data['id_kategori'] ?>">
+                                    <?= !empty($data['foto']) ? $data['foto'] : 'Pilih file foto...' ?>
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto</small>
+                        </div>
+                        <div class="form-group text-center">
+                            <img id="previewEdit<?= $data['id_kategori'] ?>" 
+                                 src="<?= !empty($data['foto']) ? '../../../data/admin/img/' . $data['foto'] : '../../../data/admin/img/default.jpg' ?>" 
+                                 alt="Preview Foto" 
+                                 style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -156,13 +198,45 @@ while ($data = mysqli_fetch_array($queryKategori)) {
 <!-- Script AJAX + SweetAlert -->
 <script>
     $(document).ready(function() {
-        // Tambah kategori
+        // Preview image untuk tambah
+        $('#fotoTambah').change(function(e) {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#previewTambah').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+                $('.custom-file-label', $(this).parent()).text(file.name);
+            }
+        });
+
+        // Preview image untuk edit
+        $('input[id^="fotoEdit"]').change(function(e) {
+            const file = this.files[0];
+            const modalId = $(this).attr('id').replace('fotoEdit', '');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#previewEdit' + modalId).attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+                $('.custom-file-label', $(this).parent()).text(file.name);
+            }
+        });
+
+        // Tambah kategori dengan FormData
         $('#formTambah').submit(function(e) {
             e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('action', 'simpan');
+            
             $.ajax({
                 url: 'proses_kategori.php',
                 type: 'POST',
-                data: $(this).serialize() + '&action=simpan',
+                data: formData,
+                processData: false,
+                contentType: false,
                 dataType: 'json',
                 success: function(res) {
                     if (res.status == 'success') {
@@ -170,17 +244,25 @@ while ($data = mysqli_fetch_array($queryKategori)) {
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');
                     }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('Error!', 'Terjadi kesalahan: ' + error, 'error');
                 }
             });
         });
 
-        // Edit kategori
+        // Edit kategori dengan FormData
         $('.formEdit').submit(function(e) {
             e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('action', 'update');
+            
             $.ajax({
                 url: 'proses_kategori.php',
                 type: 'POST',
-                data: $(this).serialize() + '&action=update',
+                data: formData,
+                processData: false,
+                contentType: false,
                 dataType: 'json',
                 success: function(res) {
                     if (res.status == 'success') {
@@ -188,6 +270,9 @@ while ($data = mysqli_fetch_array($queryKategori)) {
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');
                     }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('Error!', 'Terjadi kesalahan: ' + error, 'error');
                 }
             });
         });

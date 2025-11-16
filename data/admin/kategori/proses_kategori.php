@@ -150,3 +150,21 @@ if ($action == 'hapus') {
     }
     mysqli_stmt_close($delete);
 }
+
+// Toggle status favorit
+if ($action == 'toggle_favorite') {
+    $id = $_POST['id'];
+    $status = $_POST['status'];
+    
+    $update = mysqli_prepare($con, "UPDATE tbl_kategori SET kelas_populer=? WHERE id_kategori=?");
+    mysqli_stmt_bind_param($update, "ii", $status, $id);
+    
+    if (mysqli_stmt_execute($update)) {
+        $message = $status == 1 ? 'Kategori berhasil ditandai sebagai populer.' : 'Kategori berhasil dihapus dari daftar populer.';
+        echo json_encode(['status' => 'success', 'message' => $message]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Gagal mengubah status favorit: ' . mysqli_error($con)]);
+    }
+    mysqli_stmt_close($update);
+}
+?>

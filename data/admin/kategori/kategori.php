@@ -37,13 +37,14 @@ require "../../../setting/koneksi.php";
                             <i class="fas fa-plus"></i> Tambah Kategori
                         </button>
                         <div class="table-responsive rounded">
-                            <table id="tabelPelatih" class="table table-bordered table-striped">
+                            <table id="tabelKategori" class="table table-bordered table-striped">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>
                                         <th style="width: 15%;">Foto</th>
-                                        <th style="width: 30%;">Nama Kategori</th>
-                                        <th style="width: 30%;">Deskripsi</th>
+                                        <th style="width: 25%;">Nama Kategori</th>
+                                        <th style="width: 25%;">Deskripsi</th>
+                                        <th style="width: 15%;">Status</th>
                                         <th style="width: 20%;">Aksi</th>
                                     </tr>
                                 </thead>
@@ -51,7 +52,7 @@ require "../../../setting/koneksi.php";
                                     <?php
                                     $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori ASC");
                                     if (mysqli_num_rows($queryKategori) == 0) {
-                                        echo '<tr><td colspan="5" class="text-center">Tidak ada data kategori</td></tr>';
+                                        echo '<tr><td colspan="6" class="text-center">Tidak ada data kategori</td></tr>';
                                     } else {
                                         $no = 1;
                                         while ($data = mysqli_fetch_array($queryKategori)) {
@@ -72,8 +73,17 @@ require "../../../setting/koneksi.php";
                                                 <td><?= htmlspecialchars($data['nama_kategori']) ?></td>
                                                 <td><?= htmlspecialchars($data['deskripsi'] ?? '-') ?></td>
                                                 <td class="text-center align-middle">
+                                                    <button class="btn btn-sm btn-favorite <?= $data['kelas_populer'] ? 'active' : '' ?>" 
+                                                            data-id="<?= $data['id_kategori'] ?>" 
+                                                            data-status="<?= $data['kelas_populer'] ?>">
+                                                        <i class="fas <?= $data['kelas_populer'] ? 'fa-star text-warning' : 'fa-star text-secondary' ?>"></i>
+                                                        <span class="favorite-text"><?= $data['kelas_populer'] ? 'Populer' : 'Biasa' ?></span>
+                                                    </button>
+                                                </td>
+                                                <td class="text-center align-middle">
                                                     <div class="btn-group" style="gap:8px;">
-                                                        <button class="btn btn-warning btn-sm px-3 py-2"
+                                                        <button class="btn btn-warning btn-sm px-3 py-2 btn-edit"
+                                                            data-id="<?= $data['id_kategori'] ?>"
                                                             data-toggle="modal"
                                                             data-target="#modalEdit<?= $data['id_kategori'] ?>">
                                                             <i class="fas fa-edit"></i>
@@ -144,8 +154,9 @@ require "../../../setting/koneksi.php";
 
 <!-- Modal Edit -->
 <?php
-mysqli_data_seek($queryKategori, 0);
-while ($data = mysqli_fetch_array($queryKategori)) {
+// Query terpisah untuk modal edit agar semua data bisa diakses
+$queryModal = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY id_kategori ASC");
+while ($data = mysqli_fetch_array($queryModal)) {
 ?>
     <div class="modal fade" id="modalEdit<?= $data['id_kategori'] ?>" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -195,9 +206,64 @@ while ($data = mysqli_fetch_array($queryKategori)) {
 
 <?php include '../../../view/master/footer.php'; ?>
 
-<!-- Script AJAX + SweetAlert -->
+<!-- CSS untuk tombol favorit -->
+<style>
+.btn-favorite {
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    width: 100px;
+    cursor: pointer;
+}
+
+.btn-favorite:hover {
+    background-color: #e9ecef;
+    transform: scale(1.05);
+}
+
+.btn-favorite.active {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+}
+
+.btn-favorite .favorite-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* DataTables Customization */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.5em 1em !important;
+    margin-left: 2px !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.25rem !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #007bff !important;
+    color: white !important;
+    border-color: #007bff !important;
+}
+</style>
+
+<!-- Script AJAX + SweetAlert + DataTables -->
 <script>
     $(document).ready(function() {
+        // Inisialisasi DataTables
+        $('#tabelKategori').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+            },
+            "responsive": true,
+            "autoWidth": false
+        });
+
         // Preview image untuk tambah
         $('#fotoTambah').change(function(e) {
             const file = this.files[0];
@@ -212,7 +278,7 @@ while ($data = mysqli_fetch_array($queryKategori)) {
         });
 
         // Preview image untuk edit
-        $('input[id^="fotoEdit"]').change(function(e) {
+        $(document).on('change', 'input[id^="fotoEdit"]', function(e) {
             const file = this.files[0];
             const modalId = $(this).attr('id').replace('fotoEdit', '');
             if (file) {
@@ -278,7 +344,7 @@ while ($data = mysqli_fetch_array($queryKategori)) {
         });
 
         // Hapus kategori
-        $('.btn-hapus').click(function(e) {
+        $(document).on('click', '.btn-hapus', function(e) {
             e.preventDefault();
             const id = $(this).data('id');
             const nama = $(this).data('nama');
@@ -309,6 +375,49 @@ while ($data = mysqli_fetch_array($queryKategori)) {
                             }
                         }
                     });
+                }
+            });
+        });
+
+        // Toggle status favorit
+        $(document).on('click', '.btn-favorite', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const currentStatus = $(this).data('status');
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            
+            $.ajax({
+                url: 'proses_kategori.php',
+                type: 'POST',
+                data: {
+                    action: 'toggle_favorite',
+                    id: id,
+                    status: newStatus
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.status == 'success') {
+                        // Update tampilan tombol
+                        const $btn = $('.btn-favorite[data-id="' + id + '"]');
+                        $btn.data('status', newStatus);
+                        
+                        if (newStatus == 1) {
+                            $btn.addClass('active');
+                            $btn.find('i').removeClass('text-secondary').addClass('text-warning');
+                            $btn.find('.favorite-text').text('Populer');
+                        } else {
+                            $btn.removeClass('active');
+                            $btn.find('i').removeClass('text-warning').addClass('text-secondary');
+                            $btn.find('.favorite-text').text('Biasa');
+                        }
+                        
+                        Swal.fire('Berhasil!', res.message, 'success');
+                    } else {
+                        Swal.fire('Gagal!', res.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('Error!', 'Terjadi kesalahan: ' + error, 'error');
                 }
             });
         });

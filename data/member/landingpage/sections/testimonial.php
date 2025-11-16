@@ -11,65 +11,72 @@
     <div class="testimonial-carousel-container">
       <div class="testimonial-carousel">
         <?php
-        $testimonials = [
-          [
-            'name' => 'Andi Wijaya',
-            'role' => 'Member sejak 2023',
-            'image' => 'https://i.pravatar.cc/100?img=12',
-            'quote' => 'Arena FIT benar-benar mengubah hidup saya! Instruktur yang profesional dan fasilitas yang lengkap membuat saya termotivasi setiap hari. Dalam 6 bulan, saya berhasil menurunkan 15kg!',
-            'stars' => 5
-          ],
-          [
-            'name' => 'Sarah Putri',
-            'role' => 'Member sejak 2022',
-            'image' => 'https://i.pravatar.cc/100?img=5',
-            'quote' => 'Program Body Shape dengan Coach Mieke sangat efektif! Saya tidak pernah merasa lebih percaya diri. Komunitas di sini juga sangat supportive.',
-            'stars' => 5
-          ],
-          [
-            'name' => 'Budi Santoso',
-            'role' => 'Member sejak 2024',
-            'image' => 'https://i.pravatar.cc/100?img=8',
-            'quote' => 'Sebagai pemula, saya takut tidak bisa mengikuti kelas. Ternyata instruktur sangat sabar dan programnya disesuaikan dengan kemampuan masing-masing.',
-            'stars' => 4
-          ],
-          [
-            'name' => 'Maya Sari',
-            'role' => 'Member Premium',
-            'image' => 'https://i.pravatar.cc/100?img=3',
-            'quote' => 'Kelas Kapha Yoga dengan Coach Nana sangat menenangkan. Setelah 3 bulan rutin, sakit punggung saya hilang dan tidur lebih nyenyak.',
-            'stars' => 5
-          ],
-          [
-            'name' => 'Rizki Pratama',
-            'role' => 'Member sejak 2023',
-            'image' => 'https://i.pravatar.cc/100?img=15',
-            'quote' => 'Fasilitas lengkap dan bersih. Saya khusus datang untuk functional training dan hasilnya luar biasa untuk performa olahraga saya.',
-            'stars' => 5
-          ],
-          [
-            'name' => 'Dewi Lestari',
-            'role' => 'Member Keluarga',
-            'image' => 'https://i.pravatar.cc/100?img=20',
-            'quote' => 'Saya dan suami bergabung bersama. Sekarang kami lebih sehat dan memiliki quality time yang berkualitas. Terima kasih Arena FIT!',
-            'stars' => 5
-          ],
-          [
-            'name' => 'Ahmad Fauzi',
-            'role' => 'Atlet Amatir',
-            'image' => 'https://i.pravatar.cc/100?img=25',
-            'quote' => 'Coach Wiwik membantu saya meningkatkan teknik angkat beban dengan benar. Dalam 4 bulan, PB saya naik signifikan tanpa cedera.',
-            'stars' => 4
-          ],
-          [
-            'name' => 'Lisa Hartati',
-            'role' => 'Member sejak 2023',
-            'image' => 'https://i.pravatar.cc/100?img=30',
-            'quote' => 'Kelas trampoline sangat menyenangkan! Tidak seperti gym biasa, di sini saya benar-benar enjoy berolahraga sambil bersenang-senang.',
-            'stars' => 5
-          ]
-        ];
-
+        // Koneksi ke database
+        $host = "localhost";
+        $username = "root"; // Ganti dengan username database Anda
+        $password = ""; // Ganti dengan password database Anda
+        $database = "db_gym";
+        
+        $conn = new mysqli($host, $username, $password, $database);
+        
+        // Cek koneksi
+        if ($conn->connect_error) {
+            die("Koneksi gagal: " . $conn->connect_error);
+        }
+        
+        // Query untuk mengambil testimonial yang sudah dipublish
+        // Berdasarkan data yang ada, kita ambil langsung dari tbl_testimoni
+        $sql = "SELECT testimoni, rating, member_id, created_at 
+                FROM tbl_testimoni 
+                WHERE status = 'publish' 
+                ORDER BY created_at DESC";
+        
+        $result = $conn->query($sql);
+        $testimonials = [];
+        
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                // Untuk nama member, kita bisa menggunakan member_id atau default name
+                $member_name = "Member " . $row['member_id'];
+                
+                // Coba ambil nama member dari tbl_member jika ada
+                $member_sql = "SELECT nama FROM tbl_member WHERE id_member = " . $row['member_id'];
+                $member_result = $conn->query($member_sql);
+                if ($member_result && $member_result->num_rows > 0) {
+                    $member_data = $member_result->fetch_assoc();
+                    $member_name = $member_data['nama'];
+                }
+                
+                $testimonials[] = [
+                    'name' => $member_name,
+                    'role' => 'Member Aktif',
+                    'image' => 'https://i.pravatar.cc/100?img=' . (($row['member_id'] % 70) + 1), // Avatar berdasarkan member_id
+                    'quote' => $row['testimoni'],
+                    'stars' => $row['rating']
+                ];
+            }
+        }
+        
+        // Jika tidak ada testimonial dari database, gunakan data default
+        if (empty($testimonials)) {
+            $testimonials = [
+              [
+                'name' => 'Andi Wijaya',
+                'role' => 'Member sejak 2023',
+                'image' => 'https://i.pravatar.cc/100?img=12',
+                'quote' => 'Arena FIT benar-benar mengubah hidup saya! Instruktur yang profesional dan fasilitas yang lengkap membuat saya termotivasi setiap hari. Dalam 6 bulan, saya berhasil menurunkan 15kg!',
+                'stars' => 5
+              ],
+              [
+                'name' => 'Sarah Putri',
+                'role' => 'Member sejak 2022',
+                'image' => 'https://i.pravatar.cc/100?img=5',
+                'quote' => 'Program Body Shape dengan Coach Mieke sangat efektif! Saya tidak pernah merasa lebih percaya diri. Komunitas di sini juga sangat supportive.',
+                'stars' => 5
+              ]
+            ];
+        }
+        
         foreach ($testimonials as $testimonial) {
           echo '
           <div class="testimonial-slide">
@@ -91,7 +98,7 @@
 
               <!-- Quote -->
               <p class="testimonial-quote">
-                ' . $testimonial['quote'] . '
+                ' . htmlspecialchars($testimonial['quote']) . '
               </p>
 
               <!-- Author -->
@@ -105,6 +112,8 @@
             </div>
           </div>';
         }
+        
+        $conn->close();
         ?>
       </div>
       
@@ -132,6 +141,7 @@
   </div>
 </section>
 
+<!-- CSS dan JavaScript tetap sama seperti sebelumnya -->
 <style>
 /* ===================================
    TESTIMONIAL SECTION - WARNA SAMA DENGAN TRAINERS

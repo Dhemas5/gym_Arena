@@ -130,7 +130,7 @@ require "../../../setting/koneksi.php";
 </section>
 
 <!-- =========================
-     MODAL EDIT & DETAIL
+     MODAL DETAIL
 ========================= -->
 <?php if (!empty($members)): ?>
     <?php foreach ($members as $m): ?>
@@ -217,38 +217,157 @@ require "../../../setting/koneksi.php";
     <?php endforeach; ?>
 <?php endif; ?>
 
+<!-- =========================
+     MODAL EDIT
+========================= -->
+<?php if (!empty($members)): ?>
+    <?php foreach ($members as $m): ?>
+        <!-- MODAL EDIT -->
+        <div class="modal fade" id="modalEdit<?= $m['id_member'] ?>">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title">Edit Member: <?= htmlspecialchars($m['nama'] ?? '—') ?></h5>
+                        <button type="button" class="close text-white" data-dismiss="modal">×</button>
+                    </div>
+                    <form id="formEdit<?= $m['id_member'] ?>" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="id_member" value="<?= $m['id_member'] ?>">
+                            <input type="hidden" name="action" value="update">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nama *</label>
+                                        <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($m['nama'] ?? '') ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email *</label>
+                                        <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($m['email'] ?? '') ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>No. HP</label>
+                                        <input type="text" name="no_hp" class="form-control" value="<?= htmlspecialchars($m['no_hp'] ?? '') ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Alamat</label>
+                                        <textarea name="alamat" class="form-control" rows="4"><?= htmlspecialchars($m['alamat'] ?? '') ?></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status Akun</label>
+                                        <select name="status_akun" class="form-control" required>
+                                            <option value="aktif" <?= ($m['status_akun'] ?? '') === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                                            <option value="nonaktif" <?= ($m['status_akun'] ?? '') === 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tanggal Daftar</label>
+                                        <input type="text" class="form-control" value="<?= !empty($m['tanggal_daftar']) ? date('d M Y H:i', strtotime($m['tanggal_daftar'])) : '-' ?>" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-warning">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
 <?php include '../../../view/master/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        $('.btn-hapus').on('click', function() {
-            const id = $(this).data('id');
-            const nama = $(this).data('nama');
-            Swal.fire({
-                title: 'Hapus Member?',
-                text: `Yakin ingin menghapus "${nama}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    $.get('proses_member.php', {
-                        action: 'hapus',
-                        id
-                    }, function(res) {
-                        const data = JSON.parse(res);
+$(document).ready(function() {
+    // Handle form edit dengan AJAX
+    $('form[id^="formEdit"]').on('submit', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = form.serialize();
+        
+        Swal.fire({
+            title: 'Update Data?',
+            text: 'Yakin ingin memperbarui data member?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Update!',
+            cancelButtonText: 'Batal'
+        }).then(result => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'proses_member.php',
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                title: 'Sukses!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Tutup modal dan reload halaman
+                                $('.modal').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function() {
                         Swal.fire({
-                            title: data.status === 'success' ? 'Sukses!' : 'Gagal!',
-                            text: data.message,
-                            icon: data.status === 'success' ? 'success' : 'error'
-                        }).then(() => {
-                            if (data.status === 'success') location.reload();
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mengirim data.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
                         });
-                    }).fail(() => Swal.fire('Error', 'Gagal menghubungi server.', 'error'));
-                }
-            });
+                    }
+                });
+            }
         });
     });
+
+    // Handler untuk tombol hapus
+    $('.btn-hapus').on('click', function() {
+        const id = $(this).data('id');
+        const nama = $(this).data('nama');
+        Swal.fire({
+            title: 'Hapus Member?',
+            text: `Yakin ingin menghapus "${nama}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then(result => {
+            if (result.isConfirmed) {
+                $.get('proses_member.php', {
+                    action: 'hapus',
+                    id
+                }, function(res) {
+                    const data = JSON.parse(res);
+                    Swal.fire({
+                        title: data.status === 'success' ? 'Sukses!' : 'Gagal!',
+                        text: data.message,
+                        icon: data.status === 'success' ? 'success' : 'error'
+                    }).then(() => {
+                        if (data.status === 'success') location.reload();
+                    });
+                }).fail(() => Swal.fire('Error', 'Gagal menghubungi server.', 'error'));
+            }
+        });
+    });
+});
 </script>

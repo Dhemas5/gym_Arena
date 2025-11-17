@@ -126,6 +126,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Transaksi</p>
                     </a>
                 </li>
+                <!-- Testimonial Member -->
+                <li class="nav-header">TESTIMONIAL</li>
+                <li class="nav-item">
+                    <a href="../../../data/admin/testimonial/testimoni.php" class="nav-link <?php if ($current_page == 'tambah_transaksi.php') {
+                                                                                                        echo 'active';
+                                                                                                    } ?>">
+                        <i class="nav-icon fas fa-quote-right"></i>
+                        <p>Testimonial</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

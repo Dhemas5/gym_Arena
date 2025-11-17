@@ -12,12 +12,20 @@ if ($action == 'update') {
     $email = trim($_POST['email'] ?? '');
     $no_hp = trim($_POST['no_hp'] ?? '');
     $alamat = trim($_POST['alamat'] ?? '');
+    $status_akun = trim($_POST['status_akun'] ?? 'aktif');
 
     if ($id <= 0 || empty($nama) || empty($email)) {
         echo json_encode(['status' => 'error', 'message' => 'Nama dan email wajib diisi.']);
         exit;
     }
 
+    // Validasi format email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['status' => 'error', 'message' => 'Format email tidak valid.']);
+        exit;
+    }
+
+    // Cek duplikasi email
     $cek = $con->prepare("SELECT id_member FROM tbl_member WHERE email=? AND id_member!=?");
     $cek->bind_param('si', $email, $id);
     $cek->execute();
@@ -27,8 +35,9 @@ if ($action == 'update') {
     }
     $cek->close();
 
-    $stmt = $con->prepare("UPDATE tbl_member SET nama=?, email=?, no_hp=?, alamat=? WHERE id_member=?");
-    $stmt->bind_param('ssssi', $nama, $email, $no_hp, $alamat, $id);
+    // Update data member
+    $stmt = $con->prepare("UPDATE tbl_member SET nama=?, email=?, no_hp=?, alamat=?, status_akun=? WHERE id_member=?");
+    $stmt->bind_param('sssssi', $nama, $email, $no_hp, $alamat, $status_akun, $id);
 
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success', 'message' => 'Data member berhasil diperbarui.']);
@@ -46,6 +55,7 @@ if ($action == 'hapus') {
         exit;
     }
 
+    // Cek apakah member memiliki riwayat transaksi
     $cek = $con->prepare("SELECT id_transaksi FROM tbl_transaksi_header WHERE id_member=? LIMIT 1");
     $cek->bind_param('i', $id);
     $cek->execute();
@@ -55,6 +65,7 @@ if ($action == 'hapus') {
     }
     $cek->close();
 
+    // Hapus member
     $stmt = $con->prepare("DELETE FROM tbl_member WHERE id_member=?");
     $stmt->bind_param('i', $id);
     if ($stmt->execute()) {

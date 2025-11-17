@@ -1,138 +1,87 @@
 <?php
-// proses_transaksi.php → FINAL: QRIS DANA + TUNAI
-$DB_HOST = '127.0.0.1';
-$DB_USER = 'root';
-$DB_PASS = '';
-$DB_NAME = 'db_gym';
-
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 session_start();
 date_default_timezone_set('Asia/Jakarta');
+require "../../../setting/koneksi.php";
 
 if (!isset($_SESSION['id_user'])) {
-    $_SESSION['id_user'] = 1;
-    $_SESSION['username'] = 'admin';
-}
-
-$con = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
-if ($con->connect_error) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Koneksi gagal']);
+    echo json_encode(['success' => false, 'error' => 'Login required']);
     exit;
 }
-$con->set_charset('utf8mb4');
 
-function genTransactionId($con)
+function genId($con)
 {
-    $date = date('Ymd');
-    $prefix = 'TRX' . $date;
+    $prefix = "OFF" . date('Ymd');
+    $stmt = $con->prepare("SELECT id_transaksi FROM tbl_transaksi_offline WHERE id_transaksi LIKE ? ORDER BY id_transaksi DESC LIMIT 1");
     $like = $prefix . '%';
-    $stmt = $con->prepare("SELECT COUNT(*) AS cnt FROM tbl_transaksi_header WHERE id_transaksi LIKE ?");
     $stmt->bind_param('s', $like);
     $stmt->execute();
     $res = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    return $prefix . str_pad(intval($res['cnt']) + 1, 3, '0', STR_PAD_LEFT);
+    $num = $res ? intval(substr($res['id_transaksi'], -3)) + 1 : 1;
+    return $prefix . str_pad($num, 3, '0', STR_PAD_LEFT);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'error' => 'Metode tidak diizinkan']);
+    echo json_encode(['success' => false, 'error' => 'Invalid method']);
     exit;
 }
 
 try {
     $con->autocommit(false);
-    $con->begin_transaction();
-    $id_trx = genTransactionId($con);
-    $tgl = date('Y-m-d H:i:s');
-    $jenis_transaksi = 'offline';
-    $id_user_kasir = intval($_POST['id_user_kasir'] ?? $_SESSION['id_user']);
-    $id_paket = intval($_POST['id_paket'] ?? 0);
-    $harga_satuan = floatval($_POST['harga_paket'] ?? 0);
-    $qty = 1;
-    $potongan_item = floatval($_POST['potongan_diskon_item'] ?? 0);
-    $potongan_global = floatval($_POST['potongan_diskon'] ?? 0);
-    $metode_pembayaran = strtoupper(trim($_POST['metode_pembayaran'] ?? 'TUNAI'));
-    $keterangan = trim($_POST['keterangan'] ?? '');
 
-    if ($id_paket <= 0 || $harga_satuan <= 0) {
-        throw new Exception("Paket atau harga tidak valid.");
+    $id_transaksi = genId($con);
+    $id_kasir     = $_SESSION['id_user'];
+    $id_member    = !empty($_POST['id_member']) ? intval($_POST['id_member']) : null;
+    $id_paket     = intval($_POST['id_paket']);
+    $harga_paket  = floatval($_POST['harga_paket']);
+    $diskon       = floatval($_POST['diskon'] ?? 0);
+    $dibayar      = floatval($_POST['jumlah_dibayar']);
+    $metode       = strtoupper($_POST['metode_pembayaran'] ?? 'TUNAI');
+    $durasi_hari  = intval($_POST['durasi_hari'] ?? 30);
+
+    if ($id_paket <= 0 || $harga_paket <= 0) {
+        throw new Exception("Paket tidak valid");
     }
 
-    $sub_total = $harga_satuan * $qty;
-    $total_item = max(0, $sub_total - $potongan_item);
-    $grand_total = max(0, $total_item - $potongan_global);
-    $jumlah_dibayar_tunai = null;
-    $jumlah_kembalian = null;
-
-    if ($metode_pembayaran === 'TUNAI') {
-        $jumlah_dibayar_tunai = floatval($_POST['jumlah_dibayar_tunai'] ?? 0);
-        if ($jumlah_dibayar_tunai < $grand_total) {
-            throw new Exception("Uang tunai kurang.");
-        }
-        $jumlah_kembalian = $jumlah_dibayar_tunai - $grand_total;
-    } elseif ($metode_pembayaran === 'QRIS') {
-        $jumlah_dibayar_tunai = floatval($_POST['jumlah_dibayar_tunai'] ?? 0);
-        if ($jumlah_dibayar_tunai < $grand_total) {
-            throw new Exception("Nominal transfer kurang.");
-        }
-        $jumlah_kembalian = $jumlah_dibayar_tunai - $grand_total;
-        $keterangan .= ' [QRIS: DANA 085719630447]';
-    } else {
-        throw new Exception("Metode pembayaran tidak valid.");
+    $grand_total = max(0, $harga_paket - $diskon);
+    if ($dibayar < $grand_total) {
+        throw new Exception("Pembayaran kurang dari total");
     }
+    $kembalian = $dibayar - $grand_total;
 
-    $id_member = !empty($_POST['id_member']) ? intval($_POST['id_member']) : null;
-    if ($id_member) {
-        $cek = $con->prepare("SELECT id_member FROM tbl_member WHERE id_member = ?");
-        $cek->bind_param('i', $id_member);
-        $cek->execute();
-        if ($cek->get_result()->num_rows === 0) {
-            throw new Exception("Member tidak ditemukan.");
-        }
-        $cek->close();
-    }
-
-    $sql_header = "INSERT INTO tbl_transaksi_header 
-        (id_transaksi, jenis_transaksi, tgl_transaksi, id_member, id_user_kasir, sub_total, potongan_diskon_global, grand_total, metode_pembayaran, jumlah_dibayar_tunai, jumlah_kembalian, keterangan)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $con->prepare($sql_header);
-    $stmt->bind_param('sssisiddddds', $id_trx, $jenis_transaksi, $tgl, $id_member, $id_user_kasir, $sub_total, $potongan_global, $grand_total, $metode_pembayaran, $jumlah_dibayar_tunai, $jumlah_kembalian, $keterangan);
-    if (!$stmt->execute()) throw new Exception("Gagal simpan header: " . $stmt->error);
+    // Simpan transaksi
+    $stmt = $con->prepare("INSERT INTO tbl_transaksi_offline 
+        (id_transaksi, tgl_transaksi, id_member, id_kasir, id_paket, total, metode_pembayaran, jumlah_bayar, kembalian)
+        VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("siiidddd", $id_transaksi, $id_member, $id_kasir, $id_paket, $grand_total, $metode, $dibayar, $kembalian);
+    if (!$stmt->execute()) throw new Exception("Gagal simpan transaksi");
     $stmt->close();
 
-    $sql_detail = "INSERT INTO tbl_transaksi_detail (id_transaksi, id_paket, qty, harga_satuan, potongan_diskon_item, total_item) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $con->prepare($sql_detail);
-    $stmt->bind_param('siiddd', $id_trx, $id_paket, $qty, $harga_satuan, $potongan_item, $total_item);
-    if (!$stmt->execute()) throw new Exception("Gagal simpan detail: " . $stmt->error);
-    $stmt->close();
-
+    $member_aktif = false;
     if ($id_member) {
-        $stmt = $con->prepare("SELECT durasi_hari FROM tbl_paket WHERE id_paket = ?");
-        $stmt->bind_param('i', $id_paket);
+        $tgl_mulai = date('Y-m-d H:i:s');
+        $tgl_berakhir = date('Y-m-d 23:59:59', strtotime("+$durasi_hari days"));
+
+        $stmt = $con->prepare("INSERT INTO tbl_membership 
+            (id_member, id_transaksi, id_paket, tgl_mulai, tgl_berakhir, sumber)
+            VALUES (?, ?, ?, ?, ?, 'offline')");
+        $stmt->bind_param("isiis", $id_member, $id_transaksi, $id_paket, $tgl_mulai, $tgl_berakhir);
         $stmt->execute();
-        $paket = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        $durasi_hari = intval($paket['durasi_hari']);
-        $tgl_mulai = $tgl;
-        $tgl_berakhir = date('Y-m-d H:i:s', strtotime($tgl . " + $durasi_hari days"));
 
-        $sql_mem = "INSERT INTO tbl_membership (id_member, id_transaksi, id_paket, tgl_mulai, tgl_berakhir) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $con->prepare($sql_mem);
-        $stmt->bind_param('isiss', $id_member, $id_trx, $id_paket, $tgl_mulai, $tgl_berakhir);
-        if (!$stmt->execute()) throw new Exception("Gagal aktifkan membership: " . $stmt->error);
-        $stmt->close();
+        $con->query("UPDATE tbl_member SET membership_status = 'aktif' WHERE id_member = $id_member");
+        $member_aktif = true;
     }
 
     $con->commit();
-    $con->autocommit(true);
-    echo json_encode(['success' => true, 'id_transaksi' => $id_trx, 'metode' => $metode_pembayaran, 'kembalian' => $jumlah_kembalian]);
-    exit;
+
+    echo json_encode([
+        'success' => true,
+        'id_transaksi' => $id_transaksi,
+        'grand_total' => $grand_total,
+        'kembalian' => $kembalian,
+        'member_aktif' => $member_aktif
+    ]);
 } catch (Exception $e) {
     $con->rollback();
-    $con->autocommit(true);
-    http_response_code(400);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-    exit;
 }

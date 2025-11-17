@@ -14,7 +14,7 @@
       $membership_plans = [
         [
           'title' => 'Harian',
-          'price' => '50.000',
+          'price' => '60.000',
           'period' => 'per hari',
           'features' => [
             'Akses gym 1 hari',
@@ -25,32 +25,57 @@
           'popular' => false
         ],
         [
-          'title' => 'Bulanan',
-          'price' => '500.000',
+          'title' => '1 Bulan',
+          'price' => '285.000',
           'period' => 'per bulan',
           'features' => [
-            'Akses gym unlimited',
-            'Akses semua peralatan',
-            '3 sesi personal trainer',
-            'Loker pribadi',
-            'Handuk gratis',
-            'Free consultation'
+            'Fasilitas gym lengkap',
+            'Full acces gym dan studio kelas',
+            'Full AC',
+            'Kamar mandi dan ruang ganti',
+            'Loker'
+          ],
+          'popular' => false
+        ],
+        [
+          'title' => '3 Bulan',
+          'price' => '675.000',
+          'period' => 'per 3 bulan',
+          'features' => [
+            'Fasilitas gym lengkap',
+            'Full acces gym dan studio kelas',
+            'Full AC',
+            'Kamar mandi dan ruang ganti',
+            'Loker',
+            'Free Payung'
           ],
           'popular' => true
         ],
         [
-          'title' => 'Tahunan',
-          'price' => '4.500.000',
+          'title' => '6 Bulan',
+          'price' => '1.250.000',
+          'period' => 'per 6 bulan',
+          'features' => [
+            'Fasilitas gym lengkap',
+            'Full acces gym dan studio kelas',
+            'Full AC',
+            'Kamar mandi dan ruang ganti',
+            'Loker',
+            'Free Kaos'
+          ],
+          'popular' => false
+        ],
+        [
+          'title' => '12 Bulan',
+          'price' => '2.300.000',
           'period' => 'per tahun',
           'features' => [
-            'Akses gym unlimited',
-            'Akses semua peralatan',
-            'Kelas unlimited',
-            'Loker pribadi',
-            'Handuk gratis',
-            '2 sesi personal trainer',
-            'Program nutrisi',
-            'Diskon merchandise 20%'
+            'Fasilitas gym lengkap',
+            'Full acces gym dan studio kelas',
+            'Full AC',
+            'Kamar mandi dan ruang ganti',
+            'Loker',
+            'Free Tas Gym'
           ],
           'popular' => false
         ]
@@ -82,7 +107,7 @@
         
         echo '
             </ul>
-            <a href="registration.php" class="btn btn-danger">Daftar Sekarang</a>
+            <a href="../login/register.php" class="btn btn-danger">Daftar Sekarang</a>
           </div>
         </div>';
       }

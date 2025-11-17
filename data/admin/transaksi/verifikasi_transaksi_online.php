@@ -13,7 +13,6 @@ if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
         $con->autocommit(FALSE);
 
         if ($action === 'approve') {
-            // Ambil data transaksi online
             $stmt = $con->prepare("SELECT id_member, id_paket, total FROM tbl_transaksi_online WHERE id_transaksi = ? AND status = 'pending'");
             $stmt->bind_param("s", $id_trx);
             $stmt->execute();

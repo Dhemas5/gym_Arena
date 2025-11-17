@@ -12,17 +12,9 @@ if (!isset($_SESSION['login']) || $_SESSION['user_type'] !== 'member') {
 $nama_member = $_SESSION['nama'];
 $id_member = $_SESSION['id_member'];
 
-// Ambil data paket dari tbl_paket
-$paket_query = "SELECT * FROM tbl_paket ORDER BY harga ASC";
+// Ambil data paket dari tbl_paket - PERBAIKAN: gunakan harga_umum bukan harga
+$paket_query = "SELECT * FROM tbl_paket ORDER BY harga_umum ASC";
 $paket_result = $con->query($paket_query);
-
-// Ambil data kelas dari tbl_jadwal_kelas dengan join ke tbl_kategori dan tbl_instruktur
-$kelas_query = "SELECT jk.*, k.nama_kategori, k.deskripsi as kategori_desc, i.nama_instruktur 
-                FROM tbl_jadwal_kelas jk 
-                LEFT JOIN tbl_kategori k ON jk.id_kategori = k.id_kategori 
-                LEFT JOIN tbl_instruktur i ON jk.id_instruktur = i.id_instruktur
-                ORDER BY jk.tanggal, jk.jam_mulai";
-$kelas_result = $con->query($kelas_query);
 
 // Data paket gym dari price list
 $gym_packages = [
@@ -290,8 +282,8 @@ $current_day = date('N');
     </div>
   </section>
 
-<!-- JADWAL KELAS MINGGUAN SECTION -->
-<section class="kelas-section">
+  <!-- JADWAL KELAS MINGGUAN SECTION -->
+  <section class="kelas-section">
     <div class="container">
         <h2 class="section-title">Jadwal <span class="text-primary">Kelas Mingguan</span></h2>
         
@@ -395,10 +387,8 @@ $current_day = date('N');
                                 $class_icon = '💨';
                             } else if(strpos($kategori_upper, 'STRONG') !== false) {
                                 $class_icon = '🔥';
-                            } else if(strpos($kategori_upper, 'POUNDFIT') !== false) {
-                                $class_icon = '🥁';
-                            } else if(strpos($kategori_upper, 'TRAMPOLINE') !== false) {
-                                $class_icon = '🤸';
+                            } else if(strpos($kategori_upper, 'CID') !== false) {
+                                $class_icon = '💥';
                             }
                             
                             // Hitung durasi
@@ -431,12 +421,6 @@ $current_day = date('N');
                                         echo 'High Intensity';
                                     } else if(strpos($kategori_upper, 'CID') !== false) {
                                         echo 'Cardio Intensity';
-                                    } else if(strpos($kategori_upper, 'POUNDFIT') !== false) {
-                                        echo 'Rhythm Workout';
-                                    } else if(strpos($kategori_upper, 'TRAMPOLINE') !== false) {
-                                        echo 'Fun Cardio';
-                                    } else if(strpos($kategori_upper, 'SENAM') !== false) {
-                                        echo 'Low Impact';
                                     } else {
                                         echo 'Fitness Class';
                                     }
@@ -458,7 +442,8 @@ $current_day = date('N');
             <?php endfor; ?>
         </div>
     </div>
-</section>
+  </section>
+
   <!-- Payment Modal -->
   <div class="modal fade" id="paymentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">

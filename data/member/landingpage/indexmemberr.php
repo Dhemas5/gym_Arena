@@ -171,7 +171,7 @@ if (!$membership_aktif) {
 
       <h3 class="price-category-title">Paket Membership Gym</h3>
       <div class="gym-packages-grid">
-        <?php 
+        <?php
         // Ambil semua paket (selalu, tidak peduli aktif atau tidak)
         $paket_result = $con->query("
             SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
@@ -179,7 +179,7 @@ if (!$membership_aktif) {
             ORDER BY durasi_hari ASC
         ");
 
-        while ($p = $paket_result->fetch_assoc()): 
+        while ($p = $paket_result->fetch_assoc()):
           $durasi_text = match ((int)$p['durasi_hari']) {
             1    => '1 Hari',
             30   => '1 Bulan',

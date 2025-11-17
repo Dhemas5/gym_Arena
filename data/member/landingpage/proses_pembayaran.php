@@ -24,31 +24,31 @@ $tipe_member = $_SESSION['tipe_member'] ?? 'umum';
 // Proses upload bukti pembayaran dan simpan transaksi
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'])) {
     $catatan = $_POST['catatan'] ?? '';
-    
+
     // Validasi file upload
     if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
         $filename = $_FILES['bukti_pembayaran']['name'];
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
-        
+
         if (!in_array(strtolower($filetype), $allowed)) {
             $_SESSION['error'] = "Format file tidak valid! Hanya JPG, JPEG, PNG, dan GIF yang diperbolehkan.";
         } else {
             $upload_dir = "../../../uploads/bukti_pembayaran/";
-            
+
             // Buat direktori jika belum ada
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
-            
+
             // Generate ID Transaksi
             $id_transaksi = 'ONL' . date('YmdHis') . rand(100, 999);
-            
+
             $new_filename = 'bukti_' . $id_transaksi . '_' . time() . '.' . $filetype;
             $upload_path = $upload_dir . $new_filename;
-            
+
             if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $upload_path)) {
-                
+
                 // Handle paket custom vs paket dari database
                 if (is_numeric($paket['id_paket'])) {
                     // Paket dari database - gunakan id_paket asli
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                     // Paket custom - cari paket yang sesuai atau gunakan default
                     // Untuk sementara, kita gunakan paket harian gym (id=2) sebagai default
                     $id_paket_for_db = 2; // Default to Gym Harian
-                    
+
                     // Atau bisa juga mencari paket berdasarkan nama
                     $query_find_paket = "SELECT id_paket FROM tbl_paket WHERE nama_paket LIKE ? LIMIT 1";
                     $stmt_find = $con->prepare($query_find_paket);
@@ -65,44 +65,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                     $stmt_find->bind_param("s", $search_term);
                     $stmt_find->execute();
                     $result_find = $stmt_find->get_result();
-                    
+
                     if ($result_find->num_rows > 0) {
                         $found_paket = $result_find->fetch_assoc();
                         $id_paket_for_db = $found_paket['id_paket'];
                     }
                     $stmt_find->close();
                 }
-                
+
                 // Simpan transaksi ke tbl_transaksi_online
                 $query_insert = "INSERT INTO tbl_transaksi_online 
                                 (id_transaksi, tgl_transaksi, id_member, id_paket, total413, 
                                  bukti_pembayaran, status, verified_at, verified_by) 
                                 VALUES (?, NOW(), ?, ?, ?, ?, 'pending', NULL, NULL)";
-                
+
                 $stmt_insert = $con->prepare($query_insert);
-                
-                $stmt_insert->bind_param("siids", 
-                    $id_transaksi, 
-                    $id_member, 
-                    $id_paket_for_db, 
-                    $paket['harga'], 
+
+                $stmt_insert->bind_param(
+                    "siids",
+                    $id_transaksi,
+                    $id_member,
+                    $id_paket_for_db,
+                    $paket['harga'],
                     $new_filename
                 );
-                
+
                 if ($stmt_insert->execute()) {
                     $stmt_insert->close();
-                    
+
                     // Simpan data paket custom ke session untuk ditampilkan nanti
                     $_SESSION['last_transaction'] = [
                         'id_transaksi' => $id_transaksi,
                         'paket' => $paket,
                         'tipe_member' => $tipe_member
                     ];
-                    
+
                     // Hapus session checkout
                     unset($_SESSION['checkout_paket']);
                     unset($_SESSION['tipe_member']);
-                    
+
                     $_SESSION['success'] = "Bukti pembayaran berhasil diupload! Silakan tunggu verifikasi dari admin.";
                     header("Location: transaksi.php?id=" . $id_transaksi);
                     exit;
@@ -125,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,12 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             color: white;
             padding: 50px 0;
         }
-        
+
         .payment-container {
             max-width: 700px;
             margin: 0 auto;
         }
-        
+
         .payment-card {
             background: rgba(13, 27, 42, 0.95);
             border: 1px solid rgba(66, 165, 245, 0.3);
@@ -153,20 +155,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             margin-bottom: 20px;
         }
-        
+
         .payment-header {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid rgba(66, 165, 245, 0.3);
         }
-        
+
         .payment-header h2 {
             color: #42a5f5;
             font-weight: 700;
             margin-bottom: 10px;
         }
-        
+
         .total-payment {
             background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
             padding: 20px;
@@ -174,19 +176,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .total-payment h5 {
             color: #0d1b2a;
             margin-bottom: 10px;
             font-weight: 600;
         }
-        
+
         .total-payment h3 {
             color: #0d1b2a;
             font-weight: 700;
             margin: 0;
         }
-        
+
         .info-box {
             background: rgba(33, 150, 243, 0.1);
             border-left: 4px solid #2196F3;
@@ -194,12 +196,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             padding: 15px;
             margin-bottom: 25px;
         }
-        
+
         .info-box i {
             color: #2196F3;
             margin-right: 10px;
         }
-        
+
         .qris-section {
             background: white;
             padding: 30px;
@@ -207,13 +209,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .qris-section h5 {
             color: #0d1b2a;
             margin-bottom: 20px;
             font-weight: 700;
         }
-        
+
         .qris-image {
             max-width: 300px;
             margin: 0 auto;
@@ -223,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             padding: 10px;
             background: white;
         }
-        
+
         .rekening-section {
             background: rgba(66, 165, 245, 0.1);
             border: 1px solid rgba(66, 165, 245, 0.3);
@@ -231,13 +233,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             padding: 25px;
             margin-bottom: 30px;
         }
-        
+
         .rekening-section h5 {
             color: #42a5f5;
             margin-bottom: 20px;
             font-weight: 700;
         }
-        
+
         .rekening-item {
             background: rgba(13, 27, 42, 0.7);
             padding: 15px;
@@ -245,17 +247,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             margin-bottom: 15px;
             border: 1px solid rgba(66, 165, 245, 0.2);
         }
-        
+
         .rekening-item:last-child {
             margin-bottom: 0;
         }
-        
+
         .rekening-label {
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.9rem;
             margin-bottom: 5px;
         }
-        
+
         .rekening-value {
             color: white;
             font-weight: 700;
@@ -264,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .btn-copy {
             background: #42a5f5;
             border: none;
@@ -275,40 +277,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .btn-copy:hover {
             background: #1976d2;
         }
-        
+
         .upload-section {
             margin-top: 30px;
         }
-        
+
         .upload-section h5 {
             color: #42a5f5;
             margin-bottom: 20px;
             font-weight: 700;
         }
-        
-        .form-control, .form-control:focus {
+
+        .form-control,
+        .form-control:focus {
             background: rgba(13, 27, 42, 0.7);
             border: 1px solid rgba(66, 165, 245, 0.3);
             color: white;
         }
-        
+
         .form-label {
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
             margin-bottom: 10px;
         }
-        
+
         .file-upload-wrapper {
             position: relative;
             overflow: hidden;
             display: inline-block;
             width: 100%;
         }
-        
+
         .btn-file-upload {
             background: rgba(66, 165, 245, 0.2);
             border: 2px dashed rgba(66, 165, 245, 0.5);
@@ -320,12 +323,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             transition: all 0.3s;
             width: 100%;
         }
-        
+
         .btn-file-upload:hover {
             background: rgba(66, 165, 245, 0.3);
             border-color: #42a5f5;
         }
-        
+
         .file-upload-wrapper input[type=file] {
             position: absolute;
             left: 0;
@@ -335,13 +338,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             height: 100%;
             cursor: pointer;
         }
-        
+
         .file-name {
             margin-top: 10px;
             color: #42a5f5;
             font-weight: 600;
         }
-        
+
         .btn-submit {
             background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
             color: white;
@@ -354,12 +357,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             transition: all 0.3s;
             margin-top: 20px;
         }
-        
+
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
         }
-        
+
         .btn-back {
             background: rgba(108, 117, 125, 0.3);
             color: white;
@@ -374,18 +377,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             transition: all 0.3s;
             margin-top: 15px;
         }
-        
+
         .btn-back:hover {
             background: rgba(108, 117, 125, 0.5);
             border-color: #42a5f5;
             color: white;
         }
-        
+
         .alert {
             border-radius: 10px;
             margin-bottom: 20px;
         }
-        
+
         .paket-info {
             background: rgba(66, 165, 245, 0.1);
             border: 1px solid rgba(66, 165, 245, 0.3);
@@ -393,38 +396,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
             padding: 20px;
             margin-bottom: 20px;
         }
-        
+
         .paket-detail {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid rgba(66, 165, 245, 0.2);
         }
-        
+
         .paket-detail:last-child {
             border-bottom: none;
         }
     </style>
 </head>
+
 <body>
     <div class="payment-container">
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-circle"></i>
-            <?php 
-            echo $_SESSION['error']; 
-            unset($_SESSION['error']);
-            ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle"></i>
+                <?php
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         <?php endif; ?>
-        
+
         <div class="payment-card">
             <div class="payment-header">
                 <h2><i class="fas fa-money-bill-wave"></i> Pembayaran</h2>
                 <p class="text-muted mb-0">Silakan lakukan pembayaran dan upload bukti transfer</p>
             </div>
-            
+
             <!-- Info Paket -->
             <div class="paket-info">
                 <h5 class="text-primary mb-3">Detail Paket</h5>
@@ -439,7 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                 <div class="paket-detail">
                     <span>Durasi:</span>
                     <span class="fw-bold">
-                        <?php 
+                        <?php
                         if (isset($paket['durasi_hari'])) {
                             echo $paket['durasi_hari'] . ' Hari';
                         } else {
@@ -449,12 +453,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                     </span>
                 </div>
             </div>
-            
+
             <div class="total-payment">
                 <h5>Total Pembayaran</h5>
                 <h3>Rp <?php echo number_format($paket['harga'], 0, ',', '.'); ?></h3>
             </div>
-            
+
             <div class="info-box">
                 <i class="fas fa-info-circle"></i>
                 <strong>Petunjuk Pembayaran:</strong>
@@ -464,21 +468,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                     <li>Tunggu verifikasi dari admin (maksimal 1x24 jam)</li>
                 </ol>
             </div>
-            
+
             <!-- QRIS Section -->
             <div class="qris-section">
                 <h5><i class="fas fa-qrcode"></i> Scan QR Code untuk Pembayaran</h5>
-                <img src="../../../assets/qris-placeholder.png" alt="QR Code" class="qris-image" 
-                     onerror="this.src='https://via.placeholder.com/300x300/42a5f5/ffffff?text=QR+CODE+PEMBAYARAN'">
+                <img src="../../../assets/qris-placeholder.png" alt="QR Code" class="qris-image"
+                    onerror="this.src='https://via.placeholder.com/300x300/42a5f5/ffffff?text=QR+CODE+PEMBAYARAN'">
                 <p style="color: #666; margin-top: 15px; font-size: 0.9rem;">
                     Scan QR Code menggunakan aplikasi mobile banking Anda
                 </p>
             </div>
-            
+
             <!-- Rekening Transfer Section -->
             <div class="rekening-section">
                 <h5><i class="fas fa-university"></i> Atau Transfer ke Rekening Berikut</h5>
-                
+
                 <div class="rekening-item">
                     <div class="rekening-label">Bank BCA</div>
                     <div class="rekening-value">
@@ -490,16 +494,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                     <div class="rekening-label mt-2">a.n. CV. ARENA MAJU BERSAMA</div>
                 </div>
             </div>
-            
+
             <!-- Upload Bukti Section -->
             <div class="upload-section">
                 <form method="POST" enctype="multipart/form-data">
                     <h5><i class="fas fa-cloud-upload-alt"></i> Upload Bukti Pembayaran</h5>
-                    
+
                     <input type="hidden" name="id_paket" value="<?php echo $paket['id_paket']; ?>">
                     <input type="hidden" name="harga_paket" value="<?php echo $paket['harga']; ?>">
                     <input type="hidden" name="tipe_member" value="<?php echo $tipe_member; ?>">
-                    
+
                     <div class="mb-3">
                         <label for="bukti_pembayaran" class="form-label">Bukti Transfer <span class="text-danger">*</span></label>
                         <div class="file-upload-wrapper">
@@ -512,25 +516,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                         </div>
                         <div class="file-name" id="fileName"></div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="catatan" class="form-label">Catatan (Opsional)</label>
-                        <textarea class="form-control" name="catatan" id="catatan" rows="3" 
-                                  placeholder="Tambahkan catatan jika diperlukan..."></textarea>
+                        <textarea class="form-control" name="catatan" id="catatan" rows="3"
+                            placeholder="Tambahkan catatan jika diperlukan..."></textarea>
                     </div>
-                    
+
                     <button type="submit" name="konfirmasi_pembayaran" class="btn-submit">
                         <i class="fas fa-paper-plane"></i> Konfirmasi Pembayaran
                     </button>
                 </form>
-                
+
                 <a href="checkout_pembayaran.php" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Display selected file name
@@ -540,7 +544,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
                 document.getElementById('fileName').innerHTML = '<i class="fas fa-file-image"></i> ' + fileName;
             }
         });
-        
+
         // Copy to clipboard function
         function copyToClipboard(elementId) {
             const text = document.getElementById(elementId).innerText;
@@ -552,6 +556,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['konfirmasi_pembayaran'
         }
     </script>
 </body>
+
 </html>
 
 <?php

@@ -2,112 +2,81 @@
 require "../../../setting/session.php";
 checkSession("admin");
 require "../../../setting/koneksi.php";
-?>
-<?php include '../../../view/master/header.php'; ?>
-<?php include '../../../view/master/sidebar.php'; ?>
 
-<!-- Content Header -->
+$kategori = $con->query("SELECT id_kategori, nama_kategori FROM tbl_kategori ORDER BY nama_kategori")->fetch_all(MYSQLI_ASSOC);
+$pakets   = $con->query("SELECT p.*, k.nama_kategori FROM tbl_paket p LEFT JOIN tbl_kategori k ON p.id_kategori=k.id_kategori ORDER BY p.id_paket DESC")->fetch_all(MYSQLI_ASSOC);
+
+include '../../../view/master/header.php';
+include '../../../view/master/sidebar.php';
+?>
+
 <section class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Menu Paket</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Beranda</a></li>
-                    <li class="breadcrumb-item active">Paket</li>
-                </ol>
-            </div>
-        </div>
+        <h1 class="text-primary"><i class="fas fa-dumbbell"></i> Data Paket Membership</h1>
     </div>
 </section>
 
-<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title">Data Paket</h3>
-                    </div>
-                    <div class="card-body">
-                        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-                            <i class="fas fa-plus"></i> Tambah Paket
-                        </button>
-                        <div class="table-responsive rounded">
-                            <table class="table table-bordered table-striped" id="tabelPelatih">
-                                <thead class="bg-primary text-white">
-                                    <tr>
-                                        <th style="width:5%">No</th>
-                                        <th style="width:20%">Nama Paket</th>
-                                        <th style="width:15%">Kategori</th>
-                                        <th style="width:15%">Tipe Paket</th>
-                                        <th style="width:12%">Harga</th>
-                                        <th style="width:18%">Deskripsi</th>
-                                        <th style="width:15%">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $query = "
-                                        SELECT p.*, k.nama_kategori 
-                                        FROM tbl_paket p 
-                                        LEFT JOIN tbl_kategori k ON p.id_kategori = k.id_kategori 
-                                        ORDER BY p.id_paket ASC
-                                    ";
-                                    $result = mysqli_query($con, $query);
-                                    if (mysqli_num_rows($result) == 0) {
-                                        echo '<tr><td colspan="7" class="text-center">Tidak ada data paket</td></tr>';
-                                    } else {
-                                        $no = 1;
-                                        while ($data = mysqli_fetch_array($result)) {
-                                            $durasi = $data['durasi_hari'];
-                                            if ($durasi == 1) $tipe = '1 Hari';
-                                            elseif ($durasi == 30) $tipe = '1 Bulan';
-                                            elseif ($durasi == 90) $tipe = '3 Bulan';
-                                            elseif ($durasi == 180) $tipe = '6 Bulan';
-                                            elseif ($durasi == 365) $tipe = '1 Tahun';
-                                            else $tipe = $durasi . ' hari';
-                                    ?>
-                                            <tr>
-                                                <td><?= $no ?></td>
-                                                <td><?= htmlspecialchars($data['nama_paket']) ?></td>
-                                                <td><?= htmlspecialchars($data['nama_kategori'] ?? 'Tanpa Kategori') ?></td>
-                                                <td><span class="badge badge-info"><?= $tipe ?></span></td>
-                                                <td>Rp <?= number_format($data['harga'], 0, ',', '.') ?></td>
-                                                <td><?= htmlspecialchars($data['deskripsi']) ?: '-' ?></td>
-                                                <td class="text-center">
-                                                    <button class="btn btn-warning btn-sm edit-btn mr-1"
-                                                        data-id="<?= $data['id_paket'] ?>"
-                                                        data-nama="<?= htmlspecialchars($data['nama_paket']) ?>"
-                                                        data-kategori="<?= $data['id_kategori'] ?>"
-                                                        data-deskripsi="<?= htmlspecialchars($data['deskripsi']) ?>"
-                                                        data-harga="<?= $data['harga'] ?>"
-                                                        data-durasi="<?= $data['durasi_hari'] ?>"
-                                                        data-toggle="modal" data-target="#modalEdit"
-                                                        title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm btn-hapus"
-                                                        data-id="<?= $data['id_paket'] ?>"
-                                                        data-nama="<?= htmlspecialchars($data['nama_paket']) ?>"
-                                                        title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                    <?php
-                                            $no++;
-                                        }
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                <h3 class="card-title">Daftar Paket</h3>
+                <button class="btn btn-light" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover" id="tabelPaket">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Paket</th>
+                            <th>Kategori</th>
+                            <th>Tipe</th>
+                            <th>Harga Umum</th>
+                            <th>Harga Mahasiswa</th>
+                            <th>Deskripsi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($pakets as $i => $p):
+                            $tipe = match ($p['durasi_hari']) {
+                                1 => 'Harian',
+                                30 => 'Bulanan',
+                                90 => '3 Bulan',
+                                180 => '6 Bulan',
+                                365 => 'Tahunan',
+                                default => $p['durasi_hari'] . ' Hari'
+                            };
+                        ?>
+                            <tr>
+                                <td><?= $i + 1 ?></td>
+                                <td><strong><?= htmlspecialchars($p['nama_paket']) ?></strong></td>
+                                <td><?= htmlspecialchars($p['nama_kategori'] ?? '-') ?></td>
+                                <td><span class="badge badge-info"><?= $tipe ?></span></td>
+                                <td>Rp <?= number_format($p['harga_umum'], 0, ',', '.') ?></td>
+                                <td>Rp <?= number_format($p['harga_mahasiswa'], 0, ',', '.') ?></td>
+                                <td><?= htmlspecialchars($p['deskripsi'] ?: '-') ?></td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning edit-btn"
+                                        data-id="<?= $p['id_paket'] ?>"
+                                        data-nama="<?= htmlspecialchars($p['nama_paket']) ?>"
+                                        data-kategori="<?= $p['id_kategori'] ?>"
+                                        data-deskripsi="<?= htmlspecialchars($p['deskripsi']) ?>"
+                                        data-harga_umum="<?= $p['harga_umum'] ?>"
+                                        data-harga_mahasiswa="<?= $p['harga_mahasiswa'] ?>"
+                                        data-durasi="<?= $p['durasi_hari'] ?>">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger btn-hapus"
+                                        data-id="<?= $p['id_paket'] ?>"
+                                        data-nama="<?= htmlspecialchars($p['nama_paket']) ?>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -124,26 +93,22 @@ require "../../../setting/koneksi.php";
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Nama Paket <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="nama_paket" required
-                            placeholder="Contoh: Paket Premium / Trial Harian">
+                        <label>Nama Paket <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="nama_paket" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                        <label>Kategori <span class="text-danger">*</span></label>
                         <select class="form-control" name="id_kategori" required>
                             <option value="">-- Pilih Kategori --</option>
-                            <?php
-                            $kategori_query = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_kategori");
-                            while ($k = mysqli_fetch_array($kategori_query)) {
-                                echo "<option value='{$k['id_kategori']}'>" . htmlspecialchars($k['nama_kategori']) . "</option>";
-                            }
-                            ?>
+                            <?php foreach ($kategori as $kat): ?>
+                                <option value="<?= $kat['id_kategori'] ?>"><?= htmlspecialchars($kat['nama_kategori']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tipe Paket <span class="text-danger">*</span></label>
+                        <label>Tipe Paket <span class="text-danger">*</span></label>
                         <select class="form-control" name="tipe_paket" id="tipe_paket" required onchange="hitungDurasi()">
-                            <option value="">-- Pilih Tipe Paket --</option>
+                            <option value="">-- Pilih Tipe --</option>
                             <option value="1">1 Hari</option>
                             <option value="30">1 Bulan</option>
                             <option value="90">3 Bulan</option>
@@ -153,23 +118,21 @@ require "../../../setting/koneksi.php";
                         <input type="hidden" name="durasi_hari" id="durasi_hari">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="harga" required
-                            placeholder="Contoh: 25000" min="0">
+                        <label>Harga Umum (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="harga_umum" required min="0">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea class="form-control" name="deskripsi" rows="3"
-                            placeholder="Opsional: Deskripsi singkat tentang paket ini..."></textarea>
+                        <label>Harga Mahasiswa (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="harga_mahasiswa" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea class="form-control" name="deskripsi" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Paket
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Paket</button>
                 </div>
             </div>
         </form>
@@ -188,25 +151,22 @@ require "../../../setting/koneksi.php";
                 <div class="modal-body">
                     <input type="hidden" name="id_paket" id="edit_id">
                     <div class="form-group">
-                        <label class="form-label">Nama Paket <span class="text-danger">*</span></label>
+                        <label>Nama Paket <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="nama_paket" id="edit_nama" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                        <label>Kategori <span class="text-danger">*</span></label>
                         <select class="form-control" name="id_kategori" id="edit_kategori" required>
                             <option value="">-- Pilih Kategori --</option>
-                            <?php
-                            mysqli_data_seek($kategori_query, 0);
-                            while ($k = mysqli_fetch_array($kategori_query)) {
-                                echo "<option value='{$k['id_kategori']}'>" . htmlspecialchars($k['nama_kategori']) . "</option>";
-                            }
-                            ?>
+                            <?php foreach ($kategori as $kat): ?>
+                                <option value="<?= $kat['id_kategori'] ?>"><?= htmlspecialchars($kat['nama_kategori']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tipe Paket <span class="text-danger">*</span></label>
+                        <label>Tipe Paket <span class="text-danger">*</span></label>
                         <select class="form-control" name="tipe_paket" id="tipe_paket_edit" required onchange="setDurasiEdit(this.value)">
-                            <option value="">-- Pilih Tipe Paket --</option>
+                            <option value="">-- Pilih Tipe --</option>
                             <option value="1">1 Hari</option>
                             <option value="30">1 Bulan</option>
                             <option value="90">3 Bulan</option>
@@ -216,21 +176,21 @@ require "../../../setting/koneksi.php";
                         <input type="hidden" name="durasi_hari" id="durasi_hari_edit">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="harga" id="edit_harga" required min="0">
+                        <label>Harga Umum (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="harga_umum" id="edit_harga_umum" required min="0">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
+                        <label>Harga Mahasiswa (Rp) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="harga_mahasiswa" id="edit_harga_mahasiswa" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi" id="edit_deskripsi" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Update Paket
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning">Update Paket</button>
                 </div>
             </div>
         </form>
@@ -240,64 +200,49 @@ require "../../../setting/koneksi.php";
 <?php include '../../../view/master/footer.php'; ?>
 
 <script>
-    // Fungsi untuk hitung durasi otomatis (Tambah)
     function hitungDurasi() {
-        const tipe = document.getElementById('tipe_paket').value;
-        document.getElementById('durasi_hari').value = tipe || '';
+        document.getElementById('durasi_hari').value = document.getElementById('tipe_paket').value;
     }
 
-    // Fungsi untuk hitung durasi otomatis (Edit)
-    function setDurasiEdit(tipe) {
-        document.getElementById('durasi_hari_edit').value = tipe || '';
+    function setDurasiEdit(val) {
+        document.getElementById('durasi_hari_edit').value = val;
     }
 
     $(document).ready(function() {
-        // Edit: Isi modal dengan data
+        // Edit
         $(document).on('click', '.edit-btn', function() {
-            const durasi = $(this).data('durasi');
-
             $('#edit_id').val($(this).data('id'));
             $('#edit_nama').val($(this).data('nama'));
             $('#edit_kategori').val($(this).data('kategori'));
             $('#edit_deskripsi').val($(this).data('deskripsi'));
-            $('#edit_harga').val($(this).data('harga'));
-            $('#tipe_paket_edit').val(durasi);
-            $('#durasi_hari_edit').val(durasi);
-
+            $('#edit_harga_umum').val($(this).data('harga_umum'));
+            $('#edit_harga_mahasiswa').val($(this).data('harga_mahasiswa'));
+            $('#tipe_paket_edit').val($(this).data('durasi'));
+            $('#durasi_hari_edit').val($(this).data('durasi'));
             $('#modalEdit').modal('show');
         });
 
-        // TAMBAH PAKET
+        // Tambah
         $('#formTambah').submit(function(e) {
             e.preventDefault();
-            if (!$('#tipe_paket').val()) {
-                Swal.fire('Error!', 'Pilih tipe paket terlebih dahulu!', 'error');
-                return false;
-            }
             $.ajax({
                 url: 'proses_paket.php',
                 type: 'POST',
                 data: $(this).serialize() + '&action=simpan',
                 dataType: 'json',
-                beforeSend: function() {
-                    $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
-                },
-                success: function(res) {
+                beforeSend: () => $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...'),
+                success: res => {
                     if (res.status === 'success') {
-                        Swal.fire('Berhasil!', res.message, 'success').then(() => {
-                            location.reload();
-                        });
+                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');
                     }
                 },
-                complete: function() {
-                    $('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-save"></i> Simpan Paket');
-                }
+                complete: () => $('button[type="submit"]').prop('disabled', false).html('Simpan Paket')
             });
         });
 
-        // UPDATE PAKET
+        // Update
         $('#formEdit').submit(function(e) {
             e.preventDefault();
             $.ajax({
@@ -305,57 +250,40 @@ require "../../../setting/koneksi.php";
                 type: 'POST',
                 data: $(this).serialize() + '&action=update',
                 dataType: 'json',
-                beforeSend: function() {
-                    $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Memperbarui...');
-                },
-                success: function(res) {
+                beforeSend: () => $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...'),
+                success: res => {
                     if (res.status === 'success') {
-                        Swal.fire('Berhasil!', res.message, 'success').then(() => {
-                            location.reload();
-                        });
+                        Swal.fire('Berhasil!', res.message, 'success').then(() => location.reload());
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');
                     }
                 },
-                complete: function() {
-                    $('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-edit"></i> Update Paket');
-                }
+                complete: () => $('button[type="submit"]').prop('disabled', false).html('Update Paket')
             });
         });
 
-        // HAPUS PAKET
+        // Hapus
         $(document).on('click', '.btn-hapus', function() {
             const id = $(this).data('id');
             const nama = $(this).data('nama');
-
             Swal.fire({
-                title: 'Konfirmasi Hapus!',
-                text: `Paket "${nama}" akan dihapus permanen?`,
+                title: 'Hapus Paket?',
+                text: `"${nama}" akan dihapus permanen!`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal'
-            }).then((result) => {
+            }).then(result => {
                 if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'proses_paket.php',
-                        type: 'GET',
-                        data: {
-                            action: 'hapus',
-                            id: id
-                        },
-                        dataType: 'json',
-                        success: function(res) {
-                            if (res.status === 'success') {
-                                Swal.fire('Terhapus!', res.message, 'success').then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Gagal!', res.message, 'error');
-                            }
-                        }
+                    $.get('proses_paket.php', {
+                        action: 'hapus',
+                        id: id
+                    }, res => {
+                        res = JSON.parse(res);
+                        Swal.fire(res.status === 'success' ? 'Terhapus!' : 'Gagal!', res.message, res.status === 'success' ? 'success' : 'error')
+                            .then(() => {
+                                if (res.status === 'success') location.reload();
+                            });
                     });
                 }
             });

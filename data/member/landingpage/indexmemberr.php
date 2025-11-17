@@ -1010,7 +1010,7 @@ $current_day = date('N');
       </div>
     </div>
   </div>
-
+  
   <!-- Scroll to Top Button -->
   <button class="scroll-to-top" onclick="scrollToTop()">
     ↑
@@ -1181,5 +1181,6 @@ $current_day = date('N');
       });
     }
   </script>
+  <?php include 'sectionsmember/footer_member.php'; ?>
 </body>
 </html>

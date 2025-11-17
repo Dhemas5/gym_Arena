@@ -1,4 +1,5 @@
 <?php
+// detail_transaksi.php → API untuk ambil detail transaksi
 require "../../../setting/koneksi.php";
 date_default_timezone_set('Asia/Jakarta');
 
@@ -9,6 +10,7 @@ if (!isset($_GET['id'])) {
 
 $id_transaksi = $_GET['id'];
 
+// Ambil header
 $stmt = $con->prepare("
     SELECT th.*, m.nama AS nama_member, u.username AS nama_kasir 
     FROM tbl_transaksi_header th
@@ -26,6 +28,7 @@ if (!$header) {
     exit;
 }
 
+// Ambil detail
 $stmt2 = $con->prepare("
     SELECT td.*, p.nama_paket 
     FROM tbl_transaksi_detail td

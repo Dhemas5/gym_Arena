@@ -290,659 +290,175 @@ $current_day = date('N');
     </div>
   </section>
 
-  <!-- JADWAL KELAS MINGGUAN SECTION -->
-  <section class="kelas-section">
+<!-- JADWAL KELAS MINGGUAN SECTION -->
+<section class="kelas-section">
     <div class="container">
-      <h2 class="section-title">Jadwal <span class="text-primary">Kelas Mingguan</span></h2>
-      
-      <!-- Schedule Filters -->
-      <div class="schedule-filters">
-        <button class="filter-btn active" data-filter="all">Semua Kelas</button>
-        <button class="filter-btn" data-filter="studio1">Studio 1</button>
-        <button class="filter-btn" data-filter="studio2">Studio 2</button>
-        <button class="filter-btn" data-filter="boxing">Boxing</button>
-      </div>
-      
-      <!-- Jadwal per Hari -->
-      <div class="schedule-container">
+        <h2 class="section-title">Jadwal <span class="text-primary">Kelas Mingguan</span></h2>
         
-        <!-- SENIN -->
-        <div class="day-schedule <?php echo $current_day == 1 ? 'current-day' : ''; ?>" data-day="senin">
-          <div class="day-header">
-            <h3 class="day-title">SENIN</h3>
-            <span class="day-date">Hari Pertama Semangat</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">07:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">SENAM BL</span>
-                <span class="class-type">Low Impact</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH FITRI</span>
-                <span class="studio-badge"><span class="studio-icon">🎯</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN IRA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">08:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BODY SHAPE</span>
-                <span class="class-type">Strength Training</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH MIEKE</span>
-                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:15</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN SARI</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-          </div>
+        <!-- Schedule Filters -->
+        <div class="schedule-filters">
+            <button class="filter-btn active" data-filter="all">Semua Kelas</button>
+            <button class="filter-btn" data-filter="studio1">Studio 1</button>
+            <button class="filter-btn" data-filter="studio2">Studio 2</button>
+            <button class="filter-btn" data-filter="boxing">Boxing</button>
         </div>
+        
+        <!-- Jadwal per Hari -->
+        <div class="schedule-container">
+            <?php
+            // Data hari dalam bahasa Indonesia
+            $days = [
+                1 => 'Senin',
+                2 => 'Selasa', 
+                3 => 'Rabu',
+                4 => 'Kamis',
+                5 => 'Jumat',
+                6 => 'Sabtu',
+                7 => 'Minggu'
+            ];
 
-        <!-- SELASA -->
-        <div class="day-schedule <?php echo $current_day == 2 ? 'current-day' : ''; ?>" data-day="selasa">
-          <div class="day-header">
-            <h3 class="day-title">SELASA</h3>
-            <span class="day-date">Burn Fat Day</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN NILA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
+            $current_day = date('N'); // 1 (Senin) sampai 7 (Minggu)
+            
+            // Ambil data jadwal untuk minggu ini (Senin sampai Minggu)
+            $start_of_week = date('Y-m-d', strtotime('monday this week'));
+            $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+            
+            $jadwal_query = "SELECT jk.*, k.nama_kategori, k.deskripsi as kategori_desc, i.nama_instruktur,
+                            DAYOFWEEK(jk.tanggal) as mysql_hari_num
+                            FROM tbl_jadwal_kelas jk 
+                            LEFT JOIN tbl_kategori k ON jk.id_kategori = k.id_kategori 
+                            LEFT JOIN tbl_instruktur i ON jk.id_instruktur = i.id_instruktur
+                            WHERE jk.tanggal BETWEEN '$start_of_week' AND '$end_of_week'
+                            ORDER BY jk.tanggal, jk.jam_mulai";
+            $jadwal_result = $con->query($jadwal_query);
+            
+            // Inisialisasi array untuk setiap hari
+            $jadwal_per_hari = array_fill(1, 7, []);
+            
+            // Kelompokkan jadwal berdasarkan hari
+            while($row = $jadwal_result->fetch_assoc()) {
+                $mysql_hari_num = $row['mysql_hari_num']; // 1=Minggu, 2=Senin, ..., 7=Sabtu
+                
+                // Konversi ke sistem kita: 1=Senin, 7=Minggu
+                $our_hari_num = ($mysql_hari_num == 1) ? 7 : $mysql_hari_num - 1;
+                
+                $jadwal_per_hari[$our_hari_num][] = $row;
+            }
+            
+            // Tampilkan jadwal untuk setiap hari
+            for($i = 1; $i <= 7; $i++):
+                $jadwal_hari_ini = $jadwal_per_hari[$i];
+                $tanggal_hari_ini = date('Y-m-d', strtotime($start_of_week . " +" . ($i-1) . " days"));
+            ?>
+            <div class="day-schedule <?php echo $current_day == $i ? 'current-day' : ''; ?>" data-day="<?php echo strtolower($days[$i]); ?>">
+                <div class="day-header">
+                    <h3 class="day-title"><?php echo $days[$i]; ?></h3>
+                    <span class="day-date">
+                        <?php echo date('d M Y', strtotime($tanggal_hari_ini)); ?>
+                    </span>
+                </div>
+                <div class="schedule-grid">
+                    <?php if(empty($jadwal_hari_ini)): ?>
+                        <div class="no-classes">
+                            <p>Tidak ada jadwal kelas hari ini</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach($jadwal_hari_ini as $jadwal): 
+                            // Tentukan studio berdasarkan kategori
+                            $studio = 'studio1';
+                            $studio_icon = '🎯';
+                            $studio_name = 'STUDIO 1';
+                            
+                            $kategori_upper = strtoupper($jadwal['nama_kategori']);
+                            
+                            if(strpos($kategori_upper, 'BOXING') !== false) {
+                                $studio = 'boxing';
+                                $studio_icon = '🥊';
+                                $studio_name = 'AREA BOXING';
+                            } else if(strpos($kategori_upper, 'POUNDFIT') !== false || 
+                                     strpos($kategori_upper, 'TRAMPOLINE') !== false ||
+                                     strpos($kategori_upper, 'CID') !== false) {
+                                $studio = 'studio2';
+                                $studio_icon = '⚡';
+                                $studio_name = 'STUDIO 2';
+                            }
+                            
+                            // Tentukan icon berdasarkan kategori
+                            $class_icon = '💪';
+                            if(strpos($kategori_upper, 'ZUMBA') !== false) {
+                                $class_icon = '💃';
+                            } else if(strpos($kategori_upper, 'YOGA') !== false) {
+                                $class_icon = '🧘';
+                            } else if(strpos($kategori_upper, 'BOXING') !== false) {
+                                $class_icon = '🥊';
+                            } else if(strpos($kategori_upper, 'AERO') !== false) {
+                                $class_icon = '💨';
+                            } else if(strpos($kategori_upper, 'STRONG') !== false) {
+                                $class_icon = '🔥';
+                            } else if(strpos($kategori_upper, 'POUNDFIT') !== false) {
+                                $class_icon = '🥁';
+                            } else if(strpos($kategori_upper, 'TRAMPOLINE') !== false) {
+                                $class_icon = '🤸';
+                            }
+                            
+                            // Hitung durasi
+                            $jam_mulai = new DateTime($jadwal['jam_mulai']);
+                            $jam_selesai = new DateTime($jadwal['jam_selesai']);
+                            $durasi = $jam_mulai->diff($jam_selesai);
+                            $durasi_menit = ($durasi->h * 60) + $durasi->i;
+                        ?>
+                        <div class="schedule-item <?php echo $studio; ?>" data-studio="<?php echo $studio; ?>">
+                            <div class="time-slot">
+                                <span class="time"><?php echo date('H:i', strtotime($jadwal['jam_mulai'])); ?></span>
+                                <span class="duration"><?php echo $durasi_menit; ?> min</span>
+                            </div>
+                            <div class="class-info">
+                                <span class="class-name"><?php echo $jadwal['nama_kategori']; ?></span>
+                                <span class="class-type">
+                                    <?php 
+                                    // Tentukan tipe kelas
+                                    if(strpos($kategori_upper, 'ZUMBA') !== false) {
+                                        echo 'Dance Fitness';
+                                    } else if(strpos($kategori_upper, 'BOXING') !== false) {
+                                        echo 'High Intensity';
+                                    } else if(strpos($kategori_upper, 'YOGA') !== false) {
+                                        echo 'Mind & Body';
+                                    } else if(strpos($kategori_upper, 'BODY SHAPE') !== false) {
+                                        echo 'Strength Training';
+                                    } else if(strpos($kategori_upper, 'AERO') !== false) {
+                                        echo 'Cardio Blast';
+                                    } else if(strpos($kategori_upper, 'STRONG') !== false) {
+                                        echo 'High Intensity';
+                                    } else if(strpos($kategori_upper, 'CID') !== false) {
+                                        echo 'Cardio Intensity';
+                                    } else if(strpos($kategori_upper, 'POUNDFIT') !== false) {
+                                        echo 'Rhythm Workout';
+                                    } else if(strpos($kategori_upper, 'TRAMPOLINE') !== false) {
+                                        echo 'Fun Cardio';
+                                    } else if(strpos($kategori_upper, 'SENAM') !== false) {
+                                        echo 'Low Impact';
+                                    } else {
+                                        echo 'Fitness Class';
+                                    }
+                                    ?>
+                                </span>
+                            </div>
+                            <div class="instructor-info">
+                                <span class="instructor"><?php echo $jadwal['nama_instruktur']; ?></span>
+                                <span class="studio-badge">
+                                    <span class="studio-icon"><?php echo $class_icon; ?></span> 
+                                    <?php echo $studio_name; ?>
+                                </span>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
             </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">08:15</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">CID ROCKER</span>
-                <span class="class-type">Cardio Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">SISKA</span>
-                <span class="studio-badge"><span class="studio-icon">⚡</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:15</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">STRONG NATION</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">SYNC NOVA</span>
-                <span class="studio-badge"><span class="studio-icon">🔥</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN SACTA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-          </div>
+            <?php endfor; ?>
         </div>
-
-        <!-- RABU -->
-        <div class="day-schedule <?php echo $current_day == 3 ? 'current-day' : ''; ?>" data-day="rabu">
-          <div class="day-header">
-            <h3 class="day-title">RABU</h3>
-            <span class="day-date">Midweek Energy Boost</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN IRA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BODY SHAPE</span>
-                <span class="class-type">Strength Training</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH MIEKE</span>
-                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">18:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">KAPHA YOGA</span>
-                <span class="class-type">Mind & Body</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH NANA</span>
-                <span class="studio-badge"><span class="studio-icon">🧘</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">CID ROCKER</span>
-                <span class="class-type">Cardio Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">SISKA</span>
-                <span class="studio-badge"><span class="studio-icon">⚡</span> STUDIO 2</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- KAMIS -->
-        <div class="day-schedule <?php echo $current_day == 4 ? 'current-day' : ''; ?>" data-day="kamis">
-          <div class="day-header">
-            <h3 class="day-title">KAMIS</h3>
-            <span class="day-date">Full Body Workout</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BODY SHAPE</span>
-                <span class="class-type">Strength Training</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH MIEKE</span>
-                <span class="studio-badge"><span class="studio-icon">💪</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">AERO BL</span>
-                <span class="class-type">Cardio Blast</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH WIWIK</span>
-                <span class="studio-badge"><span class="studio-icon">💨</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN SACTA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- JUMAT -->
-        <div class="day-schedule <?php echo $current_day == 5 ? 'current-day' : ''; ?>" data-day="jumat">
-          <div class="day-header">
-            <h3 class="day-title">JUMAT</h3>
-            <span class="day-date">Weekend Warm-up</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">07:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">SENAM BL</span>
-                <span class="class-type">Low Impact</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH FITRI</span>
-                <span class="studio-badge"><span class="studio-icon">🎯</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">07:45</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">POUNDFIT</span>
-                <span class="class-type">Rhythm Workout</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">BERNI</span>
-                <span class="studio-badge"><span class="studio-icon">🥁</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">KAPHA YOGA</span>
-                <span class="class-type">Mind & Body</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH NANA</span>
-                <span class="studio-badge"><span class="studio-icon">🧘</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">POUNDFIT PP</span>
-                <span class="class-type">Rhythm Workout</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">NILA</span>
-                <span class="studio-badge"><span class="studio-icon">🥁</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">18:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">TRAMPOLINE</span>
-                <span class="class-type">Fun Cardio</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH NANA</span>
-                <span class="studio-badge"><span class="studio-icon">🤸</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">19:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SABTU -->
-        <div class="day-schedule <?php echo $current_day == 6 ? 'current-day' : ''; ?>" data-day="sabtu">
-          <div class="day-header">
-            <h3 class="day-title">SABTU</h3>
-            <span class="day-date">Weekend Energy</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item boxing" data-studio="boxing">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">90 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">BOXING</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH PROFESIONAL</span>
-                <span class="studio-badge"><span class="studio-icon">🥊</span> AREA BOXING</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">16:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN SARI</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">16:15</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">STRONG NATION</span>
-                <span class="class-type">High Intensity</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">SYNC NOVA</span>
-                <span class="studio-badge"><span class="studio-icon">🔥</span> STUDIO 1</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MINGGU -->
-        <div class="day-schedule <?php echo $current_day == 7 ? 'current-day' : ''; ?>" data-day="minggu">
-          <div class="day-header">
-            <h3 class="day-title">MINGGU</h3>
-            <span class="day-date">Sunday Funday</span>
-          </div>
-          <div class="schedule-grid">
-            <div class="schedule-item studio2" data-studio="studio2">
-              <div class="time-slot">
-                <span class="time">07:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">TRAMPOLINE</span>
-                <span class="class-type">Fun Cardio</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH NANA</span>
-                <span class="studio-badge"><span class="studio-icon">🤸</span> STUDIO 2</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">08:00</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">ZUMBA</span>
-                <span class="class-type">Dance Fitness</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">ZIN INA</span>
-                <span class="studio-badge"><span class="studio-icon">💃</span> STUDIO 1</span>
-              </div>
-            </div>
-
-            <div class="schedule-item studio1" data-studio="studio1">
-              <div class="time-slot">
-                <span class="time">15:30</span>
-                <span class="duration">60 min</span>
-              </div>
-              <div class="class-info">
-                <span class="class-name">AERO BL</span>
-                <span class="class-type">Cardio Blast</span>
-              </div>
-              <div class="instructor-info">
-                <span class="instructor">COACH WIWIK</span>
-                <span class="studio-badge"><span class="studio-icon">💨</span> STUDIO 1</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
     </div>
-  </section>
-
+</section>
   <!-- Payment Modal -->
   <div class="modal fade" id="paymentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">

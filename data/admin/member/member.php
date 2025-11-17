@@ -46,7 +46,7 @@ require "../../../setting/koneksi.php";
                         <tbody>
                             <?php
                             $members = [];
-                            $query = $con->query("SELECT * FROM vw_member_status ORDER BY id_member ASC");
+                            $query = $con->query("SELECT * FROM member_status ORDER BY id_member ASC");
                             if ($query && $query->num_rows > 0) {
                                 while ($row = $query->fetch_assoc()) {
                                     $members[] = $row;

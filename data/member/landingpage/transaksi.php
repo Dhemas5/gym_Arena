@@ -18,21 +18,21 @@ $transaction_detail = null;
 if (isset($_GET['id'])) {
     $id_transaksi = $_GET['id'];
     
-    // Query untuk mengambil detail transaksi
+    // Query untuk mengambil detail transaksi dari tbl_transaksi_online
     $query_detail = "SELECT 
                 t.*,
-                p.id_payment,
-                p.verified_at,
-                p.verified_by,
+                p.nama_paket,
+                p.deskripsi,
+                p.durasi_hari,
                 m.nama as nama_member,
                 m.email
-              FROM tbl_transaksi t
-              LEFT JOIN tbl_payments p ON t.id_transaksi = p.id_transaksi
+              FROM tbl_transaksi_online t
+              LEFT JOIN tbl_paket p ON t.id_paket = p.id_paket
               LEFT JOIN tbl_member m ON t.id_member = m.id_member
               WHERE t.id_transaksi = ? AND t.id_member = ?";
 
     $stmt_detail = $con->prepare($query_detail);
-    $stmt_detail->bind_param("ii", $id_transaksi, $id_member);
+    $stmt_detail->bind_param("si", $id_transaksi, $id_member);
     $stmt_detail->execute();
     $result_detail = $stmt_detail->get_result();
     
@@ -43,10 +43,12 @@ if (isset($_GET['id'])) {
     $stmt_detail->close();
 }
 
-// Query untuk mengambil semua transaksi member
-$query = "SELECT * FROM tbl_transaksi 
-          WHERE id_member = ? 
-          ORDER BY tanggal_transaksi DESC";
+// Query untuk mengambil semua transaksi member dari tbl_transaksi_online
+$query = "SELECT t.*, p.nama_paket, p.durasi_hari
+          FROM tbl_transaksi_online t
+          LEFT JOIN tbl_paket p ON t.id_paket = p.id_paket
+          WHERE t.id_member = ? 
+          ORDER BY t.tgl_transaksi DESC";
 $stmt = $con->prepare($query);
 $stmt->bind_param("i", $id_member);
 $stmt->execute();
@@ -57,7 +59,7 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $show_detail ? 'Detail Transaksi #'.str_pad($transaction_detail['id_transaksi'], 6, '0', STR_PAD_LEFT) : 'Riwayat Transaksi'; ?> - Arena FIT</title>
+    <title><?php echo $show_detail ? 'Detail Transaksi ' . $transaction_detail['id_transaksi'] : 'Riwayat Transaksi'; ?> - Arena FIT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -457,40 +459,39 @@ $result = $stmt->get_result();
 </head>
 <body>
     <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="indexmemberr.php">
-        <span class="brand-box">AF</span>
-        <div>
-          <span style="font-size: 1.2rem;">Arena FIT</span>
-        </div>
-      </a>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="indexmemberr.php">
+                <span class="brand-box">AF</span>
+                <div>
+                    <span style="font-size: 1.2rem;">Arena FIT</span>
+                </div>
+            </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="indexmemberr.php">Home</a></li>
-          <li class="nav-item"><a class="nav-link active" href="transaksi.php">Transaksi</a></li>
-          <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
-        </ul>
-        
-        <div class="member-info ms-3">
-          <div class="member-avatar">
-            <?php echo strtoupper(substr($nama_member, 0, 1)); ?>
-          </div>
-          <span class="welcome-text">
-            <span class="member-name"><?php echo htmlspecialchars($nama_member); ?></span>
-          </span>
-          <a href="../login/logout.php" class="btn-logout">
-            <span>🚪</span> Logout
-          </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="indexmemberr.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="transaksi.php">Transaksi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
+                </ul>
+                
+                <div class="member-info ms-3">
+                    <div class="member-avatar">
+                        <?php echo strtoupper(substr($nama_member, 0, 1)); ?>
+                    </div>
+                    <span class="welcome-text">
+                        <span style="color: #42a5f5; font-weight: 700;"><?php echo htmlspecialchars($nama_member); ?></span>
+                    </span>
+                    <a href="../login/logout.php" class="btn btn-danger ms-2">Logout</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </nav>
+    </nav>
+
     <!-- MAIN CONTENT -->
     <div class="container container-main">
         
@@ -506,6 +507,18 @@ $result = $stmt->get_result();
         </div>
         <?php endif; ?>
 
+        <!-- Error Message -->
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i>
+            <?php 
+            echo $_SESSION['error']; 
+            unset($_SESSION['error']);
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php endif; ?>
+
         <?php if ($show_detail && $transaction_detail): ?>
             <!-- DETAIL TRANSAKSI -->
             <a href="transaksi.php" class="btn-back">
@@ -514,7 +527,7 @@ $result = $stmt->get_result();
 
             <div class="detail-card">
                 <div class="card-header-custom">
-                    <h3><i class="fas fa-receipt"></i> Detail Transaksi #TRX-<?php echo str_pad($transaction_detail['id_transaksi'], 6, '0', STR_PAD_LEFT); ?></h3>
+                    <h3><i class="fas fa-receipt"></i> Detail Transaksi <?php echo htmlspecialchars($transaction_detail['id_transaksi']); ?></h3>
                     <span class="status-large <?php echo $transaction_detail['status']; ?>">
                         <?php 
                         switch($transaction_detail['status']) {
@@ -556,15 +569,15 @@ $result = $stmt->get_result();
                         
                         <div class="info-row">
                             <span class="info-label">ID Transaksi</span>
-                            <span class="info-value">#TRX-<?php echo str_pad($transaction_detail['id_transaksi'], 6, '0', STR_PAD_LEFT); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($transaction_detail['id_transaksi']); ?></span>
                         </div>
                         
                         <div class="info-row">
                             <span class="info-label">Tanggal Transaksi</span>
                             <span class="info-value">
                                 <?php 
-                                $date = new DateTime($transaction_detail['tanggal_transaksi']);
-                                echo $date->format('d F Y, H:i') . ' WIB';
+                                $tgl_transaksi = new DateTime($transaction_detail['tgl_transaksi']);
+                                echo $tgl_transaksi->format('d F Y, H:i') . ' WIB';
                                 ?>
                             </span>
                         </div>
@@ -575,25 +588,18 @@ $result = $stmt->get_result();
                         </div>
                         
                         <div class="info-row">
-                            <span class="info-label">Kategori</span>
-                            <span class="info-value text-capitalize"><?php echo htmlspecialchars($transaction_detail['kategori']); ?></span>
+                            <span class="info-label">Deskripsi</span>
+                            <span class="info-value"><?php echo htmlspecialchars($transaction_detail['deskripsi']); ?></span>
                         </div>
 
-                        <?php if (!empty($transaction_detail['durasi'])): ?>
                         <div class="info-row">
                             <span class="info-label">Durasi</span>
-                            <span class="info-value"><?php echo htmlspecialchars($transaction_detail['durasi']); ?></span>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <div class="info-row">
-                            <span class="info-label">Harga</span>
-                            <span class="info-value text-success">Rp <?php echo number_format($transaction_detail['harga'], 0, ',', '.'); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($transaction_detail['durasi_hari']); ?> Hari</span>
                         </div>
                         
                         <div class="info-row">
-                            <span class="info-label">Metode Pembayaran</span>
-                            <span class="info-value text-capitalize"><?php echo htmlspecialchars($transaction_detail['metode_pembayaran']); ?></span>
+                            <span class="info-label">Total Pembayaran</span>
+                            <span class="info-value text-success">Rp <?php echo number_format($transaction_detail['total413'], 0, ',', '.'); ?></span>
                         </div>
                         
                         <div class="info-row">
@@ -623,16 +629,6 @@ $result = $stmt->get_result();
                             <span class="info-value"><?php echo htmlspecialchars($transaction_detail['email']); ?></span>
                         </div>
                     </div>
-
-                    <!-- Catatan -->
-                    <?php if ($transaction_detail['notes']): ?>
-                    <div class="info-section">
-                        <h4 class="section-title"><i class="fas fa-sticky-note"></i> Catatan</h4>
-                        <div class="alert alert-light">
-                            <?php echo nl2br(htmlspecialchars($transaction_detail['notes'])); ?>
-                        </div>
-                    </div>
-                    <?php endif; ?>
 
                     <!-- Verifikasi Info -->
                     <?php if ($transaction_detail['verified_at']): ?>
@@ -698,7 +694,7 @@ $result = $stmt->get_result();
                         <div class="transaction-header">
                             <div class="transaction-id">
                                 <i class="fas fa-file-invoice"></i> 
-                                #TRX-<?php echo str_pad($row['id_transaksi'], 6, '0', STR_PAD_LEFT); ?>
+                                <?php echo htmlspecialchars($row['id_transaksi']); ?>
                             </div>
                             <span class="status-badge status-<?php echo $row['status']; ?>">
                                 <?php 
@@ -724,8 +720,8 @@ $result = $stmt->get_result();
                                 <span class="info-label">Tanggal</span>
                                 <span class="info-value">
                                     <?php 
-                                    $date = new DateTime($row['tanggal_transaksi']);
-                                    echo $date->format('d M Y');
+                                    $tgl = new DateTime($row['tgl_transaksi']);
+                                    echo $tgl->format('d M Y');
                                     ?>
                                 </span>
                             </div>
@@ -736,19 +732,19 @@ $result = $stmt->get_result();
                             </div>
                             
                             <div class="info-item">
-                                <span class="info-label">Kategori</span>
-                                <span class="info-value text-capitalize"><?php echo htmlspecialchars($row['kategori']); ?></span>
+                                <span class="info-label">Durasi</span>
+                                <span class="info-value"><?php echo htmlspecialchars($row['durasi_hari']); ?> Hari</span>
                             </div>
                             
                             <div class="info-item">
-                                <span class="info-label">Metode</span>
-                                <span class="info-value text-capitalize"><?php echo htmlspecialchars($row['metode_pembayaran']); ?></span>
+                                <span class="info-label">Status</span>
+                                <span class="info-value text-capitalize"><?php echo htmlspecialchars($row['status']); ?></span>
                             </div>
                         </div>
                         
                         <div class="transaction-footer">
                             <div class="price-tag">
-                                <i class="fas fa-tag"></i> Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?>
+                                <i class="fas fa-tag"></i> Rp <?php echo number_format($row['total413'], 0, ',', '.'); ?>
                             </div>
                             <a href="transaksi.php?id=<?php echo $row['id_transaksi']; ?>" class="btn-detail">
                                 <i class="fas fa-eye"></i> Lihat Detail

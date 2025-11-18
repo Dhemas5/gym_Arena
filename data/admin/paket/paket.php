@@ -21,8 +21,11 @@ include '../../../view/master/sidebar.php';
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between">
                 <h3 class="card-title">Daftar Paket</h3>
-                <button class="btn btn-light" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
             </div>
+        <div class="card-body">
+        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+          <i class="fas fa-plus"></i> Tambah Paket
+        </button>
             <div class="card-body">
                 <table class="table table-bordered table-hover" id="tabelPaket">
                     <thead class="bg-primary text-white">

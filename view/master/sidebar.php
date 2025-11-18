@@ -16,11 +16,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="sidebar">
         <!-- Enhanced user panel with status indicator -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            
             <div class="image position-relative">
-                <img src="../../../assets/assets_admin/dist/img/user2-160x160.jpg"
-                    class="img-circle elevation-2"
-                    alt="User Image"
+                <div class="img-circle elevation-2 bg-primary d-flex align-items-center justify-content-center"
                     style="width:40px; height:40px; object-fit:cover;">
+                    <i class="fas fa-user text-white"></i>
+                </div>
                 <span class="badge badge-success position-absolute" style="bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #343a40;"></span>
             </div>
             <div class="info">
@@ -30,18 +31,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <small class="text-muted">
                     <i class="fas fa-circle text-success" style="font-size: 8px;"></i> Online
                 </small>
-            </div>
-        </div>
-
-        <!-- Added search form in sidebar -->
-        <div class="form-inline">
-            <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Cari menu..." aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-sidebar">
-                        <i class="fas fa-search fa-fw"></i>
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -75,7 +64,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Member
-                            <span class="badge badge-info right">New</span>
                         </p>
                     </a>
                 </li>

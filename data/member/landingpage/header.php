@@ -1,5 +1,5 @@
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
   <div class="container">
     <a class="navbar-brand" href="#home">
       <span class="brand-box">AF</span>
@@ -27,3 +27,10 @@
     </div>
   </div>
 </nav>
+
+<!-- Back to Top Button -->
+<button id="backToTop" class="back-to-top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="m18 15-6-6-6 6"/>
+  </svg>
+</button>

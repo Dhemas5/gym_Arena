@@ -550,9 +550,10 @@ $result = $stmt->get_result();
                                 echo '<i class="fas fa-check-circle"></i> Pembayaran Disetujui';
                                 break;
                             case 'rejected':
-                            case 'expired':
                                 echo '<i class="fas fa-times-circle"></i> Pembayaran Ditolak';
                                 break;
+                            default:
+                                echo '<i class="fas fa-question-circle"></i> ' . ucfirst($transaction_detail['status']);
                         }
                         ?>
                     </span>
@@ -566,11 +567,17 @@ $result = $stmt->get_result();
                             <strong>Pembayaran Anda sedang dalam proses verifikasi.</strong>
                             <p class="mb-0 mt-2">Tim kami akan memverifikasi pembayaran Anda dalam waktu 1x24 jam. Anda akan mendapatkan notifikasi setelah pembayaran diverifikasi.</p>
                         </div>
-                    <?php elseif ($transaction_detail['status'] === 'rejected' || $transaction_detail['status'] === 'expired'): ?>
+                    <?php elseif ($transaction_detail['status'] === 'rejected'): ?>
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-triangle"></i>
                             <strong>Pembayaran Anda ditolak.</strong>
                             <p class="mb-0 mt-2">Silakan hubungi admin untuk informasi lebih lanjut atau lakukan pembayaran ulang dengan bukti yang valid.</p>
+                        </div>
+                    <?php elseif ($transaction_detail['status'] === 'approved'): ?>
+                        <div class="alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Pembayaran Anda telah disetujui!</strong>
+                            <p class="mb-0 mt-2">Membership Anda sudah aktif dan dapat digunakan.</p>
                         </div>
                     <?php endif; ?>
 
@@ -598,10 +605,12 @@ $result = $stmt->get_result();
                             <span class="info-value"><?php echo htmlspecialchars($transaction_detail['nama_paket']); ?></span>
                         </div>
 
-                        <div class="info-row">
-                            <span class="info-label">Deskripsi</span>
-                            <span class="info-value"><?php echo htmlspecialchars($transaction_detail['deskripsi']); ?></span>
-                        </div>
+                        <?php if (!empty($transaction_detail['deskripsi'])): ?>
+                            <div class="info-row">
+                                <span class="info-label">Deskripsi</span>
+                                <span class="info-value"><?php echo htmlspecialchars($transaction_detail['deskripsi']); ?></span>
+                            </div>
+                        <?php endif; ?>
 
                         <div class="info-row">
                             <span class="info-label">Durasi</span>
@@ -610,19 +619,26 @@ $result = $stmt->get_result();
 
                         <div class="info-row">
                             <span class="info-label">Total Pembayaran</span>
-                            <span class="info-value text-success">Rp <?php echo number_format($transaction_detail['total413'], 0, ',', '.'); ?></span>
+                            <span class="info-value text-success">Rp <?php echo number_format($transaction_detail['total'], 0, ',', '.'); ?></span>
                         </div>
 
                         <div class="info-row">
                             <span class="info-label">Status</span>
                             <span class="info-value">
                                 <span class="badge <?php
-                                                    echo ($transaction_detail['status'] === 'approved' || $transaction_detail['status'] === 'paid') ? 'bg-success' : (($transaction_detail['status'] === 'rejected' || $transaction_detail['status'] === 'expired') ? 'bg-danger' : 'bg-warning text-dark');
+                                                    echo ($transaction_detail['status'] === 'approved') ? 'bg-success' : (($transaction_detail['status'] === 'rejected') ? 'bg-danger' : 'bg-warning text-dark');
                                                     ?>">
                                     <?php echo strtoupper($transaction_detail['status']); ?>
                                 </span>
                             </span>
                         </div>
+
+                        <?php if (!empty($transaction_detail['catatan'])): ?>
+                            <div class="info-row">
+                                <span class="info-label">Catatan</span>
+                                <span class="info-value"><?php echo htmlspecialchars($transaction_detail['catatan']); ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Informasi Member -->
@@ -641,7 +657,7 @@ $result = $stmt->get_result();
                     </div>
 
                     <!-- Verifikasi Info -->
-                    <?php if ($transaction_detail['verified_at']): ?>
+                    <?php if (isset($transaction_detail['tgl_verifikasi']) && $transaction_detail['tgl_verifikasi']): ?>
                         <div class="info-section">
                             <h4 class="section-title"><i class="fas fa-check-double"></i> Informasi Verifikasi</h4>
 
@@ -649,7 +665,7 @@ $result = $stmt->get_result();
                                 <span class="info-label">Diverifikasi Pada</span>
                                 <span class="info-value">
                                     <?php
-                                    $verified_date = new DateTime($transaction_detail['verified_at']);
+                                    $verified_date = new DateTime($transaction_detail['tgl_verifikasi']);
                                     echo $verified_date->format('d F Y, H:i') . ' WIB';
                                     ?>
                                 </span>
@@ -662,15 +678,25 @@ $result = $stmt->get_result();
                         <div class="info-section">
                             <h4 class="section-title"><i class="fas fa-image"></i> Bukti Pembayaran</h4>
                             <div class="text-center">
-                                <a href="../../../uploads/bukti_pembayaran/<?php echo $transaction_detail['bukti_pembayaran']; ?>" target="_blank">
-                                    <img src="../../../uploads/bukti_pembayaran/<?php echo $transaction_detail['bukti_pembayaran']; ?>"
-                                        alt="Bukti Pembayaran"
-                                        class="bukti-pembayaran"
-                                        style="max-width: 500px;">
-                                </a>
-                                <p class="text-muted mt-3">
-                                    <i class="fas fa-info-circle"></i> Klik gambar untuk melihat ukuran penuh
-                                </p>
+                                <?php
+                                $bukti_path = "../../../Uploads/bukti_pembayaran/" . $transaction_detail['bukti_pembayaran'];
+                                if (file_exists($bukti_path)):
+                                ?>
+                                    <a href="<?php echo $bukti_path; ?>" target="_blank">
+                                        <img src="<?php echo $bukti_path; ?>"
+                                            alt="Bukti Pembayaran"
+                                            class="bukti-pembayaran"
+                                            style="max-width: 500px; max-height: 400px; object-fit: contain;">
+                                    </a>
+                                    <p class="text-muted mt-3">
+                                        <i class="fas fa-info-circle"></i> Klik gambar untuk melihat ukuran penuh
+                                    </p>
+                                <?php else: ?>
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        File bukti pembayaran tidak ditemukan.
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -713,13 +739,13 @@ $result = $stmt->get_result();
                                         echo '<i class="fas fa-clock"></i> Pending';
                                         break;
                                     case 'approved':
-                                    case 'paid':
                                         echo '<i class="fas fa-check-circle"></i> Approved';
                                         break;
                                     case 'rejected':
-                                    case 'expired':
                                         echo '<i class="fas fa-times-circle"></i> Rejected';
                                         break;
+                                    default:
+                                        echo '<i class="fas fa-question-circle"></i> ' . ucfirst($row['status']);
                                 }
                                 ?>
                             </span>
@@ -731,7 +757,7 @@ $result = $stmt->get_result();
                                 <span class="info-value">
                                     <?php
                                     $tgl = new DateTime($row['tgl_transaksi']);
-                                    echo $tgl->format('d M Y');
+                                    echo $tgl->format('d M Y, H:i');
                                     ?>
                                 </span>
                             </div>
@@ -754,7 +780,7 @@ $result = $stmt->get_result();
 
                         <div class="transaction-footer">
                             <div class="price-tag">
-                                <i class="fas fa-tag"></i> Rp <?php echo number_format($row['total413'], 0, ',', '.'); ?>
+                                <i class="fas fa-tag"></i> Rp <?php echo number_format($row['total'], 0, ',', '.'); ?>
                             </div>
                             <a href="transaksi.php?id=<?php echo $row['id_transaksi']; ?>" class="btn-detail">
                                 <i class="fas fa-eye"></i> Lihat Detail

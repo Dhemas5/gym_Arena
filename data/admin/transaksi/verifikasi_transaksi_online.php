@@ -77,7 +77,42 @@ if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
     exit;
 }
 
-// Ambil data transaksi pending - DIPERBAIKI: Hapus JOIN ke tbl_admin
+// Filter status
+$status_filter = $_GET['status'] ?? 'pending';
+$valid_statuses = ['pending', 'approved', 'rejected', 'all'];
+$status_filter = in_array($status_filter, $valid_statuses) ? $status_filter : 'pending';
+
+// Query untuk menghitung statistik
+$stats_sql = "SELECT 
+    status,
+    COUNT(*) as count,
+    SUM(total) as total_amount
+FROM tbl_transaksi_online 
+GROUP BY status";
+
+$stats_result = $con->query($stats_sql);
+$stats = [
+    'pending' => ['count' => 0, 'total' => 0],
+    'approved' => ['count' => 0, 'total' => 0],
+    'rejected' => ['count' => 0, 'total' => 0],
+    'all' => ['count' => 0, 'total' => 0]
+];
+
+while ($row = $stats_result->fetch_assoc()) {
+    $stats[$row['status']] = [
+        'count' => $row['count'],
+        'total' => $row['total_amount']
+    ];
+    $stats['all']['count'] += $row['count'];
+    $stats['all']['total'] += $row['total_amount'];
+}
+
+// Query data transaksi berdasarkan filter
+$where_clause = "";
+if ($status_filter !== 'all') {
+    $where_clause = "WHERE ton.status = '$status_filter'";
+}
+
 $sql = "SELECT 
             ton.*, 
             m.nama AS nama_member, 
@@ -85,14 +120,16 @@ $sql = "SELECT
             p.nama_paket, 
             p.durasi_hari,
             p.harga_umum,
-            p.harga_mahasiswa
+            p.harga_mahasiswa,
+            u.username AS admin_verifikator
         FROM tbl_transaksi_online ton
         JOIN tbl_member m ON ton.id_member = m.id_member
         JOIN tbl_paket p ON ton.id_paket = p.id_paket
-        WHERE ton.status = 'pending'
+        LEFT JOIN tbl_user u ON ton.admin_verifikasi = u.id_user
+        $where_clause
         ORDER BY ton.tgl_transaksi DESC";
 
-$pending = $con->query($sql);
+$transaksi = $con->query($sql);
 ?>
 
 <?php include '../../../view/master/header.php'; ?>
@@ -137,117 +174,244 @@ $pending = $con->query($sql);
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
 
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title"><i class="fas fa-list"></i> Daftar Pembayaran Menunggu Verifikasi</h3>
-                <div class="card-tools">
-                    <span class="badge badge-light badge-lg"><?= $pending->num_rows ?> pending</span>
+        <!-- Statistik Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="info-box bg-gradient-info">
+                    <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Menunggu</span>
+                        <span class="info-box-number"><?= $stats['pending']['count'] ?></span>
+                        <span class="progress-description">
+                            Rp <?= number_format($stats['pending']['total'], 0, ',', '.') ?>
+                        </span>
+                    </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="info-box bg-gradient-success">
+                    <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Disetujui</span>
+                        <span class="info-box-number"><?= $stats['approved']['count'] ?></span>
+                        <span class="progress-description">
+                            Rp <?= number_format($stats['approved']['total'], 0, ',', '.') ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-box bg-gradient-danger">
+                    <span class="info-box-icon"><i class="fas fa-times-circle"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Ditolak</span>
+                        <span class="info-box-number"><?= $stats['rejected']['count'] ?></span>
+                        <span class="progress-description">
+                            Rp <?= number_format($stats['rejected']['total'], 0, ',', '.') ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-box bg-gradient-secondary">
+                    <span class="info-box-icon"><i class="fas fa-list"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total</span>
+                        <span class="info-box-number"><?= $stats['all']['count'] ?></span>
+                        <span class="progress-description">
+                            Rp <?= number_format($stats['all']['total'], 0, ',', '.') ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <div class="card-body table-responsive p-0">
-                <?php if ($pending->num_rows == 0): ?>
+        <!-- Filter Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-filter"></i> Filter Status</h3>
+                <div class="card-tools">
+                    <span class="badge badge-light">Total: <?= $transaksi->num_rows ?> transaksi</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="btn-group">
+                            <a href="?status=pending" class="btn btn-<?= $status_filter == 'pending' ? 'primary' : 'outline-primary' ?>">
+                                <i class="fas fa-clock"></i> Menunggu (<?= $stats['pending']['count'] ?>)
+                            </a>
+                            <a href="?status=approved" class="btn btn-<?= $status_filter == 'approved' ? 'success' : 'outline-success' ?>">
+                                <i class="fas fa-check-circle"></i> Disetujui (<?= $stats['approved']['count'] ?>)
+                            </a>
+                            <a href="?status=rejected" class="btn btn-<?= $status_filter == 'rejected' ? 'danger' : 'outline-danger' ?>">
+                                <i class="fas fa-times-circle"></i> Ditolak (<?= $stats['rejected']['count'] ?>)
+                            </a>
+                            <a href="?status=all" class="btn btn-<?= $status_filter == 'all' ? 'secondary' : 'outline-secondary' ?>">
+                                <i class="fas fa-list"></i> Semua (<?= $stats['all']['count'] ?>)
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <div class="small text-muted">
+                            Ditampilkan: <strong><?= $status_filter == 'all' ? 'Semua Status' : ucfirst($status_filter) ?></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Table Card -->
+
+        <div class="card">
+            <div class="card-header bg-<?=
+                                        $status_filter == 'pending' ? 'primary' : ($status_filter == 'approved' ? 'success' : ($status_filter == 'rejected' ? 'danger' : 'secondary')) ?> text-white">
+                <h3 class="card-title">
+                    <i class="fas fa-list"></i>
+                    Daftar Transaksi -
+                    <?= $status_filter == 'all' ? 'Semua Status' : ucfirst($status_filter) ?>
+                </h3>
+                <div class="card-tools">
+                    <span class="badge badge-light badge-lg"><?= $transaksi->num_rows ?> transaksi</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <?php if ($transaksi->num_rows == 0): ?>
                     <div class="text-center py-5">
-                        <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
-                        <h4 class="text-success">Tidak ada pembayaran yang menunggu verifikasi</h4>
-                        <p class="text-muted">Semua transaksi online sudah diproses</p>
+                        <i class="fas fa-receipt fa-5x text-muted mb-3"></i>
+                        <h4 class="text-muted">Tidak ada transaksi</h4>
+                        <p class="text-muted">Tidak ditemukan transaksi dengan status "<?= $status_filter ?>"</p>
                     </div>
                 <?php else: ?>
-                    <table class="table table-hover text-nowrap align-middle" id="tabelPelatih">
-                        <thead class="table-dark">
-                            <tr>
-                                <th width="12%">ID Transaksi</th>
-                                <th width="15%">Member</th>
-                                <th width="18%">Paket</th>
-                                <th width="10%">Total Bayar</th>
-                                <th width="12%">Tanggal</th>
-                                <th width="15%">Bukti Pembayaran</th>
-                                <th width="18%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $pending->fetch_assoc()): ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="tabelPelatih" style="font-size: 0.9rem;">
+                            <thead class="table-dark">
                                 <tr>
-                                    <td>
-                                        <span class="badge bg-warning text-dark">#<?= htmlspecialchars($row['id_transaksi']) ?></span>
-                                        <br>
-                                        <small class="text-muted"><?= date('d/m/Y', strtotime($row['tgl_transaksi'])) ?></small>
-                                    </td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($row['nama_member']) ?></strong>
-                                        <br>
-                                        <small class="text-muted"><?= htmlspecialchars($row['email']) ?></small>
-                                    </td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($row['nama_paket']) ?></strong>
-                                        <br>
-                                        <small class="text-muted"><?= $row['durasi_hari'] ?> hari</small>
-                                        <br>
-                                        <small>
-                                            <span class="badge bg-info">Umum: Rp <?= number_format($row['harga_umum'], 0, ',', '.') ?></span>
-                                            <?php if ($row['harga_mahasiswa'] > 0): ?>
-                                                <br>
-                                                <span class="badge bg-success">Mahasiswa: Rp <?= number_format($row['harga_mahasiswa'], 0, ',', '.') ?></span>
-                                            <?php endif; ?>
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-success">Rp <?= number_format($row['total'], 0, ',', '.') ?></strong>
-                                        <?php if (!empty($row['catatan'])): ?>
-                                            <br>
-                                            <small class="text-muted" title="<?= htmlspecialchars($row['catatan']) ?>">
-                                                <i class="fas fa-sticky-note"></i> ada catatan
-                                            </small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?= date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) ?>
-                                        <br>
-                                        <small class="text-muted">
-                                            <?php
-                                            $time_diff = time() - strtotime($row['tgl_transaksi']);
-                                            $hours_ago = floor($time_diff / (60 * 60));
-                                            echo $hours_ago . ' jam lalu';
-                                            ?>
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $bukti_path = "../../../Uploads/bukti_pembayaran/" . $row['bukti_pembayaran'];
-                                        $file_exists = file_exists($bukti_path);
-                                        ?>
-                                        <button class="btn btn-sm btn-info btn-preview-bukti"
-                                            data-bukti="<?= $row['bukti_pembayaran'] ?>"
-                                            data-id="<?= $row['id_transaksi'] ?>"
-                                            <?= !$file_exists ? 'disabled' : '' ?>>
-                                            <i class="fas fa-image"></i>
-                                            <?= $file_exists ? 'Lihat Bukti' : 'File Tidak Ada' ?>
-                                        </button>
-                                        <?php if (!$file_exists): ?>
-                                            <br>
-                                            <small class="text-danger">File tidak ditemukan</small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group-vertical btn-group-sm">
-                                            <button class="btn btn-success btn-approve"
-                                                data-id="<?= $row['id_transaksi'] ?>"
-                                                data-member="<?= htmlspecialchars($row['nama_member']) ?>"
-                                                data-paket="<?= htmlspecialchars($row['nama_paket']) ?>"
-                                                data-total="Rp <?= number_format($row['total'], 0, ',', '.') ?>">
-                                                <i class="fas fa-check"></i> Approve
-                                            </button>
-                                            <button class="btn btn-danger btn-reject"
-                                                data-id="<?= $row['id_transaksi'] ?>"
-                                                data-member="<?= htmlspecialchars($row['nama_member']) ?>">
-                                                <i class="fas fa-times"></i> Reject
-                                            </button>
-                                        </div>
-                                    </td>
+                                    <th width="11%">ID TRANSAKSI</th>
+                                    <th width="15%">MEMBER</th>
+                                    <th width="14%">PAKET</th>
+                                    <th width="9%">TOTAL</th>
+                                    <th width="13%">TANGGAL</th>
+                                    <th width="8%">STATUS</th>
+                                    <th width="10%">VERIFIKATOR</th>
+                                    <th width="9%">BUKTI</th>
+                                    <th width="11%" class="text-center">AKSI</th>
                                 </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $transaksi->fetch_assoc()): ?>
+                                    <tr>
+                                        <!-- ID TRANSAKSI -->
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="badge bg-<?= $row['status'] == 'pending' ? 'warning' : ($row['status'] == 'approved' ? 'success' : 'danger') ?> text-dark fw-bold">
+                                                    <?= htmlspecialchars($row['id_transaksi']) ?>
+                                                </span>
+                                                <small class="text-muted mt-1">
+                                                    <?= date('d/m/Y', strtotime($row['tgl_transaksi'])) ?>
+                                                </small>
+                                            </div>
+                                        </td>
+
+                                        <!-- MEMBER -->
+                                        <td style="white-space: normal; word-break: break-word;">
+                                            <div>
+                                                <strong class="text-primary d-block"><?= htmlspecialchars($row['nama_member']) ?></strong>
+                                                <small class="text-muted d-block" style="font-size: 0.8rem;">
+                                                    <?= htmlspecialchars($row['email']) ?>
+                                                </small>
+                                            </div>
+                                        </td>
+
+                                        <!-- PAKET -->
+                                        <td>
+                                            <div>
+                                                <strong><?= htmlspecialchars($row['nama_paket']) ?></strong>
+                                                <small class="text-muted d-block">
+                                                    <?= $row['durasi_hari'] ?> hari
+                                                </small>
+                                            </div>
+                                        </td>
+
+                                        <!-- TOTAL -->
+                                        <td>
+                                            <strong class="text-success">Rp <?= number_format($row['total'], 0, ',', '.') ?></strong>
+                                        </td>
+
+                                        <!-- TANGGAL -->
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span><?= date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) ?></span>
+                                                <?php if ($row['tgl_verifikasi']): ?>
+                                                    <small class="text-info">
+                                                        Verif: <?= date('d/m/Y H:i', strtotime($row['tgl_verifikasi'])) ?>
+                                                    </small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+
+                                        <!-- STATUS -->
+                                        <td>
+                                            <span class="badge badge-<?= $row['status'] == 'pending' ? 'warning' : ($row['status'] == 'approved' ? 'success' : 'danger') ?>">
+                                                <?= strtoupper($row['status']) ?>
+                                            </span>
+                                        </td>
+
+                                        <!-- VERIFIKATOR -->
+                                        <td>
+                                            <?php if ($row['admin_verifikator']): ?>
+                                                <span class="text-success fw-bold"><?= htmlspecialchars($row['admin_verifikator']) ?></span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+
+                                        <!-- BUKTI -->
+                                        <td>
+                                            <?php
+                                            $bukti_path = "../../../Uploads/bukti_pembayaran/" . $row['bukti_pembayaran'];
+                                            $file_exists = file_exists($bukti_path);
+                                            ?>
+                                            <button class="btn btn-xs btn-info btn-preview-bukti"
+                                                data-bukti="<?= $row['bukti_pembayaran'] ?>"
+                                                data-id="<?= $row['id_transaksi'] ?>"
+                                                <?= !$file_exists ? 'disabled' : '' ?>
+                                                title="Lihat Bukti Pembayaran">
+                                                <i class="fas fa-image"></i>
+                                                <?= $file_exists ? 'Lihat' : 'No File' ?>
+                                            </button>
+                                        </td>
+
+                                        <!-- AKSI -->
+                                        <td class="text-center">
+                                            <?php if ($row['status'] == 'pending'): ?>
+                                                <div class="btn-group-vertical btn-group-xs">
+                                                    <button class="btn btn-success btn-approve"
+                                                        data-id="<?= $row['id_transaksi'] ?>"
+                                                        data-member="<?= htmlspecialchars($row['nama_member']) ?>"
+                                                        data-paket="<?= htmlspecialchars($row['nama_paket']) ?>"
+                                                        data-total="Rp <?= number_format($row['total'], 0, ',', '.') ?>"
+                                                        title="Setujui Transaksi">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-reject"
+                                                        data-id="<?= $row['id_transaksi'] ?>"
+                                                        data-member="<?= htmlspecialchars($row['nama_member']) ?>"
+                                                        title="Tolak Transaksi">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            <?php else: ?>
+                                                <span class="badge badge-<?= $row['status'] == 'approved' ? 'success' : 'danger' ?>">
+                                                    <?= $row['status'] == 'approved' ? 'Check' : 'Cross' ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -281,10 +445,12 @@ $pending = $con->query($sql);
 <?php include '../../../view/master/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <script>
     $(document).ready(function() {
         // Preview Bukti Pembayaran
-        $('.btn-preview-bukti').click(function() {
+        $(document).on('click', '.btn-preview-bukti', function() {
             const buktiFile = $(this).data('bukti');
             const trxId = $(this).data('id');
             const buktiPath = '../../../Uploads/bukti_pembayaran/' + buktiFile;
@@ -296,7 +462,7 @@ $pending = $con->query($sql);
         });
 
         // Approve Transaksi
-        $('.btn-approve').click(function() {
+        $(document).on('click', '.btn-approve', function() {
             const id = $(this).data('id');
             const member = $(this).data('member');
             const paket = $(this).data('paket');
@@ -329,7 +495,7 @@ $pending = $con->query($sql);
         });
 
         // Reject Transaksi
-        $('.btn-reject').click(function() {
+        $(document).on('click', '.btn-reject', function() {
             const id = $(this).data('id');
             const member = $(this).data('member');
 
@@ -338,7 +504,7 @@ $pending = $con->query($sql);
                 html: `<div class="text-left">
                     <p>Anda akan menolak pembayaran dari:</p>
                     <p><strong>${member}</strong></p>
-                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Transaksi akan ditandai sebagai ditolak dan member akan mendapatkan notifikasi.</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Transaksi akan ditandai sebagai ditolak.</p>
                    </div>`,
                 icon: 'warning',
                 showCancelButton: true,
@@ -379,9 +545,7 @@ $pending = $con->query($sql);
                             text: response.msg,
                             icon: 'success',
                             confirmButtonColor: '#28a745',
-                            confirmButtonText: 'OK',
-                            timer: 2000,
-                            timerProgressBar: true
+                            confirmButtonText: 'OK'
                         }).then(() => {
                             location.reload();
                         });
@@ -410,51 +574,10 @@ $pending = $con->query($sql);
         }
 
         // Auto refresh every 30 seconds if there are pending transactions
-        <?php if ($pending->num_rows > 0): ?>
+        <?php if ($status_filter == 'pending' && $transaksi->num_rows > 0): ?>
             setInterval(() => {
-                $.get(window.location.href, function(data) {
-                    // Simple check if page has changed
-                    const newCount = $(data).find('.badge-lg').text();
-                    const currentCount = $('.badge-lg').text();
-                    if (newCount !== currentCount) {
-                        location.reload();
-                    }
-                });
+                location.reload();
             }, 30000);
         <?php endif; ?>
     });
 </script>
-
-<style>
-    .btn-group-vertical .btn {
-        margin-bottom: 2px;
-        border-radius: 4px;
-    }
-
-    .btn-group-vertical .btn:last-child {
-        margin-bottom: 0;
-    }
-
-    .table tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .badge-lg {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .swal2-popup {
-        font-size: 0.9rem;
-    }
-
-    .swal2-title {
-        font-size: 1.2rem;
-    }
-
-    .lightbox-img {
-        max-width: 100%;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-</style>

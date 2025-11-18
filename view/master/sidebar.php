@@ -75,7 +75,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Member
-                            <span class="badge badge-info right">New</span>
                         </p>
                     </a>
                 </li>
@@ -126,12 +125,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Transaksi</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="../../../data/admin/transaksi/data_transaksi.php" class="nav-link <?php if ($current_page == 'data_transaksi.php') {
+                                                                                                    echo 'active';
+                                                                                                } ?>">
+                        <i class="nav-icon fas fa-cash-register"></i>
+                        <p>Data Transaksi</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="../../../data/admin/transaksi/verifikasi_transaksi_online.php" class="nav-link <?php if ($current_page == 'verifikasi_transaksi_online.php') {
+                                                                                                                echo 'active';
+                                                                                                            } ?>">
+                        <i class="nav-icon fas fa-cash-register"></i>
+                        <p>Verifikasi</p>
+                    </a>
+                </li>
                 <!-- Testimonial Member -->
                 <li class="nav-header">TESTIMONIAL</li>
                 <li class="nav-item">
-                    <a href="../../../data/admin/testimonial/testimoni.php" class="nav-link <?php if ($current_page == 'tambah_transaksi.php') {
-                                                                                                        echo 'active';
-                                                                                                    } ?>">
+                    <a href="../../../data/admin/testimonial/testimoni.php" class="nav-link <?php if ($current_page == 'testimonal.php') {
+                                                                                                echo 'active';
+                                                                                            } ?>">
                         <i class="nav-icon fas fa-quote-right"></i>
                         <p>Testimonial</p>
                     </a>

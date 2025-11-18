@@ -90,9 +90,10 @@
                 paging: true,
                 lengthChange: true,
                 lengthMenu: [
-                    [6, 25, 50, -1],
-                    [6, 25, 50, "Semua"]
+                    [5, 25, 50, -1],
+                    [5, 25, 50, "Semua"]
                 ],
+                pageLength: 5, // Default menampilkan 5 data per halaman
                 searching: true,
                 ordering: true,
                 info: true,
@@ -120,7 +121,6 @@
         }
     });
 </script>
-
 
 <!-- Enhanced control sidebar with better dark mode toggle -->
 <script>

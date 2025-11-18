@@ -10,7 +10,7 @@ require "../../../setting/koneksi.php";
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Data Member</h1>
+                <h1>Menu Member</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -26,11 +26,11 @@ require "../../../setting/koneksi.php";
     <div class="container-fluid">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h3 class="card-title">Daftar Member</h3>
+                <h3 class="card-title">Data Member</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="tabelMember" class="table table-bordered table-striped">
+                    <table id="tabelPelatih" class="table table-bordered table-striped">
                         <thead class="bg-primary text-white">
                             <tr>
                                 <th>No</th>

@@ -35,7 +35,7 @@
         [
           'image' => 'assets/images/gallery/gambar6.jpg',
           'title' => 'Modern Gym Facility'
-        ]
+        ],
       ];
 
       foreach ($gallery_items as $item) {

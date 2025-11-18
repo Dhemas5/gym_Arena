@@ -5,16 +5,62 @@ include '../../../view/master/header.php';
 include '../../../view/master/sidebar.php';
 require "../../../setting/koneksi.php";
 
+// Set timezone
+date_default_timezone_set('Asia/Jakarta');
+
 // ========== PROSES TAMBAH ==========
 if (isset($_POST['simpan'])) {
-  $kategori   = $_POST['id_kategori'];
-  $instruktur = $_POST['id_instruktur'];
-  $tanggal    = $_POST['tanggal'];
-  $mulai      = $_POST['jam_mulai'];
-  $selesai    = $_POST['jam_selesai'];
+  $kategori   = mysqli_real_escape_string($con, $_POST['id_kategori']);
+  $instruktur = mysqli_real_escape_string($con, $_POST['id_instruktur']);
+  $tanggal    = mysqli_real_escape_string($con, $_POST['tanggal']);
+  $mulai      = mysqli_real_escape_string($con, $_POST['jam_mulai']);
+  $selesai    = mysqli_real_escape_string($con, $_POST['jam_selesai']);
+  
+  // Format datetime untuk kolom datetime
+  $mulai_datetime = $tanggal . ' ' . $mulai . ':00';
+  $selesai_datetime = $tanggal . ' ' . $selesai . ':00';
+  
+  // Validasi tanggal tidak boleh kurang dari hari ini
+  $today = date('Y-m-d');
+  if ($tanggal < $today) {
+    echo "<script>
+            alert('Tanggal tidak boleh kurang dari hari ini!');
+            window.location='jadwal_kelas.php';
+        </script>";
+    exit;
+  }
+  
+  // Validasi jam selesai harus lebih besar dari jam mulai
+  if ($selesai <= $mulai) {
+    echo "<script>
+            alert('Jam selesai harus lebih besar dari jam mulai!');
+            window.location='jadwal_kelas.php';
+        </script>";
+    exit;
+  }
+
+  // Cek konflik jadwal
+  $cek_konflik = mysqli_query($con, 
+    "SELECT * FROM tbl_jadwal_kelas 
+     WHERE id_instruktur = '$instruktur' 
+     AND tanggal = '$tanggal' 
+     AND (
+          (jam_mulai <= '$mulai_datetime' AND jam_selesai > '$mulai_datetime') OR
+          (jam_mulai < '$selesai_datetime' AND jam_selesai >= '$selesai_datetime') OR
+          ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
+     )"
+  );
+  
+  if (mysqli_num_rows($cek_konflik) > 0) {
+    echo "<script>
+            alert('Instruktur sudah memiliki jadwal pada waktu tersebut!');
+            window.location='jadwal_kelas.php';
+        </script>";
+    exit;
+  }
 
   $insert = mysqli_query($con, "INSERT INTO tbl_jadwal_kelas (id_kategori,id_instruktur,tanggal,jam_mulai,jam_selesai) 
-        VALUES('$kategori','$instruktur','$tanggal','$mulai','$selesai')");
+        VALUES('$kategori','$instruktur','$tanggal','$mulai_datetime','$selesai_datetime')");
 
   if ($insert) {
     echo "<script>
@@ -28,15 +74,50 @@ if (isset($_POST['simpan'])) {
 
 // ========== PROSES UPDATE ==========
 if (isset($_POST['update'])) {
-  $id         = $_POST['id_jadwal'];
-  $kategori   = $_POST['id_kategori'];
-  $instruktur = $_POST['id_instruktur'];
-  $tanggal    = $_POST['tanggal'];
-  $mulai      = $_POST['jam_mulai'];
-  $selesai    = $_POST['jam_selesai'];
+  $id         = mysqli_real_escape_string($con, $_POST['id_jadwal']);
+  $kategori   = mysqli_real_escape_string($con, $_POST['id_kategori']);
+  $instruktur = mysqli_real_escape_string($con, $_POST['id_instruktur']);
+  $tanggal    = mysqli_real_escape_string($con, $_POST['tanggal']);
+  $mulai      = mysqli_real_escape_string($con, $_POST['jam_mulai']);
+  $selesai    = mysqli_real_escape_string($con, $_POST['jam_selesai']);
+  
+  // Format datetime untuk kolom datetime
+  $mulai_datetime = $tanggal . ' ' . $mulai . ':00';
+  $selesai_datetime = $tanggal . ' ' . $selesai . ':00';
+  
+  // Validasi jam selesai harus lebih besar dari jam mulai
+  if ($selesai <= $mulai) {
+    echo "<script>
+            alert('Jam selesai harus lebih besar dari jam mulai!');
+            window.location='jadwal_kelas.php';
+        </script>";
+    exit;
+  }
+
+  // Cek konflik jadwal (kecuali jadwal yang sedang diupdate)
+  $cek_konflik = mysqli_query($con, 
+    "SELECT * FROM tbl_jadwal_kelas 
+     WHERE id_instruktur = '$instruktur' 
+     AND tanggal = '$tanggal' 
+     AND id_jadwal != '$id'
+     AND (
+          (jam_mulai <= '$mulai_datetime' AND jam_selesai > '$mulai_datetime') OR
+          (jam_mulai < '$selesai_datetime' AND jam_selesai >= '$selesai_datetime') OR
+          ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
+     )"
+  );
+  
+  if (mysqli_num_rows($cek_konflik) > 0) {
+    echo "<script>
+            alert('Instruktur sudah memiliki jadwal pada waktu tersebut!');
+            window.location='jadwal_kelas.php';
+        </script>";
+    exit;
+  }
 
   $update = mysqli_query($con, "UPDATE tbl_jadwal_kelas 
-        SET id_kategori='$kategori', id_instruktur='$instruktur', tanggal='$tanggal', jam_mulai='$mulai', jam_selesai='$selesai' 
+        SET id_kategori='$kategori', id_instruktur='$instruktur', tanggal='$tanggal', 
+            jam_mulai='$mulai_datetime', jam_selesai='$selesai_datetime' 
         WHERE id_jadwal='$id'");
 
   if ($update) {
@@ -51,7 +132,7 @@ if (isset($_POST['update'])) {
 
 // ========== PROSES HAPUS ==========
 if (isset($_GET['hapus'])) {
-  $id = $_GET['hapus'];
+  $id = mysqli_real_escape_string($con, $_GET['hapus']);
   $delete = mysqli_query($con, "DELETE FROM tbl_jadwal_kelas WHERE id_jadwal='$id'");
   if ($delete) {
     echo "<script>
@@ -121,13 +202,24 @@ $jumlah = mysqli_num_rows($query);
                 </tr>
                 <?php } else {
                 $no = 1;
-                while ($row = mysqli_fetch_assoc($query)) { ?>
+                while ($row = mysqli_fetch_assoc($query)) { 
+                  // Format tanggal untuk display
+                  $tanggal_display = date('d-m-Y', strtotime($row['tanggal']));
+                  
+                  // Format jam dari datetime
+                  $jam_mulai_display = date('H:i', strtotime($row['jam_mulai']));
+                  $jam_selesai_display = date('H:i', strtotime($row['jam_selesai']));
+                  
+                  // Untuk form edit, ambil hanya waktu saja dari datetime
+                  $jam_mulai_edit = date('H:i', strtotime($row['jam_mulai']));
+                  $jam_selesai_edit = date('H:i', strtotime($row['jam_selesai']));
+                  ?>
                   <tr>
                     <td><?= $no++; ?></td>
                     <td><?= htmlspecialchars($row['nama_kategori']); ?></td>
                     <td><?= htmlspecialchars($row['nama_instruktur']); ?></td>
-                    <td><?= htmlspecialchars($row['tanggal']); ?></td>
-                    <td><?= htmlspecialchars($row['jam_mulai'] . ' - ' . $row['jam_selesai']); ?></td>
+                    <td><?= $tanggal_display; ?></td>
+                    <td><?= $jam_mulai_display . ' - ' . $jam_selesai_display; ?></td>
                     <td class="text-center align-middle">
                       <div class="btn-group" role="group" style="gap:8px;">
                         <button class="btn btn-warning btn-sm px-3 py-2 btnEdit"
@@ -137,8 +229,8 @@ $jumlah = mysqli_num_rows($query);
                           data-kategori="<?= $row['id_kategori']; ?>"
                           data-instruktur="<?= $row['id_instruktur']; ?>"
                           data-tanggal="<?= $row['tanggal']; ?>"
-                          data-mulai="<?= $row['jam_mulai']; ?>"
-                          data-selesai="<?= $row['jam_selesai']; ?>">
+                          data-mulai="<?= $jam_mulai_edit; ?>"
+                          data-selesai="<?= $jam_selesai_edit; ?>">
                           <i class="fas fa-edit"></i>
                         </button>
                         <a href="jadwal_kelas.php?hapus=<?= $row['id_jadwal']; ?>"
@@ -197,7 +289,7 @@ $jumlah = mysqli_num_rows($query);
           </div>
           <div class="form-group">
             <label>Tanggal</label>
-            <input type="date" name="tanggal" class="form-control" required>
+            <input type="date" name="tanggal" class="form-control" min="<?= date('Y-m-d'); ?>" required>
           </div>
           <div class="form-group">
             <label>Jam Mulai</label>

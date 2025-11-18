@@ -42,7 +42,7 @@ if (isset($_GET['id'])) {
     }
     $stmt_detail->close();
 }
-
+  
 // Query untuk mengambil semua transaksi member dari tbl_transaksi_online
 $query = "SELECT t.*, p.nama_paket, p.durasi_hari
           FROM tbl_transaksi_online t

@@ -4,17 +4,21 @@ require "../../../setting/session.php";
 checkSession("admin");
 require "../../../setting/koneksi.php";
 
-date_default_timezone_set('Asia/Jakarta');
+// Ambil semua paket + harga_umum dan harga_mahasiswa
+$pakets = $con->query("
+    SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari 
+    FROM tbl_paket 
+    ORDER BY nama_paket
+")->fetch_all(MYSQLI_ASSOC);
 
-$queryPaket = $con->query("SELECT id_paket, nama_paket, harga, durasi_hari FROM tbl_paket WHERE tipe_penjualan IN ('offline','keduanya')");
-$queryMember = $con->query("SELECT id_member, nama, email FROM vw_member_status WHERE (is_active = 0 OR is_active IS NULL) ORDER BY nama ASC");
-
-$pakets = $queryPaket ? $queryPaket->fetch_all(MYSQLI_ASSOC) : [];
-$members = $queryMember ? $queryMember->fetch_all(MYSQLI_ASSOC) : [];
-
-$nama_kasir = htmlspecialchars($_SESSION['username'] ?? 'Kasir');
-$id_kasir = $_SESSION['id_user'] ?? 1;
-$tanggal_saat_ini = date('d/m/Y');
+// Ambil member aktif yang membershipnya belum aktif atau sudah expired
+$members = $con->query("
+    SELECT m.id_member, m.nama, m.is_mahasiswa
+    FROM tbl_member m
+    WHERE m.status_akun = 'aktif'
+      AND (m.membership_status != 'aktif' OR m.membership_status IS NULL)
+    ORDER BY m.nama
+")->fetch_all(MYSQLI_ASSOC);
 
 include '../../../view/master/header.php';
 include '../../../view/master/sidebar.php';
@@ -22,271 +26,205 @@ include '../../../view/master/sidebar.php';
 
 <section class="content-header">
     <div class="container-fluid">
-        <h1>Transaksi Penjualan Paket</h1>
-        <p class="text-muted">QRIS DANA: <strong>085719630447</strong> | Tunai: Hitung Kembalian</p>
+        <h1><i class="fas fa-cash-register"></i> Transaksi Baru (Offline)</h1>
+        <p class="text-muted">Pilih member → Pilih paket → Harga otomatis sesuai status mahasiswa</p>
     </div>
 </section>
 
 <section class="content">
     <div class="container-fluid">
-        <form id="formTransaksi">
-            <input type="hidden" name="id_user_kasir" value="<?= $id_kasir ?>">
-            <input type="hidden" name="id_member" id="id_member_hidden" value="">
-            <input type="hidden" name="qty" value="1">
-            <input type="hidden" name="harga_paket" id="harga_paket_hidden" value="0">
-            <input type="hidden" id="grand_total_hidden" value="0">
+        <div class="row">
+            <div class="col-lg-8">
+                <form id="formTransaksi">
+                    <input type="hidden" name="id_user_kasir" value="<?= $_SESSION['id_user'] ?? 1 ?>">
 
-            <div class="row">
-                <div class="col-lg-8">
-                    <!-- STEP 1 -->
-                    <div class="card card-outline card-primary" id="step1">
-                        <div class="card-header">
-                            <h3 class="card-title">Pilih Member (Opsional)</h3>
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h3><i class="fas fa-user"></i> Pilih Member (Opsional)</h3>
                         </div>
                         <div class="card-body">
-                            <select id="pilih_member" class="form-control">
-                                <option value="">-- Pelanggan Umum --</option>
-                                <?php foreach ($members as $mem): ?>
-                                    <option value="<?= $mem['id_member'] ?>"><?= htmlspecialchars($mem['nama']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="card-footer text-right">
-                            <button type="button" class="btn btn-primary" id="btnLanjutStep1">Lanjut</button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2 -->
-                    <div class="card card-outline card-primary d-none" id="step2">
-                        <div class="card-header">
-                            <h3 class="card-title">Pilih Paket</h3>
-                        </div>
-                        <div class="card-body">
-                            <select id="id_paket" class="form-control" name="id_paket">
-                                <option value="">-- Pilih Paket --</option>
-                                <?php foreach ($pakets as $pkt): ?>
-                                    <option value="<?= $pkt['id_paket'] ?>" data-harga="<?= $pkt['harga'] ?>">
-                                        <?= $pkt['nama_paket'] ?> (Rp <?= number_format($pkt['harga'], 0, ',', '.') ?>)
+                            <select id="id_member" class="form-control select2">
+                                <option value="">-- Pelanggan Umum (Non-Member) --</option>
+                                <?php foreach ($members as $m): ?>
+                                    <option value="<?= $m['id_member'] ?>"
+                                        data-mahasiswa="<?= $m['is_mahasiswa'] ?>">
+                                        <?= htmlspecialchars($m['nama']) ?>
+                                        <?= $m['is_mahasiswa'] ? ' (Mahasiswa)' : ' (Umum)' ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
-                        <div class="card-footer text-right">
-                            <button type="button" class="btn btn-secondary" id="btnKembaliStep2">Kembali</button>
-                            <button type="button" class="btn btn-primary" id="btnLanjutStep2">Lanjut</button>
+                            <small class="text-muted">Jika member dipilih → harga & membership otomatis sesuai status</small>
                         </div>
                     </div>
 
-                    <!-- STEP 3 -->
-                    <div class="card card-outline card-primary d-none" id="step3">
-                        <div class="card-header">
-                            <h3 class="card-title">Pembayaran</h3>
+                    <div class="card mt-3">
+                        <div class="card-header bg-success text-white">
+                            <h3><i class="fas fa-dumbbell"></i> Pilih Paket Membership</h3>
+                        </div>
+                        <div class="card-body">
+                            <select name="id_paket" id="id_paket" class="form-control select2" required>
+                                <option value="">-- Pilih Paket --</option>
+                                <?php foreach ($pakets as $p): ?>
+                                    <option value="<?= $p['id_paket'] ?>"
+                                        data-harga-umum="<?= $p['harga_umum'] ?>"
+                                        data-harga-mahasiswa="<?= $p['harga_mahasiswa'] ?>"
+                                        data-durasi="<?= $p['durasi_hari'] ?>">
+                                        <?= htmlspecialchars($p['nama_paket']) ?>
+                                        → Umum: Rp <?= number_format($p['harga_umum'], 0, ',', '.') ?>
+                                        | Mahasiswa: Rp <?= number_format($p['harga_mahasiswa'], 0, ',', '.') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="mt-2">
+                                <strong>Harga yang akan dibayar: <span id="harga_terpilih" class="text-success">Rp 0</span></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h3><i class="fas fa-coins"></i> Pembayaran</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Metode</label>
-                                        <select id="metode_pembayaran" class="form-control" name="metode_pembayaran">
-                                            <option value="TUNAI">Tunai</option>
-                                            <option value="QRIS">QRIS (DANA 085719630447)</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group" id="tunai_group">
-                                        <label>Jumlah Dibayar (Tunai)</label>
-                                        <input type="number" class="form-control" id="jumlah_dibayar_tunai">
-                                        <small class="text-success" id="kembalian_info" style="display:none;">Kembalian: <strong id="kembalian">Rp 0</strong></small>
-                                    </div>
-
-                                    <div id="qris_info" class="alert alert-warning d-none">
-                                        <h5>QRIS DANA</h5>
-                                        <p><strong>Nomor: 085719630447</strong></p>
-                                        <p><em>Scan QR di meja kasir → Transfer → Masukkan nominal → Klik "Sukses"</em></p>
-                                    </div>
-                                    <div id="qris_input" class="d-none">
-                                        <div class="form-group">
-                                            <label>Nominal Transfer (Rp)</label>
-                                            <input type="number" class="form-control" id="nominal_qris">
-                                        </div>
-                                        <button type="button" class="btn btn-success btn-block" id="btnSuksesQRIS">
-                                            <i class="fas fa-check"></i> Sukses (Bayar Diterima)
-                                        </button>
-                                    </div>
+                                    <label>Diskon (Rp)</label>
+                                    <input type="number" id="diskon" class="form-control" value="0" min="0">
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group"><label>Diskon Item</label><input type="number" class="form-control" id="diskon_item" value="0"></div>
-                                    <div class="form-group"><label>Diskon Global</label><input type="number" class="form-control" id="diskon_global" value="0"></div>
-                                    <div class="form-group"><label>Keterangan</label><textarea class="form-control" id="keterangan" rows="2"></textarea></div>
+                                    <label>Metode Pembayaran</label>
+                                    <select id="metode" class="form-control">
+                                        <option value="TUNAI">Tunai</option>
+                                        <option value="QRIS">QRIS DANA (085719630447)</option>
+                                    </select>
                                 </div>
                             </div>
                             <hr>
-                            <div class="text-right">
-                                <h4>Grand Total: <strong id="preview_grand_total">Rp 0</strong></h4>
+                            <div class="form-group">
+                                <label>Jumlah Dibayar</label>
+                                <input type="number" id="dibayar" class="form-control" placeholder="Masukkan nominal" required>
+                                <small id="info_kembalian" class="text-success font-weight-bold"></small>
+                            </div>
+
+                            <div class="alert alert-primary text-center">
+                                <h3>Total Bayar: <strong id="total_bayar">Rp 0</strong></h3>
                             </div>
                         </div>
                         <div class="card-footer text-right">
-                            <button type="button" class="btn btn-secondary" id="btnKembaliStep3">Kembali</button>
-                            <button type="submit" class="btn btn-success" id="btnBayar"><i class="fas fa-check mr-1"></i> Bayar</button>
+                            <button type="submit" class="btn btn-lg btn-success">
+                                <i class="fas fa-check-circle"></i> Selesai Transaksi
+                            </button>
                         </div>
                     </div>
-                </div>
+                </form>
+            </div>
 
-                <div class="col-lg-4">
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Preview</h3>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Kasir:</strong> <span id="preview_kasir"><?= $nama_kasir ?></span></p>
-                            <p><strong>Tanggal:</strong> <span id="preview_tanggal"><?= $tanggal_saat_ini ?></span></p>
-                            <p><strong>Member:</strong> <span id="preview_member">Umum</span></p>
-                            <p><strong>Paket:</strong> <span id="preview_paket">-</span></p>
-                            <p><strong>Metode:</strong> <span id="preview_metode">TUNAI</span></p>
-                            <p><strong>Keterangan:</strong> <span id="preview_keterangan">-</span></p>
-                            <hr>
-                            <p class="text-right"><strong>Total: <span id="preview_total">Rp 0</span></strong></p>
-                        </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h4>QRIS DANA</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=085719630447" class="img-fluid">
+                        <h5 class="mt-3">085719630447</h5>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </section>
 
+<?php include '../../../view/master/footer.php'; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const formatIDR = (num) => 'Rp ' + parseInt(num).toLocaleString('id-ID');
+    const formatRupiah = (num) => 'Rp ' + parseInt(num || 0).toLocaleString('id-ID');
+
     let hargaPaket = 0;
+    let durasiHari = 0;
+    let isMahasiswa = false;
 
-    const updatePreview = () => {
-        const diskonItem = parseFloat($('#diskon_item').val()) || 0;
-        const diskonGlobal = parseFloat($('#diskon_global').val()) || 0;
-        const total = Math.max(0, hargaPaket - diskonItem - diskonGlobal);
-        $('#grand_total_hidden').val(total);
-        $('#preview_total').text(formatIDR(total));
-        $('#preview_grand_total').text(formatIDR(total));
-    };
-
-    $('#btnLanjutStep1').click(() => {
-        const mem = $('#pilih_member').val();
-        $('#id_member_hidden').val(mem);
-        $('#preview_member').text(mem ? $('#pilih_member option:selected').text() : 'Umum');
-        $('#step1').addClass('d-none');
-        $('#step2').removeClass('d-none');
+    // Update harga saat pilih member
+    $('#id_member').change(function() {
+        isMahasiswa = $(this).find(':selected').data('mahasiswa') == 1;
+        updateHargaTerpilih();
     });
 
-    $('#btnKembaliStep2').click(() => {
-        $('#step2').addClass('d-none');
-        $('#step1').removeClass('d-none');
-    });
-    $('#btnLanjutStep2').click(() => {
-        if (!$('#id_paket').val()) return Swal.fire('Pilih Paket', 'Silakan pilih paket.', 'warning');
-        const opt = $('#id_paket option:selected');
-        hargaPaket = parseFloat(opt.data('harga')) || 0;
-        $('#harga_paket_hidden').val(hargaPaket);
-        $('#preview_paket').text(opt.text());
-        $('#step2').addClass('d-none');
-        $('#step3').removeClass('d-none');
-        updatePreview();
-    });
-    $('#btnKembaliStep3').click(() => {
-        $('#step3').addClass('d-none');
-        $('#step2').removeClass('d-none');
+    // Update saat pilih paket
+    $('#id_paket').change(function() {
+        const opt = $(this).find(':selected');
+        const hargaUmum = parseFloat(opt.data('harga-umum')) || 0;
+        const hargaMhs = parseFloat(opt.data('harga-mahasiswa')) || 0;
+        durasiHari = parseInt(opt.data('durasi')) || 30;
+
+        hargaPaket = isMahasiswa ? hargaMhs : hargaUmum;
+        updateHargaTerpilih();
     });
 
-    $('#metode_pembayaran').change(function() {
-        const val = $(this).val();
-        $('#preview_metode').text(val);
-        if (val === 'TUNAI') {
-            $('#tunai_group').removeClass('d-none');
-            $('#qris_info, #qris_input').addClass('d-none');
+    function updateHargaTerpilih() {
+        $('#harga_terpilih').text(formatRupiah(hargaPaket));
+        hitungTotal();
+    }
+
+    $('#diskon, #dibayar').on('input', hitungTotal);
+
+    function hitungTotal() {
+        const diskon = parseFloat($('#diskon').val()) || 0;
+        const total = Math.max(0, hargaPaket - diskon);
+        $('#total_bayar').text(formatRupiah(total));
+
+        const dibayar = parseFloat($('#dibayar').val()) || 0;
+        if (dibayar >= total && total > 0) {
+            $('#info_kembalian').text('Kembalian: ' + formatRupiah(dibayar - total));
         } else {
-            $('#tunai_group').addClass('d-none');
-            $('#qris_info, #qris_input').removeClass('d-none');
+            $('#info_kembalian').text('');
         }
-    });
-
-    $('#jumlah_dibayar_tunai').on('input', function() {
-        const dibayar = parseFloat($(this).val()) || 0;
-        const grand = parseFloat($('#grand_total_hidden').val()) || 0;
-        if (dibayar >= grand) {
-            $('#kembalian').text(formatIDR(dibayar - grand));
-            $('#kembalian_info').removeClass('d-none');
-        } else {
-            $('#kembalian_info').addClass('d-none');
-        }
-    });
-
-    $('#btnSuksesQRIS').click(function() {
-        const nominal = parseFloat($('#nominal_qris').val()) || 0;
-        const grandTotal = parseFloat($('#grand_total_hidden').val()) || 0;
-        if (nominal < grandTotal) return Swal.fire('Kurang', 'Nominal transfer kurang.', 'warning');
-
-        const data = {
-            id_user_kasir: $('[name=id_user_kasir]').val(),
-            id_member: $('#id_member_hidden').val(),
-            id_paket: $('#id_paket').val(),
-            harga_paket: $('#harga_paket_hidden').val(),
-            qty: 1,
-            potongan_diskon_item: $('#diskon_item').val(),
-            potongan_diskon: $('#diskon_global').val(),
-            metode_pembayaran: 'QRIS',
-            jumlah_dibayar_tunai: nominal,
-            keterangan: $('#keterangan').val()
-        };
-
-        $.post('proses_transaksi.php', data, function(res) {
-            if (res.success) {
-                Swal.fire('Sukses!', `Transaksi ${res.id_transaksi} via QRIS berhasil!`, 'success')
-                    .then(() => window.location.href = 'transaksi.php');
-            } else {
-                Swal.fire('Gagal', res.error, 'error');
-            }
-        }, 'json');
-    });
+    }
 
     $('#formTransaksi').submit(function(e) {
         e.preventDefault();
-        const grandTotal = parseFloat($('#grand_total_hidden').val()) || 0;
-        if (grandTotal <= 0) return Swal.fire('Error', 'Total tidak boleh 0', 'error');
 
-        const metode = $('#metode_pembayaran').val();
-        if (metode === 'TUNAI') {
-            const dibayar = parseFloat($('#jumlah_dibayar_tunai').val()) || 0;
-            if (dibayar < grandTotal) return Swal.fire('Uang Kurang', 'Jumlah tunai kurang.', 'warning');
+        if (!$('#id_paket').val()) {
+            Swal.fire('Error', 'Pilih paket terlebih dahulu', 'error');
+            return;
         }
 
-        const data = {
-            id_user_kasir: $('[name=id_user_kasir]').val(),
-            id_member: $('#id_member_hidden').val(),
-            id_paket: $('#id_paket').val(),
-            harga_paket: $('#harga_paket_hidden').val(),
-            qty: 1,
-            potongan_diskon_item: $('#diskon_item').val(),
-            potongan_diskon: $('#diskon_global').val(),
-            metode_pembayaran: metode,
-            jumlah_dibayar_tunai: metode === 'TUNAI' ? $('#jumlah_dibayar_tunai').val() : '',
-            keterangan: $('#keterangan').val()
-        };
+        const diskon = parseFloat($('#diskon').val()) || 0;
+        const total = Math.max(0, hargaPaket - diskon);
+        const dibayar = parseFloat($('#dibayar').val()) || 0;
 
-        $.post('proses_transaksi.php', data, function(res) {
+        if (dibayar < total) {
+            Swal.fire('Kurang Bayar', 'Nominal yang dibayar kurang dari total tagihan', 'warning');
+            return;
+        }
+
+        $.post('proses_transaksi.php', {
+            id_user_kasir: <?= $_SESSION['id_user'] ?? 1 ?>,
+            id_member: $('#id_member').val() || null,
+            id_paket: $('#id_paket').val(),
+            harga_paket: hargaPaket,
+            diskon: diskon,
+            metode_pembayaran: $('#metode').val(),
+            jumlah_dibayar: dibayar,
+            durasi_hari: durasiHari
+        }, function(res) {
             if (res.success) {
-                let pesan = `Transaksi berhasil! No: <strong>${res.id_transaksi}</strong>`;
-                if (res.kembalian > 0) pesan += `<br>Kembalian: <strong>${formatIDR(res.kembalian)}</strong>`;
                 Swal.fire({
-                        icon: 'success',
-                        title: 'Sukses!',
-                        html: pesan
-                    })
-                    .then(() => window.location.href = 'transaksi.php');
+                    icon: 'success',
+                    title: 'Transaksi Berhasil!',
+                    html: `
+                        <strong>No. Transaksi:</strong> ${res.id_transaksi}<br>
+                        <strong>Total Bayar:</strong> ${formatRupiah(res.grand_total)}<br>
+                        <strong>Kembalian:</strong> ${formatRupiah(res.kembalian)}<br>
+                        ${res.member_aktif ? '<br><span class="text-success">Membership telah diaktifkan!</span>' : ''}
+                    `,
+                    timer: 6000
+                }).then(() => {
+                    location.reload();
+                });
             } else {
-                Swal.fire('Gagal', res.error, 'error');
+                Swal.fire('Gagal', res.error || 'Terjadi kesalahan', 'error');
             }
         }, 'json');
     });
-
-    updatePreview();
 </script>
-
-<?php include '../../../view/master/footer.php'; ?>

@@ -12,7 +12,7 @@ include '../../../view/master/sidebar.php';
 
 <section class="content-header">
     <div class="container-fluid">
-        <h1 class="text-primary"><i class="fas fa-dumbbell"></i> Data Paket Membership</h1>
+        <h1>Menu Paket</h1>
     </div>
 </section>
 
@@ -21,10 +21,10 @@ include '../../../view/master/sidebar.php';
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between">
                 <h3 class="card-title">Daftar Paket</h3>
-                <button class="btn btn-light" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
             </div>
             <div class="card-body">
-                <table class="table table-bordered table-hover" id="tabelPaket">
+                <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
+                <table class="table table-bordered table-hover" id="tabelPelatih">
                     <thead class="bg-primary text-white">
                         <tr>
                             <th>No</th>

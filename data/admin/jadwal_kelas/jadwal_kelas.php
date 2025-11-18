@@ -15,11 +15,11 @@ if (isset($_POST['simpan'])) {
   $tanggal    = mysqli_real_escape_string($con, $_POST['tanggal']);
   $mulai      = mysqli_real_escape_string($con, $_POST['jam_mulai']);
   $selesai    = mysqli_real_escape_string($con, $_POST['jam_selesai']);
-  
+
   // Format datetime untuk kolom datetime
   $mulai_datetime = $tanggal . ' ' . $mulai . ':00';
   $selesai_datetime = $tanggal . ' ' . $selesai . ':00';
-  
+
   // Validasi tanggal tidak boleh kurang dari hari ini
   $today = date('Y-m-d');
   if ($tanggal < $today) {
@@ -29,7 +29,7 @@ if (isset($_POST['simpan'])) {
         </script>";
     exit;
   }
-  
+
   // Validasi jam selesai harus lebih besar dari jam mulai
   if ($selesai <= $mulai) {
     echo "<script>
@@ -40,7 +40,8 @@ if (isset($_POST['simpan'])) {
   }
 
   // Cek konflik jadwal
-  $cek_konflik = mysqli_query($con, 
+  $cek_konflik = mysqli_query(
+    $con,
     "SELECT * FROM tbl_jadwal_kelas 
      WHERE id_instruktur = '$instruktur' 
      AND tanggal = '$tanggal' 
@@ -50,7 +51,7 @@ if (isset($_POST['simpan'])) {
           ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
      )"
   );
-  
+
   if (mysqli_num_rows($cek_konflik) > 0) {
     echo "<script>
             alert('Instruktur sudah memiliki jadwal pada waktu tersebut!');
@@ -80,11 +81,11 @@ if (isset($_POST['update'])) {
   $tanggal    = mysqli_real_escape_string($con, $_POST['tanggal']);
   $mulai      = mysqli_real_escape_string($con, $_POST['jam_mulai']);
   $selesai    = mysqli_real_escape_string($con, $_POST['jam_selesai']);
-  
+
   // Format datetime untuk kolom datetime
   $mulai_datetime = $tanggal . ' ' . $mulai . ':00';
   $selesai_datetime = $tanggal . ' ' . $selesai . ':00';
-  
+
   // Validasi jam selesai harus lebih besar dari jam mulai
   if ($selesai <= $mulai) {
     echo "<script>
@@ -95,7 +96,8 @@ if (isset($_POST['update'])) {
   }
 
   // Cek konflik jadwal (kecuali jadwal yang sedang diupdate)
-  $cek_konflik = mysqli_query($con, 
+  $cek_konflik = mysqli_query(
+    $con,
     "SELECT * FROM tbl_jadwal_kelas 
      WHERE id_instruktur = '$instruktur' 
      AND tanggal = '$tanggal' 
@@ -106,7 +108,7 @@ if (isset($_POST['update'])) {
           ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
      )"
   );
-  
+
   if (mysqli_num_rows($cek_konflik) > 0) {
     echo "<script>
             alert('Instruktur sudah memiliki jadwal pada waktu tersebut!');
@@ -160,7 +162,7 @@ $jumlah = mysqli_num_rows($query);
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <h1>Jadwal Kelas</h1>
+        <h1>Menu Jadwal Kelas</h1>
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
@@ -202,18 +204,18 @@ $jumlah = mysqli_num_rows($query);
                 </tr>
                 <?php } else {
                 $no = 1;
-                while ($row = mysqli_fetch_assoc($query)) { 
+                while ($row = mysqli_fetch_assoc($query)) {
                   // Format tanggal untuk display
                   $tanggal_display = date('d-m-Y', strtotime($row['tanggal']));
-                  
+
                   // Format jam dari datetime
                   $jam_mulai_display = date('H:i', strtotime($row['jam_mulai']));
                   $jam_selesai_display = date('H:i', strtotime($row['jam_selesai']));
-                  
+
                   // Untuk form edit, ambil hanya waktu saja dari datetime
                   $jam_mulai_edit = date('H:i', strtotime($row['jam_mulai']));
                   $jam_selesai_edit = date('H:i', strtotime($row['jam_selesai']));
-                  ?>
+                ?>
                   <tr>
                     <td><?= $no++; ?></td>
                     <td><?= htmlspecialchars($row['nama_kategori']); ?></td>

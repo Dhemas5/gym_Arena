@@ -37,7 +37,7 @@ require "../../../setting/koneksi.php";
                             <i class="fas fa-plus"></i> Tambah Kategori
                         </button>
                         <div class="table-responsive rounded">
-                            <table id="tabelKategori" class="table table-bordered table-striped">
+                            <table id="tabelPelatih" class="table table-bordered table-striped">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>
@@ -61,21 +61,21 @@ require "../../../setting/koneksi.php";
                                                 <td><?= $no ?></td>
                                                 <td class="text-center">
                                                     <?php if (!empty($data['foto'])): ?>
-                                                        <img src="../../../data/admin/img/<?= $data['foto'] ?>" 
-                                                             alt="Foto Kategori" 
-                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                                        <img src="../../../data/admin/img/<?= $data['foto'] ?>"
+                                                            alt="Foto Kategori"
+                                                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
                                                     <?php else: ?>
-                                                        <img src="../../../data/admin/img/default.jpg" 
-                                                             alt="Default" 
-                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                                        <img src="../../../data/admin/img/default.jpg"
+                                                            alt="Default"
+                                                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?= htmlspecialchars($data['nama_kategori']) ?></td>
                                                 <td><?= htmlspecialchars($data['deskripsi'] ?? '-') ?></td>
                                                 <td class="text-center align-middle">
-                                                    <button class="btn btn-sm btn-favorite <?= $data['kelas_populer'] ? 'active' : '' ?>" 
-                                                            data-id="<?= $data['id_kategori'] ?>" 
-                                                            data-status="<?= $data['kelas_populer'] ?>">
+                                                    <button class="btn btn-sm btn-favorite <?= $data['kelas_populer'] ? 'active' : '' ?>"
+                                                        data-id="<?= $data['id_kategori'] ?>"
+                                                        data-status="<?= $data['kelas_populer'] ?>">
                                                         <i class="fas <?= $data['kelas_populer'] ? 'fa-star text-warning' : 'fa-star text-secondary' ?>"></i>
                                                         <span class="favorite-text"><?= $data['kelas_populer'] ? 'Populer' : 'Biasa' ?></span>
                                                     </button>
@@ -138,9 +138,9 @@ require "../../../setting/koneksi.php";
                         <small class="form-text text-muted">Format: JPG, PNG, JPEG. Maksimal 5MB</small>
                     </div>
                     <div class="form-group text-center">
-                        <img id="previewTambah" src="../../../data/admin/img/default.jpg" 
-                             alt="Preview Foto" 
-                             style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
+                        <img id="previewTambah" src="../../../data/admin/img/default.jpg"
+                            alt="Preview Foto"
+                            style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -188,10 +188,10 @@ while ($data = mysqli_fetch_array($queryModal)) {
                             <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto</small>
                         </div>
                         <div class="form-group text-center">
-                            <img id="previewEdit<?= $data['id_kategori'] ?>" 
-                                 src="<?= !empty($data['foto']) ? '../../../data/admin/img/' . $data['foto'] : '../../../data/admin/img/default.jpg' ?>" 
-                                 alt="Preview Foto" 
-                                 style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
+                            <img id="previewEdit<?= $data['id_kategori'] ?>"
+                                src="<?= !empty($data['foto']) ? '../../../data/admin/img/' . $data['foto'] : '../../../data/admin/img/default.jpg' ?>"
+                                alt="Preview Foto"
+                                style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -208,48 +208,48 @@ while ($data = mysqli_fetch_array($queryModal)) {
 
 <!-- CSS untuk tombol favorit -->
 <style>
-.btn-favorite {
-    border: 1px solid #ddd;
-    background-color: #f8f9fa;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    width: 100px;
-    cursor: pointer;
-}
+    .btn-favorite {
+        border: 1px solid #ddd;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        width: 100px;
+        cursor: pointer;
+    }
 
-.btn-favorite:hover {
-    background-color: #e9ecef;
-    transform: scale(1.05);
-}
+    .btn-favorite:hover {
+        background-color: #e9ecef;
+        transform: scale(1.05);
+    }
 
-.btn-favorite.active {
-    background-color: #fff3cd;
-    border-color: #ffc107;
-}
+    .btn-favorite.active {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+    }
 
-.btn-favorite .favorite-text {
-    font-size: 0.8rem;
-    font-weight: 500;
-}
+    .btn-favorite .favorite-text {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
 
-/* DataTables Customization */
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 0.5em 1em !important;
-    margin-left: 2px !important;
-    border: 1px solid #dee2e6 !important;
-    border-radius: 0.25rem !important;
-}
+    /* DataTables Customization */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.5em 1em !important;
+        margin-left: 2px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.25rem !important;
+    }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background: #007bff !important;
-    color: white !important;
-    border-color: #007bff !important;
-}
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #007bff !important;
+        color: white !important;
+        border-color: #007bff !important;
+    }
 </style>
 
 <!-- Script AJAX + SweetAlert + DataTables -->
@@ -296,7 +296,7 @@ while ($data = mysqli_fetch_array($queryModal)) {
             e.preventDefault();
             const formData = new FormData(this);
             formData.append('action', 'simpan');
-            
+
             $.ajax({
                 url: 'proses_kategori.php',
                 type: 'POST',
@@ -322,7 +322,7 @@ while ($data = mysqli_fetch_array($queryModal)) {
             e.preventDefault();
             const formData = new FormData(this);
             formData.append('action', 'update');
-            
+
             $.ajax({
                 url: 'proses_kategori.php',
                 type: 'POST',
@@ -385,7 +385,7 @@ while ($data = mysqli_fetch_array($queryModal)) {
             const id = $(this).data('id');
             const currentStatus = $(this).data('status');
             const newStatus = currentStatus == 1 ? 0 : 1;
-            
+
             $.ajax({
                 url: 'proses_kategori.php',
                 type: 'POST',
@@ -400,7 +400,7 @@ while ($data = mysqli_fetch_array($queryModal)) {
                         // Update tampilan tombol
                         const $btn = $('.btn-favorite[data-id="' + id + '"]');
                         $btn.data('status', newStatus);
-                        
+
                         if (newStatus == 1) {
                             $btn.addClass('active');
                             $btn.find('i').removeClass('text-secondary').addClass('text-warning');
@@ -410,7 +410,7 @@ while ($data = mysqli_fetch_array($queryModal)) {
                             $btn.find('i').removeClass('text-warning').addClass('text-secondary');
                             $btn.find('.favorite-text').text('Biasa');
                         }
-                        
+
                         Swal.fire('Berhasil!', res.message, 'success');
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');

@@ -89,6 +89,199 @@ if (!$membership_aktif) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="stylesheet" href="assets/css/stylemember.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Jadwal Section Styles */
+    .schedule-section {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      padding: 80px 0;
+      color: white;
+    }
+
+    .schedule-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .schedule-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .schedule-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .day-schedule {
+      background: rgba(13, 27, 42, 0.9);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(66, 165, 245, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .day-schedule:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(66, 165, 245, 0.2);
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(66, 165, 245, 0.3);
+    }
+
+    .day-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #42a5f5;
+      margin-right: 15px;
+    }
+
+    .day-date {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(66, 165, 245, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .class-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .class-table th {
+      text-align: left;
+      padding: 12px 15px;
+      background: rgba(66, 165, 245, 0.1);
+      color: #42a5f5;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(66, 165, 245, 0.3);
+    }
+
+    .class-table td {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .class-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .class-table tr:hover td {
+      background: rgba(66, 165, 245, 0.05);
+    }
+
+    .time-cell {
+      font-weight: 600;
+      color: #64b5f6;
+      width: 100px;
+    }
+
+    .studio-cell {
+      color: #81c784;
+      font-weight: 500;
+      width: 120px;
+    }
+
+    .class-cell {
+      font-weight: 500;
+    }
+
+    .instructor-cell {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .class-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(66, 165, 245, 0.2);
+      color: #42a5f5;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 8px;
+      margin-bottom: 5px;
+    }
+
+    .instagram-section {
+      text-align: center;
+      margin-top: 60px;
+      padding: 30px;
+      background: rgba(13, 27, 42, 0.8);
+      border-radius: 16px;
+      border: 1px solid rgba(66, 165, 245, 0.2);
+    }
+
+    .instagram-handle {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #42a5f5;
+      margin-bottom: 15px;
+    }
+
+    .instagram-cta {
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 20px;
+    }
+
+    .btn-instagram {
+      background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-instagram:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .schedule-section {
+        padding: 50px 0;
+      }
+
+      .schedule-title {
+        font-size: 2rem;
+      }
+
+      .day-schedule {
+        padding: 20px;
+      }
+
+      .class-table {
+        font-size: 0.9rem;
+      }
+
+      .class-table th,
+      .class-table td {
+        padding: 10px 8px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -147,6 +340,379 @@ if (!$membership_aktif) {
       </div>
     </div>
   </section>
+
+  <!-- JADWAL KELAS SECTION -->
+  <section class="schedule-section">
+    <div class="container">
+      <div class="schedule-header">
+        <h2 class="schedule-title">JADWAL KELAS ARENA FIT</h2>
+        <p class="schedule-subtitle">Ikuti kelas favorit Anda dengan instruktur profesional. Jadwal terbaru update setiap bulan.</p>
+      </div>
+
+      <!-- SENIN -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">SENIN</div>
+          <div class="day-date">Hari Ini</div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">07:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">SEMAN BL</div>
+                <div class="instructor-cell">COACH FITRI</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:00</td>
+              <td class="studio-cell">-</td>
+              <td>
+                <div class="class-cell">BOXING</div>
+                <div class="instructor-cell"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN IRA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">BODY SHAPE</div>
+                <div class="instructor-cell">COACH NIEKE</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SELASA -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">SELASA</div>
+          <div class="day-date">Besok</div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN NILA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:15</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">CID ROCKER</div>
+                <div class="instructor-cell">SISKA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">18:15</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN INA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">13:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">STROKU KATOI</div>
+                <div class="instructor-cell">SYNCHOVA</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RABU -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">RABU</div>
+          <div class="day-date"></div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">08:00</td>
+              <td class="studio-cell">-</td>
+              <td>
+                <div class="class-cell">BOXING</div>
+                <div class="instructor-cell"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN IRA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">18:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">BODY SHAPE</div>
+                <div class="instructor-cell">COACH NIEKE</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">18:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">KAPHA YOGA</div>
+                <div class="instructor-cell">COACH NANA</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- KAMIS -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">KAMIS</div>
+          <div class="day-date"></div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">08:00</td>
+              <td class="studio-cell">-</td>
+              <td>
+                <div class="class-cell">BOXING</div>
+                <div class="instructor-cell"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">BODY SHAPE</div>
+                <div class="instructor-cell">COACH NIEKE</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">18:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN INA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">16:00</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">AERO BL</div>
+                <div class="instructor-cell">COACH WIVVIK</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- JUMAT -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">JUM'AT</div>
+          <div class="day-date"></div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">07:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">SEMAN BL</div>
+                <div class="instructor-cell">COACH FITRI</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">07:45</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">POUNDFIT</div>
+                <div class="instructor-cell">BERNI</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">18:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">KAPHA YOGA</div>
+                <div class="instructor-cell">COACH NANA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">16:00</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">POUNDFIT</div>
+                <div class="instructor-cell">PPNILA</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SABTU -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">SABTU</div>
+          <div class="day-date"></div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">08:00</td>
+              <td class="studio-cell">-</td>
+              <td>
+                <div class="class-cell">BOXING</div>
+                <div class="instructor-cell"></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN INA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">16:00</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN SARI</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">16:15</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">STROKU KATOI</div>
+                <div class="instructor-cell">SYNCHOVA</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MINGGU -->
+      <div class="day-schedule">
+        <div class="day-header">
+          <div class="day-name">MINGGU</div>
+          <div class="day-date"></div>
+        </div>
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th>WAKTU</th>
+              <th>STUDIO</th>
+              <th>KELAS & INSTRUKTUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="time-cell">07:30</td>
+              <td class="studio-cell">STUDIO 2</td>
+              <td>
+                <div class="class-cell">TRAMPOLINE</div>
+                <div class="instructor-cell">COACH NANA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">08:00</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">ZUMBA</div>
+                <div class="instructor-cell">ZIN INA</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="time-cell">15:30</td>
+              <td class="studio-cell">STUDIO 1</td>
+              <td>
+                <div class="class-cell">AERO BL</div>
+                <div class="instructor-cell">COACH WIVVIK</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Instagram Section -->
+      <div class="instagram-section">
+        <div class="instagram-handle">@arenafticlub2022</div>
+        <p class="instagram-cta">Follow Instagram kami untuk update jadwal terbaru dan informasi promo!</p>
+        <a href="https://instagram.com/arenafticlub2022" target="_blank" class="btn-instagram">
+          <i class="fab fa-instagram"></i>
+          Follow Instagram
+        </a>
+        <div class="mt-3 text-muted">
+          <small>Contact: 0821-4308-0510</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PRICE LIST SECTION -->
   <section class="pricelist-section">
     <div class="container">

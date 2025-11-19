@@ -79,14 +79,6 @@
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <span class="dropdown-item dropdown-header">User Menu</span>
                         <div class="dropdown-divider"></div>
-                        <a href="profil.php" class="dropdown-item">
-                            <i class="fas fa-id-card mr-2"></i> Profil
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="setting.php" class="dropdown-item">
-                            <i class="fas fa-cog mr-2"></i> Pengaturan
-                        </a>
-                        <div class="dropdown-divider"></div>
                         <a href="../login/logout.php" class="dropdown-item text-danger">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </a>

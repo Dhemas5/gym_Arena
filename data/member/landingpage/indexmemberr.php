@@ -10,17 +10,6 @@ if (!isset($_SESSION['login']) || $_SESSION['user_type'] !== 'member') {
 $nama_member = $_SESSION['nama'];
 $id_member   = $_SESSION['id_member'];
 
-// Ambil data foto member dari database
-$foto_member = '';
-$stmt_foto = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
-$stmt_foto->bind_param("i", $id_member);
-$stmt_foto->execute();
-$result_foto = $stmt_foto->get_result();
-if ($row_foto = $result_foto->fetch_assoc()) {
-    $foto_member = $row_foto['foto'] ?? '';
-}
-$stmt_foto->close();
-
 // Cek status mahasiswa
 $is_mahasiswa = 0;
 $stmt = $con->prepare("SELECT is_mahasiswa FROM tbl_member WHERE id_member = ?");
@@ -55,36 +44,99 @@ if ($res->num_rows > 0) {
 }
 $stmt->close();
 
-// Ambil semua paket untuk ditampilkan
+// Data jadwal sesuai gambar
+$jadwal_kelas = [
+    'Senin' => [
+        ['07:00', 'STUDIO 1', 'SEMAN BL', 'COACH FITRI'],
+        ['08:00', '-', 'BOXING', ''],
+        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN IRA'],
+        ['08:30', 'STUDIO 2', 'BODY SHAPE', 'COACH NIEKE']
+    ],
+    'Selasa' => [
+        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN NILA'],
+        ['08:15', 'STUDIO 2', 'CID ROCKER', 'SISKA'],
+        ['18:15', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
+        ['13:00', 'STUDIO 1', 'STROKU KATOI', 'SYNCHOVA']
+    ],
+    'Rabu' => [
+        ['08:00', '-', 'BOXING', ''],
+        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN IRA'],
+        ['18:00', 'STUDIO 1', 'BODY SHAPE', 'COACH NIEKE'],
+        ['18:30', 'STUDIO 1', 'KAPHA YOGA', 'COACH NANA']
+    ],
+    'Kamis' => [
+        ['08:00', '-', 'BOXING', ''],
+        ['08:30', 'STUDIO 1', 'BODY SHAPE', 'COACH NIEKE'],
+        ['18:00', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
+        ['16:00', 'STUDIO 2', 'AERO BL', 'COACH WIVVIK']
+    ],
+    'Jumat' => [
+        ['07:00', 'STUDIO 1', 'SEMAN BL', 'COACH FITRI'],
+        ['07:45', 'STUDIO 2', 'POUNDFIT', 'BERNI'],
+        ['18:00', 'STUDIO 1', 'KAPHA YOGA', 'COACH NANA'],
+        ['16:00', 'STUDIO 2', 'POUNDFIT', 'PPNILA']
+    ],
+    'Sabtu' => [
+        ['08:00', '-', 'BOXING', ''],
+        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
+        ['16:00', 'STUDIO 2', 'ZUMBA', 'ZIN SARI'],
+        ['16:15', 'STUDIO 1', 'STROKU KATOI', 'SYNCHOVA']
+    ],
+    'Minggu' => [
+        ['07:30', 'STUDIO 2', 'TRAMPOLINE', 'COACH NANA'],
+        ['08:00', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
+        ['15:30', 'STUDIO 1', 'AERO BL', 'COACH WIVVIK']
+    ]
+];
+
+// Urutan hari dalam seminggu
+$hari_dalam_minggu = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+// Dapatkan hari ini (0 = Minggu, 1 = Senin, ..., 6 = Sabtu)
+$hari_ini_index = date('w');
+// Konversi ke format kita (0 = Senin, 6 = Minggu)
+$hari_ini_index = $hari_ini_index == 0 ? 6 : $hari_ini_index - 1;
+$hari_ini = $hari_dalam_minggu[$hari_ini_index];
+
+// Susun jadwal mulai dari hari ini
+$jadwal_terurut = [];
+for ($i = 0; $i < 7; $i++) {
+    $index = ($hari_ini_index + $i) % 7;
+    $hari = $hari_dalam_minggu[$index];
+    $jadwal_terurut[$hari] = $jadwal_kelas[$hari];
+}
+
+// Ambil paket hanya jika belum aktif
 $pakets = [];
-$paket_result = $con->query("
-    SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
-    FROM tbl_paket 
-    ORDER BY durasi_hari ASC
-");
+if (!$membership_aktif) {
+  $paket_result = $con->query("
+        SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
+        FROM tbl_paket 
+        ORDER BY durasi_hari ASC
+    ");
 
-while ($p = $paket_result->fetch_assoc()) {
-  $durasi_text = match ((int)$p['durasi_hari']) {
-    1    => '1 Hari',
-    30   => '1 Bulan',
-    90   => '3 Bulan',
-    180  => '6 Bulan',
-    365  => '1 Tahun',
-    default => $p['durasi_hari'] . ' Hari'
-  };
+  while ($p = $paket_result->fetch_assoc()) {
+    $durasi_text = match ((int)$p['durasi_hari']) {
+      1    => '1 Hari',
+      30   => '1 Bulan',
+      90   => '3 Bulan',
+      180  => '6 Bulan',
+      365  => '1 Tahun',
+      default => $p['durasi_hari'] . ' Hari'
+    };
 
-  $featured = in_array($p['durasi_hari'], [90, 180, 365]);
+    $featured = in_array($p['durasi_hari'], [90, 180, 365]);
 
-  $pakets[] = [
-    'id'              => $p['id_paket'],
-    'nama'            => htmlspecialchars($p['nama_paket']),
-    'harga_umum'      => (int)$p['harga_umum'],
-    'harga_mahasiswa' => (int)$p['harga_mahasiswa'],
-    'durasi'          => $durasi_text,
-    'durasi_hari'     => (int)$p['durasi_hari'],
-    'featured'        => $featured,
-    'deskripsi'       => htmlspecialchars($p['deskripsi'] ?? '')
-  ];
+    $pakets[] = [
+      'id'              => $p['id_paket'],
+      'nama'            => htmlspecialchars($p['nama_paket']),
+      'harga_umum'      => (int)$p['harga_umum'],
+      'harga_mahasiswa' => (int)$p['harga_mahasiswa'],
+      'durasi'          => $durasi_text,
+      'featured'        => $featured,
+      'deskripsi'       => htmlspecialchars($p['deskripsi'] ?? '')
+    ];
+  }
 }
 ?>
 
@@ -100,87 +152,215 @@ while ($p = $paket_result->fetch_assoc()) {
   <link rel="stylesheet" href="assets/css/stylemember.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .member-avatar-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+    /* Jadwal Section Styles */
+    .schedule-section {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      padding: 80px 0;
+      color: white;
     }
-    
-    .member-avatar-initial {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+    .schedule-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .schedule-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .schedule-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .day-schedule {
+      background: rgba(13, 27, 42, 0.9);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(66, 165, 245, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .day-schedule.today {
+      border: 2px solid #42a5f5;
+      box-shadow: 0 0 30px rgba(66, 165, 245, 0.4);
+      transform: scale(1.02);
+    }
+
+    .day-schedule:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(66, 165, 245, 0.2);
+    }
+
+    .day-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 1.1rem;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(66, 165, 245, 0.3);
     }
-  </style>
-  <style>
-    .price-option {
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
+
+    .day-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #42a5f5;
+      margin-right: 15px;
+    }
+
+    .day-date {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(66, 165, 245, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .today-badge {
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      color: white;
+      font-weight: 600;
+    }
+
+    .class-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .class-table th {
+      text-align: left;
+      padding: 12px 15px;
+      background: rgba(66, 165, 245, 0.1);
+      color: #42a5f5;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(66, 165, 245, 0.3);
+    }
+
+    .class-table td {
       padding: 15px;
-      margin: 10px 0;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
     }
 
-    .price-option:hover {
-      border-color: #42a5f5;
-      background-color: rgba(66, 165, 245, 0.05);
+    .class-table tr:last-child td {
+      border-bottom: none;
     }
 
-    .price-option.selected {
-      border-color: #42a5f5;
-      background-color: rgba(66, 165, 245, 0.1);
+    .class-table tr:hover td {
+      background: rgba(66, 165, 245, 0.05);
     }
 
-    .price-option.disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .price-label {
+    .time-cell {
       font-weight: 600;
-      font-size: 1rem;
+      color: #64b5f6;
+      width: 100px;
+    }
+
+    .studio-cell {
+      color: #81c784;
+      font-weight: 500;
+      width: 120px;
+    }
+
+    .class-cell {
+      font-weight: 500;
+    }
+
+    .instructor-cell {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .class-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(66, 165, 245, 0.2);
+      color: #42a5f5;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 8px;
       margin-bottom: 5px;
     }
 
-    .price-value {
-      font-size: 1.2rem;
+    .instagram-section {
+      text-align: center;
+      margin-top: 60px;
+      padding: 30px;
+      background: rgba(13, 27, 42, 0.8);
+      border-radius: 16px;
+      border: 1px solid rgba(66, 165, 245, 0.2);
+    }
+
+    .instagram-handle {
+      font-size: 1.3rem;
       font-weight: 700;
-      color: #198754;
+      color: #42a5f5;
+      margin-bottom: 15px;
     }
 
-    .price-value.mahasiswa {
-      color: #0d6efd;
+    .instagram-cta {
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 20px;
     }
 
-    .badge-mahasiswa {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    .btn-instagram {
+      background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+      border: none;
       color: white;
-    }
-
-    .badge-umum {
-      background: linear-gradient(135deg, #48c78e, #00a76f);
-      color: white;
-    }
-
-    .package-actions {
-      margin-top: 20px;
-    }
-
-    .btn-beli {
-      width: 100%;
-      padding: 12px;
+      padding: 12px 30px;
+      border-radius: 25px;
       font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-instagram:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4);
+      color: white;
+    }
+
+    .current-week {
+      text-align: center;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .schedule-section {
+        padding: 50px 0;
+      }
+
+      .schedule-title {
+        font-size: 2rem;
+      }
+
+      .day-schedule {
+        padding: 20px;
+      }
+
+      .class-table {
+        font-size: 0.9rem;
+      }
+
+      .class-table th,
+      .class-table td {
+        padding: 10px 8px;
+      }
     }
   </style>
 </head>
@@ -204,21 +384,7 @@ while ($p = $paket_result->fetch_assoc()) {
           <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
         </ul>
         <div class="member-info ms-3">
-          <div class="member-avatar">
-            <?php if (!empty($foto_member) && $foto_member !== 'default.jpg'): ?>
-              <img src="../../uploads/member/<?= $foto_member ?>" 
-                   alt="Foto <?= htmlspecialchars($nama_member) ?>" 
-                   class="member-avatar-img"
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-              <div class="member-avatar-initial" style="display: none;">
-                <?= strtoupper(substr($nama_member, 0, 1)) ?>
-              </div>
-            <?php else: ?>
-              <div class="member-avatar-initial">
-                <?= strtoupper(substr($nama_member, 0, 1)) ?>
-              </div>
-            <?php endif; ?>
-          </div>
+          <div class="member-avatar"><?= strtoupper(substr($nama_member, 0, 1)) ?></div>
           <span class="welcome-text">
             <span class="member-name"><?= htmlspecialchars($nama_member) ?></span>
           </span>
@@ -256,6 +422,75 @@ while ($p = $paket_result->fetch_assoc()) {
     </div>
   </section>
 
+  <!-- JADWAL KELAS SECTION -->
+  <section class="schedule-section">
+    <div class="container">
+      <div class="schedule-header">
+        <h2 class="schedule-title">JADWAL KELAS ARENA FIT</h2>
+        <p class="schedule-subtitle">Ikuti kelas favorit Anda dengan instruktur profesional. Jadwal terbaru update setiap bulan.</p>
+      </div>
+
+      <div class="current-week">
+        <i class="fas fa-calendar-alt me-2"></i>
+        Jadwal Minggu Ini - <?= date('d F Y') ?>
+      </div>
+
+      <?php foreach($jadwal_terurut as $hari => $kelas): ?>
+        <?php 
+        // Hitung tanggal untuk hari ini dan seterusnya
+        $offset = array_search($hari, $hari_dalam_minggu) - $hari_ini_index;
+        $tanggal_hari = date('d M', strtotime("+$offset days"));
+        $is_today = $hari === $hari_ini;
+        ?>
+        
+        <div class="day-schedule <?= $is_today ? 'today' : '' ?>">
+          <div class="day-header">
+            <div class="day-name"><?= strtoupper($hari) ?></div>
+            <div class="day-date <?= $is_today ? 'today-badge' : '' ?>">
+              <?= $is_today ? 'HARI INI' : $tanggal_hari ?>
+            </div>
+          </div>
+          <table class="class-table">
+            <thead>
+              <tr>
+                <th>WAKTU</th>
+                <th>STUDIO</th>
+                <th>KELAS & INSTRUKTUR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach($kelas as $kelas_item): ?>
+                <tr>
+                  <td class="time-cell"><?= $kelas_item[0] ?></td>
+                  <td class="studio-cell"><?= $kelas_item[1] ?></td>
+                  <td>
+                    <div class="class-cell"><?= $kelas_item[2] ?></div>
+                    <?php if(!empty($kelas_item[3])): ?>
+                      <div class="instructor-cell"><?= $kelas_item[3] ?></div>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      <?php endforeach; ?>
+
+      <!-- Instagram Section -->
+      <div class="instagram-section">
+        <div class="instagram-handle">@arenafticlub2022</div>
+        <p class="instagram-cta">Follow Instagram kami untuk update jadwal terbaru dan informasi promo!</p>
+        <a href="https://instagram.com/arenafticlub2022" target="_blank" class="btn-instagram">
+          <i class="fab fa-instagram"></i>
+          Follow Instagram
+        </a>
+        <div class="mt-3 text-muted">
+          <small>Contact: 0821-4308-0510</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PRICE LIST SECTION -->
   <section class="pricelist-section">
     <div class="container">
@@ -280,75 +515,113 @@ while ($p = $paket_result->fetch_assoc()) {
 
       <h3 class="price-category-title">Paket Membership Gym</h3>
       <div class="gym-packages-grid">
-        <?php foreach ($pakets as $p): ?>
-          <div class="gym-package-card <?= $p['featured'] ? 'featured' : '' ?>" data-package-id="<?= $p['id'] ?>">
-            <?php if ($p['featured']): ?>
+        <?php 
+        // Ambil semua paket (selalu, tidak peduli aktif atau tidak)
+        $paket_result = $con->query("
+            SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
+            FROM tbl_paket 
+            ORDER BY durasi_hari ASC
+        ");
+
+        while ($p = $paket_result->fetch_assoc()): 
+          $durasi_text = match ((int)$p['durasi_hari']) {
+            1    => '1 Hari',
+            30   => '1 Bulan',
+            90   => '3 Bulan',
+            180  => '6 Bulan',
+            365  => '1 Tahun',
+            default => $p['durasi_hari'] . ' Hari'
+          };
+
+          $featured = in_array($p['durasi_hari'], [90, 180, 365]);
+          $harga_akhir = $is_mahasiswa && $p['harga_mahasiswa'] > 0 ? $p['harga_mahasiswa'] : $p['harga_umum'];
+        ?>
+          <div class="gym-package-card <?= $pkg['featured'] ?? $featured ? 'featured' : '' ?>">
+            <?php if ($featured): ?>
               <div class="ribbon"><span>Paling Laris</span></div>
             <?php endif; ?>
 
-            <div class="gym-package-name"><?= $p['nama'] ?></div>
-            <div class="gym-package-duration"><?= $p['durasi'] ?></div>
+            <div class="gym-package-name"><?= htmlspecialchars($p['nama_paket']) ?></div>
+            <div class="gym-package-duration"><?= $durasi_text ?></div>
 
-            <!-- Pilihan Harga Umum -->
-            <div class="price-option" data-type="umum" data-price="<?= $p['harga_umum'] ?>">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="price-label">
-                    <span class="badge badge-umum">UMUM</span>
-                  </div>
-                  <div class="price-value">Rp <?= number_format($p['harga_umum'], 0, ',', '.') ?></div>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input price-radio" type="radio" name="price_option_<?= $p['id'] ?>"
-                    value="umum" id="umum_<?= $p['id'] ?>" checked>
-                </div>
-              </div>
+            <!-- Harga Umum -->
+            <div class="price-row umum">
+              <span class="price-label">UMUM</span>
+              <span class="price-value">Rp <?= number_format($p['harga_umum'], 0, ',', '.') ?></span>
             </div>
 
-            <!-- Pilihan Harga Mahasiswa -->
+            <!-- Harga Mahasiswa (jika ada diskon) -->
             <?php if ($p['harga_mahasiswa'] > 0 && $p['harga_mahasiswa'] < $p['harga_umum']): ?>
-              <div class="price-option <?= $is_mahasiswa ? '' : 'disabled' ?>"
-                data-type="mahasiswa"
-                data-price="<?= $p['harga_mahasiswa'] ?>">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <div class="price-label">
-                      <span class="badge badge-mahasiswa">MAHASISWA</span>
-                      <?php if (!$is_mahasiswa): ?>
-                        <small class="text-muted d-block">*Hanya untuk mahasiswa terverifikasi</small>
-                      <?php endif; ?>
-                    </div>
-                    <div class="price-value mahasiswa">Rp <?= number_format($p['harga_mahasiswa'], 0, ',', '.') ?></div>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input price-radio" type="radio" name="price_option_<?= $p['id'] ?>"
-                      value="mahasiswa" id="mahasiswa_<?= $p['id'] ?>"
-                      <?= $is_mahasiswa ? '' : 'disabled' ?>>
-                  </div>
-                </div>
+              <div class="price-row mahasiswa">
+                <span class="price-label">MAHASISWA</span>
+                <span class="price-value text-success">Rp <?= number_format($p['harga_mahasiswa'], 0, ',', '.') ?></span>
               </div>
             <?php endif; ?>
 
-            <!-- Tombol Beli -->
-            <div class="package-actions">
-              <form method="POST" action="checkout_pembayaran.php" class="package-form">
-                <input type="hidden" name="id_paket" value="<?= $p['id'] ?>">
-                <input type="hidden" name="nama_paket" value="<?= $p['nama'] ?>">
-                <input type="hidden" name="durasi_hari" value="<?= $p['durasi_hari'] ?>">
-                <input type="hidden" name="harga_paket" value="<?= $p['harga_umum'] ?>" class="harga-input">
-                <input type="hidden" name="tipe_member" value="umum" class="tipe-input">
-                <button type="submit" class="btn btn-primary btn-beli">
-                  <i class="fas fa-shopping-cart"></i> Beli Sekarang -
-                  <span class="selected-price">Rp <?= number_format($p['harga_umum'], 0, ',', '.') ?></span>
-                </button>
-              </form>
-            </div>
+            <!-- Tombol sesuai status membership -->
+            <?php if ($membership_aktif): ?>
+              <button class="btn-choose-package" disabled style="background:#28a745; opacity:0.8; cursor:not-allowed;">
+                <i class="fas fa-check"></i> Sudah Aktif
+              </button>
+            <?php else: ?>
+              <button class="btn-choose-package"
+                onclick="openPaymentModal('<?= $p['id_paket'] ?>', 'gym', '<?= htmlspecialchars($p['nama_paket']) ?>', 
+                  <?= $harga_akhir ?>, <?= $p['harga_mahasiswa'] ?>, '<?= $durasi_text ?>')">
+                Pilih Paket Ini
+              </button>
+            <?php endif; ?>
           </div>
-        <?php endforeach; ?>
+        <?php endwhile; ?>
       </div>
 
     </div>
   </section>
+
+  <!-- Modal Pembayaran -->
+  <div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="formPembayaran" enctype="multipart/form-data">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Konfirmasi Pembayaran</h5>
+            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="id_paket" id="package_id">
+            <input type="hidden" name="harga" id="total_harga_input">
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="summary-card">
+                  <h6>Ringkasan Pembelian</h6>
+                  <hr>
+                  <p><strong>Paket:</strong> <span id="summary_package"></span></p>
+                  <p><strong>Durasi:</strong> <span id="duration_display"></span></p>
+                  <p><strong>Tipe:</strong> <span id="summary_type">Umum</span></p>
+                  <h4>Total: <strong id="total_price_display" class="text-primary">Rp 0</strong></h4>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Upload Bukti Transfer</label>
+                  <input type="file" class="form-control" name="bukti_pembayaran" accept="image/*" required>
+                  <small class="text-muted">Transfer ke: <strong>BCA 2009138999</strong> a.n. CV. ARENA MAJU BERSAMA</small>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Catatan (Opsional)</label>
+                  <textarea class="form-control" name="catatan" rows="3" placeholder="Contoh: Bayar via m-BCA"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-success">Kirim Bukti Pembayaran</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <?php include 'sectionsmember/footer_member.php'; ?>
   <button class="scroll-to-top" onclick="scrollToTop()">Up</button>
@@ -356,56 +629,54 @@ while ($p = $paket_result->fetch_assoc()) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Fungsi untuk mengatur pilihan harga
-    document.addEventListener('DOMContentLoaded', function() {
-      // Event listener untuk semua radio button harga
-      document.querySelectorAll('.price-radio').forEach(radio => {
-        radio.addEventListener('change', function() {
-          const packageCard = this.closest('.gym-package-card');
-          const priceOption = this.closest('.price-option');
-          const packageId = packageCard.dataset.packageId;
+    function openPaymentModal(id_paket, tipe, nama, harga, harga_mhs, durasi) {
+      document.getElementById('package_id').value = id_paket;
+      document.getElementById('total_harga_input').value = harga;
+      document.getElementById('summary_package').textContent = nama;
+      document.getElementById('duration_display').textContent = durasi;
+      document.getElementById('total_price_display').textContent = 'Rp ' + harga.toLocaleString('id-ID');
+      document.getElementById('summary_type').textContent = (harga === harga_mhs && harga_mhs > 0) ? 'Mahasiswa' : 'Umum';
 
-          // Reset semua pilihan di package ini
-          packageCard.querySelectorAll('.price-option').forEach(option => {
-            option.classList.remove('selected');
-          });
+      new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    }
 
-          // Tandai yang dipilih
-          priceOption.classList.add('selected');
+    // SweetAlert Setelah Upload Bukti
+    document.getElementById('formPembayaran').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button[type="submit"]');
+      const old = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
 
-          // Update form data
-          const form = packageCard.querySelector('.package-form');
-          const hargaInput = form.querySelector('.harga-input');
-          const tipeInput = form.querySelector('.tipe-input');
-          const selectedPrice = form.querySelector('.selected-price');
+      const formData = new FormData(this);
 
-          const selectedType = priceOption.dataset.type;
-          const selectedPriceValue = priceOption.dataset.price;
-
-          hargaInput.value = selectedPriceValue;
-          tipeInput.value = selectedType;
-          selectedPrice.textContent = 'Rp ' + parseInt(selectedPriceValue).toLocaleString('id-ID');
-        });
-      });
-
-      // Set pilihan default untuk semua package
-      document.querySelectorAll('.gym-package-card').forEach(card => {
-        const defaultRadio = card.querySelector('.price-radio:checked');
-        if (defaultRadio) {
-          defaultRadio.closest('.price-option').classList.add('selected');
-        }
-      });
-
-      // Event listener untuk klik pada price option
-      document.querySelectorAll('.price-option:not(.disabled)').forEach(option => {
-        option.addEventListener('click', function() {
-          const radio = this.querySelector('.price-radio');
-          if (radio && !radio.disabled) {
-            radio.checked = true;
-            radio.dispatchEvent(new Event('change'));
+      fetch('proses_bayar.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil!',
+              html: '<strong>Bukti pembayaran telah dikirim!</strong><br>Mohon tunggu konfirmasi admin.',
+              timer: 5000,
+              timerProgressBar: true,
+              showConfirmButton: true,
+              confirmButtonText: 'OK'
+            }).then(() => location.reload());
+          } else {
+            Swal.fire('Gagal', res.message || 'Terjadi kesalahan', 'error');
           }
+        })
+        .catch(() => {
+          Swal.fire('Error', 'Koneksi terputus, coba lagi nanti', 'error');
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = old;
         });
-      });
     });
 
     function scrollToTop() {
@@ -414,26 +685,8 @@ while ($p = $paket_result->fetch_assoc()) {
         behavior: 'smooth'
       });
     }
-
     window.addEventListener('scroll', () => {
-      const scrollBtn = document.querySelector('.scroll-to-top');
-      if (scrollBtn) {
-        scrollBtn.classList.toggle('visible', window.pageYOffset > 300);
-      }
-    });
-
-    // Handle error pada foto profil
-    document.addEventListener('DOMContentLoaded', function() {
-      const avatarImages = document.querySelectorAll('.member-avatar-img');
-      avatarImages.forEach(img => {
-        img.addEventListener('error', function() {
-          this.style.display = 'none';
-          const initialDiv = this.nextElementSibling;
-          if (initialDiv && initialDiv.classList.contains('member-avatar-initial')) {
-            initialDiv.style.display = 'flex';
-          }
-        });
-      });
+      document.querySelector('.scroll-to-top').classList.toggle('visible', window.pageYOffset > 300);
     });
   </script>
 </body>

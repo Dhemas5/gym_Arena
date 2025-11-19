@@ -10,6 +10,17 @@ if (!isset($_SESSION['login']) || $_SESSION['user_type'] !== 'member') {
 $nama_member = $_SESSION['nama'];
 $id_member   = $_SESSION['id_member'];
 
+// Ambil data foto member dari database
+$foto_member = '';
+$stmt_foto = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
+$stmt_foto->bind_param("i", $id_member);
+$stmt_foto->execute();
+$result_foto = $stmt_foto->get_result();
+if ($row_foto = $result_foto->fetch_assoc()) {
+    $foto_member = $row_foto['foto'] ?? '';
+}
+$stmt_foto->close();
+
 // Cek status mahasiswa
 $is_mahasiswa = 0;
 $stmt = $con->prepare("SELECT is_mahasiswa FROM tbl_member WHERE id_member = ?");
@@ -88,6 +99,29 @@ while ($p = $paket_result->fetch_assoc()) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="stylesheet" href="assets/css/stylemember.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .member-avatar-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .member-avatar-initial {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
   <style>
     .price-option {
       border: 2px solid #e9ecef;
@@ -170,7 +204,21 @@ while ($p = $paket_result->fetch_assoc()) {
           <li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>
         </ul>
         <div class="member-info ms-3">
-          <div class="member-avatar"><?= strtoupper(substr($nama_member, 0, 1)) ?></div>
+          <div class="member-avatar">
+            <?php if (!empty($foto_member) && $foto_member !== 'default.jpg'): ?>
+              <img src="../../uploads/member/<?= $foto_member ?>" 
+                   alt="Foto <?= htmlspecialchars($nama_member) ?>" 
+                   class="member-avatar-img"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-avatar-initial" style="display: none;">
+                <?= strtoupper(substr($nama_member, 0, 1)) ?>
+              </div>
+            <?php else: ?>
+              <div class="member-avatar-initial">
+                <?= strtoupper(substr($nama_member, 0, 1)) ?>
+              </div>
+            <?php endif; ?>
+          </div>
           <span class="welcome-text">
             <span class="member-name"><?= htmlspecialchars($nama_member) ?></span>
           </span>
@@ -372,6 +420,20 @@ while ($p = $paket_result->fetch_assoc()) {
       if (scrollBtn) {
         scrollBtn.classList.toggle('visible', window.pageYOffset > 300);
       }
+    });
+
+    // Handle error pada foto profil
+    document.addEventListener('DOMContentLoaded', function() {
+      const avatarImages = document.querySelectorAll('.member-avatar-img');
+      avatarImages.forEach(img => {
+        img.addEventListener('error', function() {
+          this.style.display = 'none';
+          const initialDiv = this.nextElementSibling;
+          if (initialDiv && initialDiv.classList.contains('member-avatar-initial')) {
+            initialDiv.style.display = 'flex';
+          }
+        });
+      });
     });
   </script>
 </body>

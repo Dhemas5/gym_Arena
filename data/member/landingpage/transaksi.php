@@ -11,6 +11,17 @@ if (!isset($_SESSION['login']) || $_SESSION['user_type'] !== 'member') {
 $id_member = $_SESSION['id_member'];
 $nama_member = $_SESSION['nama'];
 
+// Ambil data foto member dari database
+$foto_member = '';
+$stmt_foto = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
+$stmt_foto->bind_param("i", $id_member);
+$stmt_foto->execute();
+$result_foto = $stmt_foto->get_result();
+if ($row_foto = $result_foto->fetch_assoc()) {
+    $foto_member = $row_foto['foto'] ?? '';
+}
+$stmt_foto->close();
+
 // Cek apakah ada parameter ID untuk detail transaksi
 $show_detail = false;
 $transaction_detail = null;
@@ -42,7 +53,7 @@ if (isset($_GET['id'])) {
     }
     $stmt_detail->close();
 }
-
+  
 // Query untuk mengambil semua transaksi member dari tbl_transaksi_online
 $query = "SELECT t.*, p.nama_paket, p.durasi_hari
           FROM tbl_transaksi_online t
@@ -118,7 +129,15 @@ $result = $stmt->get_result();
             gap: 10px;
         }
 
-        .member-avatar {
+        .member-avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .member-avatar-initial {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -129,6 +148,35 @@ $result = $stmt->get_result();
             color: white;
             font-weight: 600;
             font-size: 1.1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .welcome-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .member-name {
+            color: #42a5f5;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white !important;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            color: white !important;
         }
 
         .container-main {
@@ -464,6 +512,12 @@ $result = $stmt->get_result();
             .info-row .info-label {
                 width: 100%;
             }
+
+            .member-info {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -492,12 +546,26 @@ $result = $stmt->get_result();
 
                 <div class="member-info ms-3">
                     <div class="member-avatar">
-                        <?php echo strtoupper(substr($nama_member, 0, 1)); ?>
+                        <?php if (!empty($foto_member) && $foto_member !== 'default.jpg'): ?>
+                            <img src="../../uploads/member/<?= $foto_member ?>" 
+                                 alt="Foto <?= htmlspecialchars($nama_member) ?>" 
+                                 class="member-avatar-img"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="member-avatar-initial" style="display: none;">
+                                <?= strtoupper(substr($nama_member, 0, 1)) ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="member-avatar-initial">
+                                <?= strtoupper(substr($nama_member, 0, 1)) ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <span class="welcome-text">
-                        <span style="color: #42a5f5; font-weight: 700;"><?php echo htmlspecialchars($nama_member); ?></span>
+                        <span class="member-name"><?= htmlspecialchars($nama_member) ?></span>
                     </span>
-                    <a href="../login/logout.php" class="btn btn-danger ms-2">Logout</a>
+                    <a href="../login/logout.php" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -806,6 +874,21 @@ $result = $stmt->get_result();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle error pada foto profil
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarImages = document.querySelectorAll('.member-avatar-img');
+            avatarImages.forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const initialDiv = this.nextElementSibling;
+                    if (initialDiv && initialDiv.classList.contains('member-avatar-initial')) {
+                        initialDiv.style.display = 'flex';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

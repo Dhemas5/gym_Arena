@@ -545,23 +545,58 @@ html {
 .membership-section {
   padding: 100px 0;
   background: #0a1929;
+  position: relative;
 }
 
+.membership-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(25, 118, 210, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.membership-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+/* Pricing Cards */
 .pricing-card {
   background: rgba(25, 118, 210, 0.05);
   border: 1px solid rgba(66, 165, 245, 0.2);
   border-radius: 20px;
   padding: 40px 30px;
   text-align: center;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   height: 100%;
   position: relative;
+  backdrop-filter: blur(10px);
 }
 
 .pricing-card:hover {
   transform: translateY(-10px);
   border-color: rgba(66, 165, 245, 0.5);
   box-shadow: 0 15px 40px rgba(25, 118, 210, 0.3);
+  background: rgba(25, 118, 210, 0.08);
 }
 
 .pricing-card.popular {
@@ -572,55 +607,125 @@ html {
 
 .pricing-card.popular:hover {
   transform: scale(1.05) translateY(-10px);
+  box-shadow: 0 20px 50px rgba(25, 118, 210, 0.4);
 }
 
 .popular-badge {
   position: absolute;
-  top: -15px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1976d2;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
   color: #fff;
   padding: 8px 24px;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+}
+
+/* Kategori Badge */
+.category-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(66, 165, 245, 0.2);
+  color: #42a5f5;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(66, 165, 245, 0.3);
 }
 
 .pricing-title {
   font-size: 1.8rem;
   font-weight: 700;
   color: #fff;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-top: 10px;
+}
+
+.pricing-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .pricing-price {
   margin-bottom: 30px;
   padding-bottom: 30px;
   border-bottom: 1px solid rgba(66, 165, 245, 0.2);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+}
+
+.price-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .price-currency {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.7);
-  vertical-align: top;
+  font-size: 1.8rem;
+  color: #42a5f5;
+  font-weight: 600;
+  margin-top: 8px;
 }
 
 .price-amount {
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 3.5rem;
+  font-weight: 800;
   color: #fff;
-  display: block;
   line-height: 1;
-  margin: 10px 0;
+  text-shadow: 0 2px 10px rgba(25, 118, 210, 0.3);
 }
 
 .price-period {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  margin-top: 10px;
   display: block;
+}
+
+/* Harga Mahasiswa */
+.student-price {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed rgba(66, 165, 245, 0.2);
+}
+
+.student-price-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.student-price-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 1.2rem;
+  color: #64b5f6;
+  font-weight: 600;
+}
+
+.student-price-currency {
+  font-size: 1rem;
+  color: #64b5f6;
 }
 
 .pricing-features {
@@ -637,6 +742,16 @@ html {
   display: flex;
   align-items: center;
   gap: 12px;
+  border-bottom: 1px solid rgba(66, 165, 245, 0.1);
+  transition: color 0.3s ease;
+}
+
+.pricing-features li:last-child {
+  border-bottom: none;
+}
+
+.pricing-features li:hover {
+  color: #fff;
 }
 
 .check-icon {
@@ -650,43 +765,186 @@ html {
   justify-content: center;
   font-weight: 700;
   flex-shrink: 0;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
 }
 
+.pricing-features li:hover .check-icon {
+  background: #1976d2;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Pricing Button */
 .btn-pricing {
   width: 100%;
   background: transparent;
   border: 2px solid #1976d2;
   color: #1976d2;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 14px 20px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
 .btn-pricing:hover {
   background: #1976d2;
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+  box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+  text-decoration: none;
 }
 
 .btn-pricing.popular-btn {
   background: #1976d2;
   color: #fff;
+  border-color: #1976d2;
 }
 
 .btn-pricing.popular-btn:hover {
   background: #1565c0;
+  border-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.5);
 }
 
 .pricing-note {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.9rem;
   font-style: italic;
+  text-align: center;
+  margin-top: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .pricing-card.popular {
+    transform: scale(1.02);
+  }
+  
+  .pricing-card.popular:hover {
+    transform: scale(1.02) translateY(-10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .membership-section {
+    padding: 80px 0;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .pricing-card {
+    padding: 30px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .pricing-card.popular {
+    transform: none;
+    margin-bottom: 30px;
+  }
+  
+  .pricing-card.popular:hover {
+    transform: translateY(-10px);
+  }
+  
+  .price-amount {
+    font-size: 3rem;
+  }
+  
+  .price-currency {
+    font-size: 1.5rem;
+    margin-top: 5px;
+  }
+  
+  .pricing-title {
+    font-size: 1.5rem;
+  }
+  
+  .category-badge {
+    top: 10px;
+    right: 10px;
+    font-size: 0.65rem;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .membership-section {
+    padding: 60px 0;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .pricing-card {
+    padding: 25px 15px;
+  }
+  
+  .price-amount {
+    font-size: 2.5rem;
+  }
+  
+  .price-currency {
+    font-size: 1.3rem;
+    margin-top: 3px;
+  }
+  
+  .pricing-features li {
+    font-size: 0.9rem;
+    padding: 10px 0;
+  }
+  
+  .btn-pricing {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .category-badge {
+    top: 8px;
+    right: 8px;
+    font-size: 0.6rem;
+    padding: 3px 6px;
+  }
+}
+
+/* Animation for card entrance */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pricing-card {
+  animation: cardEntrance 0.6s ease-out forwards;
+}
+
+.pricing-card:nth-child(1) { animation-delay: 0.1s; }
+.pricing-card:nth-child(2) { animation-delay: 0.2s; }
+.pricing-card:nth-child(3) { animation-delay: 0.3s; }
+.pricing-card:nth-child(4) { animation-delay: 0.4s; }
+.pricing-card:nth-child(5) { animation-delay: 0.5s; }
 
 /* ===================================
    CONTACT SECTION

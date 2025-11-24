@@ -22,10 +22,6 @@ include '../../../view/master/sidebar.php';
             <div class="card-header bg-primary text-white d-flex justify-content-between">
                 <h3 class="card-title">Daftar Paket</h3>
             </div>
-        <div class="card-body">
-        <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">
-          <i class="fas fa-plus"></i> Tambah Paket
-        </button>
             <div class="card-body">
                 <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
                 <table class="table table-bordered table-hover" id="tabelPelatih">

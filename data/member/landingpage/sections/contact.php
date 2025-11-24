@@ -16,43 +16,61 @@
           'icon' => 'location',
           'title' => 'Alamat',
           'content' => 'Jl. Kaliwates 5, Jember, Jawa Timur',
-          'type' => 'text'
+          'type' => 'location',
+          'link' => 'https://maps.app.goo.gl/Sa4KrD6Pa67DRoLn9'
         ],
         [
           'icon' => 'phone',
           'title' => 'Telepon',
           'content' => '+62 812-3456-7890',
-          'type' => 'phone'
+          'type' => 'phone',
+          'link' => 'https://wa.me/message/7TCOAF5OPHLYO1'
         ],
         [
           'icon' => 'email',
           'title' => 'Email',
           'content' => 'info@arenafit.com',
-          'type' => 'email'
+          'type' => 'email',
+          'link' => 'mailto:info@arenafit.com'
         ],
         [
           'icon' => 'time',
           'title' => 'Jam Buka',
           'content' => 'Senin - Minggu<br>05:00 - 22:00',
-          'type' => 'text'
+          'type' => 'text',
+          'link' => ''
         ]
       ];
 
       foreach ($contact_info as $info) {
         echo '
         <div class="col-lg-3 col-md-6">
-          <div class="contact-card">
+          <div class="contact-card">';
+        
+        // Buat seluruh card bisa diklik untuk tipe tertentu
+        if ($info['type'] === 'location' || $info['type'] === 'phone' || $info['type'] === 'email') {
+          echo '<a href="' . $info['link'] . '" class="contact-card-link" target="_blank" style="text-decoration: none; color: inherit; display: block;">';
+        }
+        
+        echo '
             <div class="contact-icon">
               ' . get_contact_icon($info['icon']) . '
             </div>
             <h4 class="contact-title">' . $info['title'] . '</h4>';
         
         if ($info['type'] === 'phone') {
-          echo '<a href="tel:' . $info['content'] . '" class="contact-text contact-link">' . $info['content'] . '</a>';
+          echo '<p class="contact-text contact-link">' . $info['content'] . '</p>';
         } elseif ($info['type'] === 'email') {
-          echo '<a href="mailto:' . $info['content'] . '" class="contact-text contact-link">' . $info['content'] . '</a>';
+          echo '<p class="contact-text contact-link">' . $info['content'] . '</p>';
+        } elseif ($info['type'] === 'location') {
+          echo '<p class="contact-text contact-link">' . $info['content'] . '</p>';
         } else {
           echo '<p class="contact-text">' . $info['content'] . '</p>';
+        }
+        
+        // Tutup tag link jika card bisa diklik
+        if ($info['type'] === 'location' || $info['type'] === 'phone' || $info['type'] === 'email') {
+          echo '</a>';
         }
         
         echo '
@@ -100,7 +118,7 @@
     <!-- Map -->
     <div class="contact-map">
       <iframe 
-        src="https://maps.app.goo.gl/5iK7z18jjnPrwrLC6?g_st=aw" 
+        src="https://maps.app.goo.gl/Sa4KrD6Pa67DRoLn9" 
         width="100%" 
         height="400" 
         style="border:0; border-radius: 15px;" 

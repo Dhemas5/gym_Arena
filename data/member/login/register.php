@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../landingpage/assets/css/registration.css">
 </head>
+
 <body>
     <div class="registration-container">
         <!-- Header -->
@@ -124,7 +126,7 @@
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
+
             // Toggle icon
             const icon = this.querySelector('i');
             if (type === 'text') {
@@ -139,7 +141,7 @@
         toggleConfirmPassword.addEventListener('click', function() {
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             confirmPasswordInput.setAttribute('type', type);
-            
+
             // Toggle icon
             const icon = this.querySelector('i');
             if (type === 'text') {
@@ -155,21 +157,21 @@
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             let strength = 0;
-            
+
             // Check password length
             if (password.length >= 6) strength += 25;
             if (password.length >= 8) strength += 25;
-            
+
             // Check for uppercase letters
             if (/[A-Z]/.test(password)) strength += 25;
-            
+
             // Check for numbers and special characters
             if (/[0-9]/.test(password)) strength += 15;
             if (/[^A-Za-z0-9]/.test(password)) strength += 10;
-            
+
             // Update strength bar
             passwordStrengthBar.style.width = strength + '%';
-            
+
             // Update color based on strength
             if (strength < 50) {
                 passwordStrengthBar.className = 'password-strength-bar strength-weak';
@@ -184,7 +186,7 @@
         confirmPasswordInput.addEventListener('input', function() {
             const password = passwordInput.value;
             const confirmPassword = this.value;
-            
+
             if (confirmPassword === '') {
                 passwordMatchMessage.textContent = '';
                 passwordMatchMessage.style.color = '';
@@ -201,7 +203,7 @@
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
-            
+
             if (password !== confirmPassword) {
                 e.preventDefault();
                 alert('Password dan konfirmasi password tidak cocok!');
@@ -210,4 +212,5 @@
         });
     </script>
 </body>
+
 </html>

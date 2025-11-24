@@ -50,11 +50,11 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
 }
 
 // Data untuk grafik Donut (status membership)
-$queryStatus = mysqli_query($con, "SELECT status_membership, COUNT(*) AS total FROM tbl_member GROUP BY status_membership");
+$queryStatus = mysqli_query($con, "SELECT membership_status, COUNT(*) AS total FROM tbl_member GROUP BY membership_status");
 $statusLabels = [];
 $statusData = [];
 while ($r = mysqli_fetch_assoc($queryStatus)) {
-    $statusLabels[] = $r['status_membership'];
+    $statusLabels[] = $r['membership_status'];
     $statusData[] = $r['total'];
 }
 ?>

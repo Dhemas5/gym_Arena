@@ -32,10 +32,6 @@ $jumlahPelatih = mysqli_num_rows($queryPelatih);
 $queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
 $jumlahJadwal = mysqli_num_rows($queryJadwal);
 
-// // notifikasi
-// $queryNotif = mysqli_query($con, "SELECT * FROM tbl_member WHERE status_notif = 'baru' ORDER BY tanggal_daftar DESC LIMIT 5");
-// $jumlahNotif = mysqli_num_rows($queryNotif);
-
 // Data untuk grafik pendaftaran member per bulan
 $dataBulan = [];
 $dataJumlah = [];
@@ -53,14 +49,14 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
   $dataJumlah[] = $row['jumlah'];
 }
 
-// // Data untuk grafik Donut (status membership)
-// $queryStatus = mysqli_query($con, "SELECT status_membership, COUNT(*) AS total FROM tbl_member GROUP BY status_membership");
-// $statusLabels = [];
-// $statusData = [];
-// while ($r = mysqli_fetch_assoc($queryStatus)) {
-//   $statusLabels[] = $r['status_membership'];
-//   $statusData[] = $r['total'];
-// }
+// Data untuk grafik Donut (status membership)
+$queryStatus = mysqli_query($con, "SELECT membership_status, COUNT(*) AS total FROM tbl_member GROUP BY membership_status");
+$statusLabels = [];
+$statusData = [];
+while ($r = mysqli_fetch_assoc($queryStatus)) {
+    $statusLabels[] = $r['membership_status'];
+    $statusData[] = $r['total'];
+}
 ?>
 
 <!-- Content Header -->
@@ -157,33 +153,32 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
       </div>
     </div>
 
-    <!-- Chart Tabs (AdminLTE Style) -->
+        <!-- Chart Section: Line dan Donut Berdampingan -->
+        <div class="row">
+  <!-- Grafik Line (lebih panjang) -->
+  <div class="col-md-8 mb-4">
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-chart-pie mr-1"></i>
-          Statistik Member Tahun <?= date('Y') ?>
-        </h3>
-        <div class="card-tools">
-          <ul class="nav nav-pills ml-auto">
-            <li class="nav-item"><a class="nav-link active" href="#area-chart" data-toggle="tab">Pendaftaran</a></li>
-            <li class="nav-item"><a class="nav-link" href="#donut-chart" data-toggle="tab">Status</a></li>
-          </ul>
-        </div>
+      <div class="card-header bg-primary text-white">
+        <i class="fas fa-chart-line mr-2"></i> Statistik Pendaftaran Member Tahun <?= date('Y') ?>
       </div>
-      <div class="card-body">
-        <div class="tab-content p-0">
-          <div class="chart tab-pane active" id="area-chart" style="position: relative; height: 300px;">
-            <canvas id="areaChart" height="300"></canvas>
-          </div>
-          <div class="chart tab-pane" id="donut-chart" style="position: relative; height: 300px;">
-            <canvas id="donutChart" height="300"></canvas>
-          </div>
-        </div>
+      <div class="card-body" style="height: 350px;">
+        <canvas id="areaChart"></canvas>
       </div>
     </div>
-
   </div>
+
+  <!-- Grafik Donut (lebih kecil, menyesuaikan) -->
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <i class="fas fa-chart-pie mr-2"></i> Status Member Tahun <?= date('Y') ?>
+      </div>
+      <div class="card-body" style="height: 350px;">
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
 <!-- ChartJS Script -->

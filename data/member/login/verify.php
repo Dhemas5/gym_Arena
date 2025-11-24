@@ -8,6 +8,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../vendor/autoload.php';
 
+// Set timezone ke Asia/Jakarta
+date_default_timezone_set('Asia/Jakarta');
+
 // Cek apakah user sudah di halaman verifikasi
 if (!isset($_SESSION['verify_email'])) {
     header("Location: register.php");
@@ -22,38 +25,47 @@ $success = "";
 if (isset($_POST['verifybtn'])) {
     $input_code = trim(htmlspecialchars($_POST['verification_code']));
     
-    // Cek kode verifikasi di database
-    $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND code_expiry > NOW() AND is_verified = 0");
+    // Query verifikasi yang lebih robust
+    $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
     $query->bind_param("ss", $email, $input_code);
     $query->execute();
     $result = $query->get_result();
-    
+
     if ($result->num_rows === 1) {
-        // Update status verifikasi
-        $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL WHERE email = ?");
-        $update->bind_param("s", $email);
+        $member = $result->fetch_assoc();
+        $expiry_time = strtotime($member['code_expiry']);
+        $current_time = time();
         
-        if ($update->execute()) {
-            // Hapus session verifikasi
-            unset($_SESSION['verify_email']);
-            unset($_SESSION['registration_step']);
+        // Manual check expiry time dengan timezone Jakarta
+        if ($expiry_time > $current_time) {
+            // Kode masih valid, lanjutkan verifikasi
+            $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
+            $update->bind_param("s", $email);
             
-            // Set session untuk menampilkan pesan sukses di halaman login
-            $_SESSION['verification_success'] = true;
-            $_SESSION['verified_email'] = $email;
-            
-            // Redirect ke halaman login
-            header("Location: login.php");
-            exit();
+            if ($update->execute()) {
+                // Hapus session verifikasi
+                unset($_SESSION['verify_email']);
+                unset($_SESSION['registration_step']);
+                
+                $_SESSION['verification_success'] = true;
+                $_SESSION['verified_email'] = $email;
+                
+                header("Location: login.php");
+                exit();
+            } else {
+                $error = "❌ Gagal memperbarui status verifikasi!";
+            }
+        } else {
+            $error = "❌ Kode verifikasi sudah kadaluarsa!";
         }
     } else {
-        $error = "❌ Kode verifikasi salah atau sudah kadaluarsa!";
+        $error = "❌ Kode verifikasi salah!";
     }
 }
 
 // Kirim ulang kode verifikasi
 if (isset($_POST['resendbtn'])) {
-    // Generate kode baru
+    // Generate kode baru dengan timezone Jakarta
     $new_code = sprintf("%06d", mt_rand(1, 999999));
     $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
     
@@ -87,14 +99,16 @@ if (isset($_POST['resendbtn'])) {
             $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
             $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
                               Kode verifikasi baru Anda adalah: <h2 style='color: #1976d2;'>$new_code</h2><br>
-                              Kode ini berlaku selama 1 jam.<br><br>
+                              Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB</strong><br><br>
                               Silakan masukkan kode ini pada halaman verifikasi.";
 
             $mail->send();
-            $success = "✅ Kode verifikasi baru telah dikirim ke email Anda!";
+            $success = "✅ Kode verifikasi baru telah dikirim ke email Anda! Berlaku hingga " . date('H:i', strtotime($new_expiry)) . " WIB";
         } catch (Exception $e) {
             $error = "❌ Gagal mengirim email. Error: " . $mail->ErrorInfo;
         }
+    } else {
+        $error = "❌ Gagal memperbarui kode verifikasi!";
     }
 }
 ?>
@@ -456,7 +470,7 @@ if (isset($_POST['resendbtn'])) {
         </form>
 
         <div class="info-box">
-            <p>💡 Kode verifikasi berlaku selama 1 jam. Jika tidak menerima email, periksa folder spam atau klik tombol kirim ulang.</p>
+            <p>💡 Kode verifikasi berlaku selama 1 jam (WIB). Jika tidak menerima email, periksa folder spam atau klik tombol kirim ulang.</p>
         </div>
 
         <div class="links">

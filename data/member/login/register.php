@@ -1,408 +1,15 @@
-<?php
-ob_start();
-session_start();
-require "../../../setting/koneksi.php";
-require "../../../setting/session.php";
-blockLoginPageIfLoggedIn();
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require '../../../vendor/autoload.php';
-
-date_default_timezone_set('Asia/Jakarta');
-
-if ($con->connect_error) {
-    die("Koneksi gagal: " . $con->connect_error);
-}
-
-$error = "";
-$success = "";
-
-// Jika tombol register ditekan (hanya menyimpan data dan kirim verifikasi)
-if (isset($_POST['registerbtn'])) {
-    $nama = trim(htmlspecialchars($_POST['nama']));
-    $email = trim(htmlspecialchars($_POST['email']));
-    $password = trim(htmlspecialchars($_POST['password']));
-    $confirm_password = trim(htmlspecialchars($_POST['confirm_password']));
-    $no_hp = trim(htmlspecialchars($_POST['no_hp']));
-
-    // Validasi input
-    if (empty($nama) || empty($email) || empty($password) || empty($confirm_password) || empty($no_hp)) {
-        $error = "Semua field harus diisi!";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Format email tidak valid!";
-    } elseif ($password !== $confirm_password) {
-        $error = "Password dan konfirmasi password tidak cocok!";
-    } elseif (strlen($password) < 6) {
-        $error = "Password minimal 6 karakter!";
-    } else {
-        // Cek apakah email atau username sudah terdaftar
-        $check_query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? OR nama = ?");
-        $check_query->bind_param("ss", $email, $nama);
-        $check_query->execute();
-        $check_result = $check_query->get_result();
-
-        if ($check_result->num_rows > 0) {
-            $error = "Username atau email sudah terdaftar!";
-        } else {
-            // Hash password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            
-            // Generate kode verifikasi 6 digit
-            $verification_code = sprintf("%06d", mt_rand(1, 999999));
-            $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
-            
-            // Insert data ke database dengan is_verified = 0 (TANPA PAKET MEMBERSHIP DULU)
-            $insert_query = $con->prepare("INSERT INTO tbl_member (nama, email, password, no_hp, verification_code, code_expiry, is_verified) VALUES (?, ?, ?, ?, ?, ?, 0)");
-            $insert_query->bind_param("ssssss", $nama, $email, $hashed_password, $no_hp, $verification_code, $code_expiry);
-
-            if ($insert_query->execute()) {
-                // Kirim kode verifikasi via email
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host       = 'smtp.gmail.com';
-                    $mail->SMTPAuth   = true;
-                    $mail->Username   = 'valhidayat01@gmail.com';
-                    $mail->Password   = 'ecbnikaaznxaujbk';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port       = 587;
-
-                    $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
-                    $mail->addAddress($email);
-
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Kode Verifikasi Registrasi Arena FIT';
-                    $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
-                                      Terima kasih telah mendaftar di Arena FIT!<br><br>
-                                      Kode verifikasi Anda adalah: <h2 style='color: #1976d2;'>$verification_code</h2><br>
-                                      Kode ini berlaku selama 1 jam.<br><br>
-                                      Silakan masukkan kode ini pada halaman verifikasi untuk melanjutkan.";
-
-                    $mail->send();
-                    
-                    // Redirect ke halaman verifikasi
-                    $_SESSION['verify_email'] = $email;
-                    $_SESSION['registration_step'] = 'verify';
-                    header("Location: verify.php");
-                    exit();
-                    
-                } catch (Exception $e) {
-                    $error = "Registrasi berhasil, tapi gagal mengirim email verifikasi. Error: " . $mail->ErrorInfo;
-                }
-            } else {
-                $error = "Terjadi kesalahan saat registrasi. Silakan coba lagi!";
-            }
-        }
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendaftaran Member - Arena FIT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(66, 165, 245, 0.15) 0%, transparent 70%);
-            top: -250px;
-            right: -250px;
-            border-radius: 50%;
-        }
-
-        body::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(25, 118, 210, 0.1) 0%, transparent 70%);
-            bottom: -200px;
-            left: -200px;
-            border-radius: 50%;
-        }
-
-        .registration-container {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header-section img {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            border: 2px solid rgba(66, 165, 245, 0.3);
-        }
-
-        .header-section h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .header-section .text-primary {
-            background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-section p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .step-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(25, 118, 210, 0.2);
-            border: 2px solid rgba(66, 165, 245, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            transition: all 0.3s;
-        }
-
-        .step.active .step-circle {
-            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-            border-color: #42a5f5;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(66, 165, 245, 0.4);
-        }
-
-        .step span {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .step.active span {
-            color: #42a5f5;
-        }
-
-        .step-arrow {
-            color: rgba(66, 165, 245, 0.3);
-            font-size: 1.5rem;
-        }
-
-        .section-card {
-            background: rgba(13, 27, 42, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px;
-            border: 1px solid rgba(66, 165, 245, 0.2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 25px;
-        }
-
-        .alert {
-            border-radius: 12px;
-            padding: 14px 18px;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-            animation: shake 0.5s ease-in-out;
-            border: none;
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-
-        .alert-success {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #86efac;
-        }
-
-        .alert-info {
-            background: rgba(66, 165, 245, 0.15);
-            border: 1px solid rgba(66, 165, 245, 0.3);
-            color: #93c5fd;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-label {
-            display: block;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(66, 165, 245, 0.6);
-            font-size: 1.1rem;
-            pointer-events: none;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 16px 14px 48px;
-            background: rgba(25, 118, 210, 0.05);
-            border: 1px solid rgba(66, 165, 245, 0.2);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #42a5f5;
-            background: rgba(25, 118, 210, 0.08);
-            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 600;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .links {
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        .links a {
-            color: #42a5f5;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .links a:hover {
-            color: #64b5f6;
-            text-decoration: underline;
-        }
-
-        .links p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95rem;
-        }
-
-        @media (max-width: 768px) {
-            .section-card {
-                padding: 25px;
-            }
-
-            .header-section h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../landingpage/assets/css/registration.css">
 </head>
+
 <body>
     <div class="registration-container">
         <!-- Header -->
@@ -441,7 +48,7 @@ if (isset($_POST['registerbtn'])) {
                 <div class="alert alert-success"><?= $success; ?></div>
             <?php endif; ?>
 
-            <form method="POST">
+            <form method="POST" id="registrationForm">
                 <div class="form-group">
                     <label class="form-label">Username *</label>
                     <div class="input-wrapper">
@@ -473,7 +80,13 @@ if (isset($_POST['registerbtn'])) {
                     <label class="form-label">Password *</label>
                     <div class="input-wrapper">
                         <span class="input-icon">🔒</span>
-                        <input type="password" name="password" class="form-control" placeholder="Minimal 6 karakter" required>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Minimal 6 karakter" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
                     </div>
                 </div>
 
@@ -481,8 +94,12 @@ if (isset($_POST['registerbtn'])) {
                     <label class="form-label">Konfirmasi Password *</label>
                     <div class="input-wrapper">
                         <span class="input-icon">🔒</span>
-                        <input type="password" name="confirm_password" class="form-control" placeholder="Ulangi password" required>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Ulangi password" required>
+                        <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
+                    <div id="passwordMatchMessage" style="margin-top: 8px; font-size: 0.9rem;"></div>
                 </div>
 
                 <button type="submit" name="registerbtn" class="btn-primary">
@@ -497,7 +114,103 @@ if (isset($_POST['registerbtn'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+        const passwordMatchMessage = document.getElementById('passwordMatchMessage');
 
-<?php ob_end_flush(); ?>
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle icon
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+
+            // Toggle icon
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Password strength indicator
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+
+            // Check password length
+            if (password.length >= 6) strength += 25;
+            if (password.length >= 8) strength += 25;
+
+            // Check for uppercase letters
+            if (/[A-Z]/.test(password)) strength += 25;
+
+            // Check for numbers and special characters
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+
+            // Update strength bar
+            passwordStrengthBar.style.width = strength + '%';
+
+            // Update color based on strength
+            if (strength < 50) {
+                passwordStrengthBar.className = 'password-strength-bar strength-weak';
+            } else if (strength < 80) {
+                passwordStrengthBar.className = 'password-strength-bar strength-medium';
+            } else {
+                passwordStrengthBar.className = 'password-strength-bar strength-strong';
+            }
+        });
+
+        // Password confirmation check
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+
+            if (confirmPassword === '') {
+                passwordMatchMessage.textContent = '';
+                passwordMatchMessage.style.color = '';
+            } else if (password === confirmPassword) {
+                passwordMatchMessage.textContent = '✓ Password cocok';
+                passwordMatchMessage.style.color = '#4caf50';
+            } else {
+                passwordMatchMessage.textContent = '✗ Password tidak cocok';
+                passwordMatchMessage.style.color = '#f44336';
+            }
+        });
+
+        // Form validation
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Password dan konfirmasi password tidak cocok!');
+                confirmPasswordInput.focus();
+            }
+        });
+    </script>
+</body>
+
+</html>

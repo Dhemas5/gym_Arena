@@ -164,7 +164,7 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Data Instruktur</h1>
+                <h1>Menu Instruktur</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -180,7 +180,7 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
     <div class="container-fluid">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h3 class="card-title">Daftar Instruktur</h3>
+                <h3 class="card-title">Data Instruktur</h3>
             </div>
             <div class="card-body">
                 <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah">

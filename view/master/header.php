@@ -27,6 +27,9 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../assets/assets_admin/dist/css/admin-styles.css">
+    
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition light-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed <?= $body_class ?? '' ?>">
@@ -66,11 +69,9 @@
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
+                        <!-- Hanya tombol "Tandai Semua Sudah Dibaca" saja -->
                         <a href="javascript:void(0)" class="dropdown-item dropdown-footer" id="markAllRead">
                             <i class="fas fa-check-circle mr-1"></i> Tandai Semua Sudah Dibaca
-                        </a>
-                        <a href="notifikasi.php" class="dropdown-item dropdown-footer">
-                            <i class="fas fa-list mr-1"></i> Lihat Semua Notifikasi
                         </a>
                     </div>
                 </li>
@@ -94,124 +95,183 @@
             </ul>
         </nav>
         <!-- /.navbar -->
-         <script>
-$(document).ready(function() {
-    // Load notifikasi pertama kali
-    loadNotifications();
-    
-    // Auto refresh notifikasi setiap 30 detik
-    setInterval(loadNotifications, 30000);
-    
-    // Tandai semua sudah dibaca
-    $('#markAllRead').click(function(e) {
-        e.preventDefault();
-        markAllAsRead();
-    });
-    
-    // Toggle dropdown notifikasi
-    $('#notificationDropdown').click(function() {
-        loadNotifications();
-    });
-});
 
-function loadNotifications() {
-    $.ajax({
-        url: '../../api/notifikasi_api.php?action=get_notifications&limit=10',
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                updateNotificationUI(response.notifications, response.unread_count);
-            }
-        },
-        error: function() {
-            console.error('Gagal memuat notifikasi');
-        }
-    });
-}
-
-function updateNotificationUI(notifications, unreadCount) {
-    // Update badge count
-    $('#notificationCount').text(unreadCount);
-    $('#notificationHeader').text(unreadCount + ' Notifikasi');
-    
-    // Update notification list
-    let notificationHTML = '';
-    
-    if (notifications.length === 0) {
-        notificationHTML = `
-            <div class="text-center py-3 text-muted">
-                <i class="fas fa-bell-slash fa-2x mb-2"></i>
-                <p>Tidak ada notifikasi</p>
-            </div>
-        `;
-    } else {
-        notifications.forEach(notif => {
-            const badgeClass = notif.dibaca ? 'badge-secondary' : 'badge-primary';
-            notificationHTML += `
-                <div class="dropdown-item notification-item ${!notif.dibaca ? 'bg-light' : ''}" 
-                     data-id="${notif.id}" style="border-left: 3px solid ${getColorByType(notif.tipe)}">
-                    <div class="d-flex align-items-start">
-                        <div class="mr-2">
-                            <i class="${notif.icon} text-${getColorByType(notif.tipe)}"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between">
-                                <h6 class="mb-1" style="font-size: 0.9rem;">${notif.judul}</h6>
-                                <small class="text-muted">${notif.waktu}</small>
-                            </div>
-                            <p class="mb-1 small text-muted">${notif.pesan}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="dropdown-divider"></div>
-            `;
+        <script>
+        $(document).ready(function() {
+            console.log('Notifikasi system initialized');
+            
+            // Load notifikasi pertama kali
+            loadNotifications();
+            
+            // Auto refresh notifikasi setiap 30 detik
+            setInterval(loadNotifications, 30000);
+            
+            // Tandai semua sudah dibaca
+            $('#markAllRead').click(function(e) {
+                e.preventDefault();
+                markAllAsRead();
+            });
+            
+            // Toggle dropdown notifikasi
+            $('#notificationDropdown').click(function() {
+                console.log('Notification dropdown clicked');
+                loadNotifications();
+            });
         });
-    }
-    
-    $('#notificationList').html(notificationHTML);
-    
-    // Add click event untuk mark as read
-    $('.notification-item').click(function() {
-        const notifId = $(this).data('id');
-        markAsRead(notifId);
-    });
-}
 
-function getColorByType(tipe) {
-    switch (tipe) {
-        case 'member_baru': return 'success';
-        case 'transaksi': return 'info';
-        default: return 'primary';
-    }
-}
+        function loadNotifications() {
+            console.log('Loading notifications...');
+            
+            $.ajax({
+                url: '../../api/notifikasi_api.php?action=get_notifications&limit=5',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Notifications response:', response);
+                    if (response.success) {
+                        updateNotificationUI(response.notifications, response.unread_count);
+                    } else {
+                        console.error('Notifications API error:', response.message);
+                        showNotificationError('Gagal memuat notifikasi: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load notifications:', error);
+                    showNotificationError('Koneksi gagal: ' + error);
+                }
+            });
+        }
 
-function markAsRead(notifId) {
-    $.ajax({
-        url: '../../api/notifikasi_api.php?action=mark_read',
-        type: 'POST',
-        data: { id: notifId },
-        dataType: 'json'
-    });
-}
-
-function markAllAsRead() {
-    $.ajax({
-        url: '../../api/notifikasi_api.php?action=mark_all_read',
-        type: 'POST',
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                loadNotifications(); // Reload notifikasi
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: response.message,
-                    timer: 2000,
-                    showConfirmButton: false
+        function updateNotificationUI(notifications, unreadCount) {
+            console.log('Updating UI with', notifications.length, 'notifications,', unreadCount, 'unread');
+            
+            // Update badge count
+            $('#notificationCount').text(unreadCount);
+            $('#notificationHeader').text(unreadCount > 0 ? unreadCount + ' Notifikasi Baru' : 'Tidak ada notifikasi baru');
+            
+            // Update notification list
+            let notificationHTML = '';
+            
+            if (notifications.length === 0) {
+                notificationHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                        <p>Tidak ada notifikasi</p>
+                        <small class="text-muted">Registrasi member baru akan muncul di sini</small>
+                    </div>
+                `;
+            } else {
+                notifications.forEach(notif => {
+                    const isUnread = !notif.dibaca;
+                    const borderColor = getColorByType(notif.tipe);
+                    notificationHTML += `
+                        <div class="dropdown-item notification-item ${isUnread ? 'unread' : ''}" 
+                             data-id="${notif.id}" style="cursor: pointer; border-left: 3px solid ${borderColor};">
+                            <div class="d-flex align-items-start">
+                                <div class="mr-2">
+                                    <i class="${notif.icon} text-${getColorClassByType(notif.tipe)}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">${notif.judul}</h6>
+                                        ${isUnread ? '<span class="badge badge-primary badge-sm ml-2">Baru</span>' : ''}
+                                    </div>
+                                    <p class="mb-1 small text-muted" style="line-height: 1.3;">${notif.pesan}</p>
+                                    <small class="text-muted"><i class="far fa-clock mr-1"></i>${notif.waktu}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                    `;
                 });
             }
+            
+            $('#notificationList').html(notificationHTML);
+            
+            // Add click event untuk mark as read
+            $('.notification-item').click(function() {
+                const notifId = $(this).data('id');
+                console.log('Marking notification as read:', notifId);
+                markAsRead(notifId);
+                
+                // Update UI langsung
+                $(this).removeClass('unread').find('.badge').remove();
+                
+                // Update counter
+                const currentCount = parseInt($('#notificationCount').text());
+                if (currentCount > 0) {
+                    $('#notificationCount').text(currentCount - 1);
+                    $('#notificationHeader').text((currentCount - 1) > 0 ? (currentCount - 1) + ' Notifikasi Baru' : 'Tidak ada notifikasi baru');
+                }
+            });
         }
-    });
-}
-</script>
+
+        function showNotificationError(message) {
+            $('#notificationList').html(`
+                <div class="text-center py-3 text-danger">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <p>${message}</p>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="loadNotifications()">
+                        <i class="fas fa-redo mr-1"></i> Coba Lagi
+                    </button>
+                </div>
+            `);
+        }
+
+        function getColorByType(tipe) {
+            switch (tipe) {
+                case 'member_baru': return '#28a745';
+                case 'transaksi': return '#17a2b8';
+                default: return '#6c757d';
+            }
+        }
+
+        function getColorClassByType(tipe) {
+            switch (tipe) {
+                case 'member_baru': return 'success';
+                case 'transaksi': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        function markAsRead(notifId) {
+            $.ajax({
+                url: '../../api/notifikasi_api.php?action=mark_read',
+                type: 'POST',
+                data: { id: notifId },
+                dataType: 'json',
+                error: function() {
+                    console.error('Gagal menandai notifikasi sebagai dibaca');
+                }
+            });
+        }
+
+        function markAllAsRead() {
+            $.ajax({
+                url: '../../api/notifikasi_api.php?action=mark_all_read',
+                type: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        loadNotifications();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi kesalahan saat menandai notifikasi',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+        </script>

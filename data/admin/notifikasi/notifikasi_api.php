@@ -1,79 +1,107 @@
 <?php
-require "../../../setting/session.php";
-checkSession("admin");
-require "../../../setting/koneksi.php";
+session_start();
+require "../../setting/koneksi.php";
+
 header('Content-Type: application/json');
+
+// Cek apakah user adalah admin/staff
+if (!isset($_SESSION['user_level']) || ($_SESSION['user_level'] != 'admin' && $_SESSION['user_level'] != 'staff')) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit;
+}
 
 $action = $_GET['action'] ?? '';
 
-if ($action == 'get_notifications') {
-    $limit = intval($_GET['limit'] ?? 10);
-    
-    // Ambil notifikasi terbaru
-    $query = $con->prepare("
-        SELECT * FROM tbl_notifikasi 
-        ORDER BY dibuat_pada DESC 
-        LIMIT ?
-    ");
-    $query->bind_param('i', $limit);
-    $query->execute();
-    $result = $query->get_result();
-    
-    $notifications = [];
-    while ($row = $result->fetch_assoc()) {
-        $notifications[] = [
-            'id' => $row['id_notifikasi'],
-            'judul' => $row['judul'],
-            'pesan' => $row['pesan'],
-            'tipe' => $row['tipe'],
-            'waktu' => waktu_lalu($row['dibuat_pada']),
-            'dibaca' => (bool)$row['dibaca'],
-            'icon' => get_icon_by_type($row['tipe'])
-        ];
-    }
-    
-    // Hitung jumlah notifikasi belum dibaca
-    $count_query = $con->query("SELECT COUNT(*) as total FROM tbl_notifikasi WHERE dibaca = 0");
-    $count_data = $count_query->fetch_assoc();
-    $unread_count = $count_data['total'];
-    
-    echo json_encode([
-        'success' => true,
-        'notifications' => $notifications,
-        'unread_count' => $unread_count
-    ]);
-    exit;
+switch ($action) {
+    case 'get_notifications':
+        getNotifications();
+        break;
+    case 'mark_read':
+        markAsRead();
+        break;
+    case 'mark_all_read':
+        markAllAsRead();
+        break;
+    default:
+        echo json_encode(['success' => false, 'message' => 'Action tidak valid']);
 }
 
-if ($action == 'mark_all_read') {
-    $con->query("UPDATE tbl_notifikasi SET dibaca = 1 WHERE dibaca = 0");
-    echo json_encode(['success' => true, 'message' => 'Semua notifikasi telah ditandai sudah dibaca']);
-    exit;
+function getNotifications() {
+    global $con;
+    
+    $limit = intval($_GET['limit'] ?? 5);
+    
+    // Query untuk mendapatkan notifikasi
+    $query = "SELECT * FROM tbl_notifikasi 
+              ORDER BY dibuat_pada DESC 
+              LIMIT ?";
+    
+    if ($stmt = $con->prepare($query)) {
+        $stmt->bind_param("i", $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $notifications = [];
+        $unread_count = 0;
+        
+        while ($row = $result->fetch_assoc()) {
+            $notifications[] = [
+                'id' => $row['id'],
+                'judul' => $row['judul'],
+                'pesan' => $row['pesan'],
+                'tipe' => $row['tipe'],
+                'dibaca' => (bool)$row['dibaca'],
+                'icon' => getIconByType($row['tipe']),
+                'waktu' => formatWaktu($row['dibuat_pada'])
+            ];
+            
+            if (!$row['dibaca']) {
+                $unread_count++;
+            }
+        }
+        
+        $stmt->close();
+        
+        echo json_encode([
+            'success' => true,
+            'notifications' => $notifications,
+            'unread_count' => $unread_count
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
 }
 
-if ($action == 'mark_read') {
-    $id = intval($_POST['id'] ?? 0);
-    if ($id > 0) {
-        $con->query("UPDATE tbl_notifikasi SET dibaca = 1 WHERE id_notifikasi = $id");
+function markAsRead() {
+    global $con;
+    
+    $id = $_POST['id'] ?? 0;
+    
+    if ($id) {
+        $query = "UPDATE tbl_notifikasi SET dibaca = 1, dibaca_pada = NOW() WHERE id = ?";
+        if ($stmt = $con->prepare($query)) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
     }
+    
     echo json_encode(['success' => true]);
-    exit;
 }
 
-// Fungsi helper untuk format waktu
-function waktu_lalu($timestamp) {
-    $selisih = time() - strtotime($timestamp);
+function markAllAsRead() {
+    global $con;
     
-    if ($selisih < 60) return 'Baru saja';
-    if ($selisih < 3600) return floor($selisih / 60) . ' menit lalu';
-    if ($selisih < 86400) return floor($selisih / 3600) . ' jam lalu';
-    if ($selisih < 2592000) return floor($selisih / 86400) . ' hari lalu';
+    $query = "UPDATE tbl_notifikasi SET dibaca = 1, dibaca_pada = NOW() WHERE dibaca = 0";
+    if ($stmt = $con->prepare($query)) {
+        $stmt->execute();
+        $stmt->close();
+    }
     
-    return date('d M Y', strtotime($timestamp));
+    echo json_encode(['success' => true, 'message' => 'Semua notifikasi telah ditandai sudah dibaca']);
 }
 
-// Fungsi helper untuk icon notifikasi
-function get_icon_by_type($tipe) {
+function getIconByType($tipe) {
     switch ($tipe) {
         case 'member_baru': return 'fas fa-user-plus';
         case 'transaksi': return 'fas fa-shopping-cart';
@@ -81,5 +109,16 @@ function get_icon_by_type($tipe) {
     }
 }
 
-echo json_encode(['success' => false, 'message' => 'Aksi tidak valid']);
+function formatWaktu($timestamp) {
+    $now = new DateTime();
+    $waktu = new DateTime($timestamp);
+    $diff = $now->diff($waktu);
+    
+    if ($diff->y > 0) return $diff->y . ' tahun lalu';
+    if ($diff->m > 0) return $diff->m . ' bulan lalu';
+    if ($diff->d > 0) return $diff->d . ' hari lalu';
+    if ($diff->h > 0) return $diff->h . ' jam lalu';
+    if ($diff->i > 0) return $diff->i . ' menit lalu';
+    return 'Baru saja';
+}
 ?>

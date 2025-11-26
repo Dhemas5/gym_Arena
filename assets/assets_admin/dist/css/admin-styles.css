@@ -67,6 +67,185 @@ html {
   font-size: 1.1rem;
 }
 
+/* ============ NOTIFICATION STYLES ============ */
+.notification-item {
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  border-left: 3px solid transparent;
+  padding: 0.75rem 1rem;
+}
+
+.notification-item:hover {
+  background: #1b263b;
+  transform: translateX(2px);
+}
+
+.notification-item.unread {
+  background: rgba(25, 118, 210, 0.1);
+  border-left-color: #1976d2;
+}
+
+.notification-item .notification-content {
+  flex: 1;
+}
+
+.notification-item .notification-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #ffffff;
+}
+
+.notification-item .notification-message {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.notification-item .notification-time {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.notification-item .notification-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.notification-item .notification-icon.member {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.notification-item .notification-icon.transaksi {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+}
+
+.notification-item .notification-icon.lainnya {
+  background: rgba(158, 158, 158, 0.2);
+  color: #9e9e9e;
+}
+
+/* Badge notification */
+.navbar-badge {
+  font-size: 0.6rem;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  background: #ff5722;
+  border: 2px solid #0d1b2a;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 5px rgba(255, 87, 34, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 87, 34, 0);
+  }
+}
+
+/* Dropdown notification */
+.dropdown-menu-lg {
+  max-width: 400px;
+  min-width: 350px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.dropdown-notification {
+  padding: 0;
+}
+
+.dropdown-notification .dropdown-header {
+  background: #1b263b;
+  color: #ffffff;
+  font-weight: 600;
+  border-bottom: 1px solid #2c3e50;
+}
+
+.dropdown-notification .dropdown-item {
+  border-bottom: 1px solid #2c3e50;
+  padding: 0.75rem 1rem;
+}
+
+.dropdown-notification .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-notification .dropdown-footer {
+  background: #1b263b;
+  border-top: 1px solid #2c3e50;
+  padding: 0.75rem 1rem;
+}
+
+.dropdown-notification .dropdown-footer .dropdown-item {
+  border-bottom: none;
+  padding: 0.5rem 0;
+  color: #2196f3;
+}
+
+.dropdown-notification .dropdown-footer .dropdown-item:hover {
+  background: transparent;
+  color: #64b5f6;
+}
+
+/* Empty state */
+.notification-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.notification-empty i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.notification-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Loading state */
+.notification-loading {
+  text-align: center;
+  padding: 1.5rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.notification-loading i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Dropdown Menu Styling */
 .dropdown-menu {
   border: none;
@@ -721,6 +900,11 @@ html {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
+
+  .dropdown-menu-lg {
+    min-width: 300px;
+    max-width: 350px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -791,6 +975,12 @@ html {
   .user-panel {
     padding: 0.75rem 1rem !important;
   }
+
+  .dropdown-menu-lg {
+    min-width: 280px;
+    max-width: 300px;
+    right: -50px !important;
+  }
 }
 
 @media (max-width: 575px) {
@@ -833,6 +1023,12 @@ html {
   .table td:last-child .btn {
     width: 100%;
     margin: 0;
+  }
+
+  .dropdown-menu-lg {
+    min-width: 250px;
+    max-width: 280px;
+    right: -80px !important;
   }
 }
 

@@ -3,7 +3,7 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 
-// Import PHPMailer di bagian paling atas
+// Import PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../vendor/autoload.php';
@@ -11,8 +11,8 @@ require '../../../vendor/autoload.php';
 // Set timezone ke Asia/Jakarta
 date_default_timezone_set('Asia/Jakarta');
 
-// Cek apakah user sudah di halaman verifikasi
-if (!isset($_SESSION['verify_email'])) {
+// Cek apakah user sudah di halaman verifikasi dengan session yang valid
+if (!isset($_SESSION['verify_email']) || empty($_SESSION['verify_email'])) {
     header("Location: register.php");
     exit();
 }
@@ -21,98 +21,167 @@ $email = $_SESSION['verify_email'];
 $error = "";
 $success = "";
 
+// Validasi email session
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    session_destroy();
+    header("Location: register.php");
+    exit();
+}
+
 // Proses verifikasi kode
 if (isset($_POST['verifybtn'])) {
     $input_code = trim(htmlspecialchars($_POST['verification_code']));
     
-    // Query verifikasi yang lebih robust
-    $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
-    $query->bind_param("ss", $email, $input_code);
-    $query->execute();
-    $result = $query->get_result();
+    // Validasi input kode
+    if (empty($input_code) || strlen($input_code) != 6 || !is_numeric($input_code)) {
+        $error = "❌ Kode verifikasi harus 6 digit angka!";
+    } else {
+        // Query verifikasi dengan prepared statement
+        $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
+        $query->bind_param("ss", $email, $input_code);
+        $query->execute();
+        $result = $query->get_result();
 
-    if ($result->num_rows === 1) {
-        $member = $result->fetch_assoc();
-        $expiry_time = strtotime($member['code_expiry']);
-        $current_time = time();
-        
-        // Manual check expiry time dengan timezone Jakarta
-        if ($expiry_time > $current_time) {
-            // Kode masih valid, lanjutkan verifikasi
-            $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
-            $update->bind_param("s", $email);
+        if ($result->num_rows === 1) {
+            $member = $result->fetch_assoc();
+            $expiry_time = strtotime($member['code_expiry']);
+            $current_time = time();
             
-            if ($update->execute()) {
-                // Hapus session verifikasi
-                unset($_SESSION['verify_email']);
-                unset($_SESSION['registration_step']);
+            // Check expiry time
+            if ($expiry_time > $current_time) {
+                // Kode valid, lanjutkan verifikasi
+                $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
+                $update->bind_param("s", $email);
                 
-                $_SESSION['verification_success'] = true;
-                $_SESSION['verified_email'] = $email;
-                
-                header("Location: login.php");
-                exit();
+                if ($update->execute()) {
+                    // Hapus session verifikasi
+                    unset($_SESSION['verify_email']);
+                    unset($_SESSION['registration_step']);
+                    
+                    // Set session success
+                    $_SESSION['verification_success'] = true;
+                    $_SESSION['verified_email'] = $email;
+                    
+                    header("Location: login.php");
+                    exit();
+                } else {
+                    $error = "❌ Gagal memperbarui status verifikasi! Silakan coba lagi.";
+                }
             } else {
-                $error = "❌ Gagal memperbarui status verifikasi!";
+                $error = "❌ Kode verifikasi sudah kadaluarsa! Silakan minta kode baru.";
             }
         } else {
-            $error = "❌ Kode verifikasi sudah kadaluarsa!";
+            $error = "❌ Kode verifikasi salah! Periksa kembali kode Anda.";
         }
-    } else {
-        $error = "❌ Kode verifikasi salah!";
     }
 }
 
 // Kirim ulang kode verifikasi
 if (isset($_POST['resendbtn'])) {
-    // Generate kode baru dengan timezone Jakarta
-    $new_code = sprintf("%06d", mt_rand(1, 999999));
-    $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+    // Generate kode baru
+    $new_code = sprintf("%06d", random_int(1, 999999));
+    $new_expiry = date("Y-m-d H:i:s", time() + 3600); // 1 jam dari sekarang
     
     // Update kode di database
     $update = $con->prepare("UPDATE tbl_member SET verification_code = ?, code_expiry = ? WHERE email = ?");
     $update->bind_param("sss", $new_code, $new_expiry, $email);
     
     if ($update->execute()) {
-        // Ambil nama user
+        // Ambil data user
         $user_query = $con->prepare("SELECT nama FROM tbl_member WHERE email = ?");
         $user_query->bind_param("s", $email);
         $user_query->execute();
-        $user = $user_query->get_result()->fetch_assoc();
-        $nama = $user['nama'];
+        $user_result = $user_query->get_result();
         
-        // Kirim email
-        $mail = new PHPMailer(true);
-        try {
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'valhidayat01@gmail.com';
-            $mail->Password   = 'ecbnikaaznxaujbk';
-            $mail->SMTPSecure = 'tls';
-            $mail->Port       = 587;
+        if ($user_result->num_rows === 1) {
+            $user = $user_result->fetch_assoc();
+            $nama = $user['nama'];
+            
+            // Kirim email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'valhidayat01@gmail.com';
+                $mail->Password   = 'ecbnikaaznxaujbk';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+                $mail->CharSet    = 'UTF-8';
 
-            $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
-            $mail->addAddress($email);
+                $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
+                $mail->addAddress($email);
+                $mail->addReplyTo('valhidayat01@gmail.com', 'Arena FIT');
 
-            $mail->isHTML(true);
-            $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
-            $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
-                              Kode verifikasi baru Anda adalah: <h2 style='color: #1976d2;'>$new_code</h2><br>
-                              Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB</strong><br><br>
-                              Silakan masukkan kode ini pada halaman verifikasi.";
+                $mail->isHTML(true);
+                $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
+                $mail->Body    = "
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; color: #333; }
+                            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                            .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                            .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
+                            .code { font-size: 32px; font-weight: bold; color: #1976d2; text-align: center; margin: 20px 0; }
+                            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class='container'>
+                            <div class='header'>
+                                <h1>Arena FIT</h1>
+                                <p>Verifikasi Email Anda</p>
+                            </div>
+                            <div class='content'>
+                                <p>Halo <strong>$nama</strong>,</p>
+                                <p>Berikut adalah kode verifikasi baru untuk akun Arena FIT Anda:</p>
+                                <div class='code'>$new_code</div>
+                                <p>Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB</strong></p>
+                                <p>Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.</p>
+                                <p>Jika Anda tidak merasa mendaftar, abaikan email ini.</p>
+                            </div>
+                            <div class='footer'>
+                                <p>&copy; " . date('Y') . " Arena FIT. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                ";
+                
+                // Tambahkan plain text version
+                $mail->AltBody = "Halo $nama,\n\nKode verifikasi baru Anda: $new_code\n\nKode berlaku hingga: " . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB\n\nSilakan masukkan kode pada halaman verifikasi.";
 
-            $mail->send();
-            $success = "✅ Kode verifikasi baru telah dikirim ke email Anda! Berlaku hingga " . date('H:i', strtotime($new_expiry)) . " WIB";
-        } catch (Exception $e) {
-            $error = "❌ Gagal mengirim email. Error: " . $mail->ErrorInfo;
+                if ($mail->send()) {
+                    $success = "✅ Kode verifikasi baru telah dikirim ke email Anda! Berlaku hingga " . date('H:i', strtotime($new_expiry)) . " WIB";
+                } else {
+                    $error = "❌ Gagal mengirim email. Silakan coba lagi.";
+                }
+            } catch (Exception $e) {
+                error_log("Mailer Error: " . $mail->ErrorInfo);
+                $error = "❌ Terjadi kesalahan saat mengirim email. Silakan coba lagi nanti.";
+            }
+        } else {
+            $error = "❌ Data user tidak ditemukan!";
         }
     } else {
-        $error = "❌ Gagal memperbarui kode verifikasi!";
+        $error = "❌ Gagal memperbarui kode verifikasi! Silakan coba lagi.";
     }
 }
-?>
 
+// Cek status kode verifikasi saat ini
+$status_query = $con->prepare("SELECT code_expiry FROM tbl_member WHERE email = ? AND is_verified = 0");
+$status_query->bind_param("s", $email);
+$status_query->execute();
+$status_result = $status_query->get_result();
+
+$current_code_expiry = null;
+if ($status_result->num_rows === 1) {
+    $status_data = $status_result->fetch_assoc();
+    $current_code_expiry = $status_data['code_expiry'];
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -121,6 +190,7 @@ if (isset($_POST['resendbtn'])) {
     <title>Verifikasi Email - Arena FIT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
+        /* CSS tetap sama seperti sebelumnya */
         * {
             margin: 0;
             padding: 0;
@@ -403,6 +473,21 @@ if (isset($_POST['resendbtn'])) {
             line-height: 1.6;
         }
 
+        .expiry-info {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .expiry-info p {
+            color: #ffd54f;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
         @media (max-width: 576px) {
             .verify-container {
                 padding: 40px 25px;
@@ -430,6 +515,11 @@ if (isset($_POST['resendbtn'])) {
         <div class="email-info">
             <p>Kode verifikasi dikirim ke:</p>
             <strong><?= htmlspecialchars($email); ?></strong>
+            <?php if ($current_code_expiry): ?>
+                <div class="expiry-info">
+                    <p>⏰ Kode berlaku hingga: <?= date('H:i', strtotime($current_code_expiry)) ?> WIB</p>
+                </div>
+            <?php endif; ?>
         </div>
 
         <?php if (!empty($error)) : ?>
@@ -440,7 +530,7 @@ if (isset($_POST['resendbtn'])) {
             <div class="alert alert-success"><?= $success; ?></div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" id="verifyForm">
             <div class="form-group">
                 <label class="form-label">Kode Verifikasi</label>
                 <div class="input-wrapper">
@@ -454,6 +544,8 @@ if (isset($_POST['resendbtn'])) {
                         pattern="[0-9]{6}"
                         required
                         autofocus
+                        autocomplete="one-time-code"
+                        value="<?= isset($_POST['verification_code']) ? htmlspecialchars($_POST['verification_code']) : '' ?>"
                     >
                 </div>
             </div>
@@ -485,13 +577,43 @@ if (isset($_POST['resendbtn'])) {
         codeInput.addEventListener('input', function(e) {
             // Hanya izinkan angka
             this.value = this.value.replace(/[^0-9]/g, '');
+            
+            // HAPUS AUTO SUBMIT - Ini penyebab refresh otomatis
+            // Hanya beri visual feedback ketika 6 digit terisi
+            if (this.value.length === 6) {
+                this.style.borderColor = '#4caf50';
+                this.style.boxShadow = '0 0 0 3px rgba(76, 175, 80, 0.1)';
+                
+                // Opsional: Focus ke tombol verify
+                document.querySelector('.btn-verify').focus();
+            } else {
+                this.style.borderColor = 'rgba(66, 165, 245, 0.2)';
+                this.style.boxShadow = 'none';
+            }
         });
 
-        // Auto submit ketika 6 digit sudah diisi (optional)
-        codeInput.addEventListener('input', function(e) {
-            if (this.value.length === 6) {
-                // Auto focus ke tombol verify (opsional)
-                // document.querySelector('.btn-verify').focus();
+        // Prevent form submission jika kode tidak valid
+        document.getElementById('verifyForm').addEventListener('submit', function(e) {
+            const code = codeInput.value;
+            if (code.length !== 6 || !/^\d+$/.test(code)) {
+                e.preventDefault();
+                alert('Kode verifikasi harus 6 digit angka!');
+                codeInput.focus();
+            }
+        });
+
+        // Auto focus ke input kode dan select semua text
+        codeInput.focus();
+        codeInput.select();
+
+        // Auto pindah ke input berikutnya (jika ada multiple inputs)
+        // Tapi karena hanya satu input, kita tidak perlu fitur ini
+
+        // Tambahkan event listener untuk keypress (Enter)
+        codeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('verifyForm').submit();
             }
         });
     </script>

@@ -52,19 +52,26 @@
             <ul class="navbar-nav ml-auto">
                 <!-- Notifications Dropdown Menu -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#" aria-label="Notifications">
+                    <a class="nav-link" data-toggle="dropdown" href="#" aria-label="Notifications" id="notificationDropdown">
                         <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">3</span>
+                        <span class="badge badge-warning navbar-badge" id="notificationCount">0</span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">3 Notifikasi</span>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificationMenu">
+                        <span class="dropdown-item dropdown-header" id="notificationHeader">0 Notifikasi</span>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-user-plus mr-2"></i> Member baru terdaftar
-                            <span class="float-right text-muted text-sm">5 menit lalu</span>
+                        <div id="notificationList">
+                            <!-- Notifikasi akan dimuat via AJAX -->
+                            <div class="text-center py-3">
+                                <i class="fas fa-spinner fa-spin"></i> Memuat notifikasi...
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="dropdown-item dropdown-footer" id="markAllRead">
+                            <i class="fas fa-check-circle mr-1"></i> Tandai Semua Sudah Dibaca
                         </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">Lihat Semua Notifikasi</a>
+                        <a href="notifikasi.php" class="dropdown-item dropdown-footer">
+                            <i class="fas fa-list mr-1"></i> Lihat Semua Notifikasi
+                        </a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -84,11 +91,127 @@
                         </a>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button" aria-label="Settings">
-                        <i class="fas fa-th-large"></i>
-                    </a>
-                </li>
             </ul>
         </nav>
         <!-- /.navbar -->
+         <script>
+$(document).ready(function() {
+    // Load notifikasi pertama kali
+    loadNotifications();
+    
+    // Auto refresh notifikasi setiap 30 detik
+    setInterval(loadNotifications, 30000);
+    
+    // Tandai semua sudah dibaca
+    $('#markAllRead').click(function(e) {
+        e.preventDefault();
+        markAllAsRead();
+    });
+    
+    // Toggle dropdown notifikasi
+    $('#notificationDropdown').click(function() {
+        loadNotifications();
+    });
+});
+
+function loadNotifications() {
+    $.ajax({
+        url: '../../api/notifikasi_api.php?action=get_notifications&limit=10',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                updateNotificationUI(response.notifications, response.unread_count);
+            }
+        },
+        error: function() {
+            console.error('Gagal memuat notifikasi');
+        }
+    });
+}
+
+function updateNotificationUI(notifications, unreadCount) {
+    // Update badge count
+    $('#notificationCount').text(unreadCount);
+    $('#notificationHeader').text(unreadCount + ' Notifikasi');
+    
+    // Update notification list
+    let notificationHTML = '';
+    
+    if (notifications.length === 0) {
+        notificationHTML = `
+            <div class="text-center py-3 text-muted">
+                <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                <p>Tidak ada notifikasi</p>
+            </div>
+        `;
+    } else {
+        notifications.forEach(notif => {
+            const badgeClass = notif.dibaca ? 'badge-secondary' : 'badge-primary';
+            notificationHTML += `
+                <div class="dropdown-item notification-item ${!notif.dibaca ? 'bg-light' : ''}" 
+                     data-id="${notif.id}" style="border-left: 3px solid ${getColorByType(notif.tipe)}">
+                    <div class="d-flex align-items-start">
+                        <div class="mr-2">
+                            <i class="${notif.icon} text-${getColorByType(notif.tipe)}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1" style="font-size: 0.9rem;">${notif.judul}</h6>
+                                <small class="text-muted">${notif.waktu}</small>
+                            </div>
+                            <p class="mb-1 small text-muted">${notif.pesan}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+            `;
+        });
+    }
+    
+    $('#notificationList').html(notificationHTML);
+    
+    // Add click event untuk mark as read
+    $('.notification-item').click(function() {
+        const notifId = $(this).data('id');
+        markAsRead(notifId);
+    });
+}
+
+function getColorByType(tipe) {
+    switch (tipe) {
+        case 'member_baru': return 'success';
+        case 'transaksi': return 'info';
+        default: return 'primary';
+    }
+}
+
+function markAsRead(notifId) {
+    $.ajax({
+        url: '../../api/notifikasi_api.php?action=mark_read',
+        type: 'POST',
+        data: { id: notifId },
+        dataType: 'json'
+    });
+}
+
+function markAllAsRead() {
+    $.ajax({
+        url: '../../api/notifikasi_api.php?action=mark_all_read',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                loadNotifications(); // Reload notifikasi
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: response.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+</script>

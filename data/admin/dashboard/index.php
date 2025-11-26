@@ -32,10 +32,6 @@ $jumlahPelatih = mysqli_num_rows($queryPelatih);
 $queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
 $jumlahJadwal = mysqli_num_rows($queryJadwal);
 
-// // notifikasi
-// $queryNotif = mysqli_query($con, "SELECT * FROM tbl_member WHERE status_notif = 'baru' ORDER BY tanggal_daftar DESC LIMIT 5");
-// $jumlahNotif = mysqli_num_rows($queryNotif);
-
 // Data untuk grafik pendaftaran member per bulan
 $dataBulan = [];
 $dataJumlah = [];
@@ -53,14 +49,66 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
   $dataJumlah[] = $row['jumlah'];
 }
 
-// // Data untuk grafik Donut (status membership)
-// $queryStatus = mysqli_query($con, "SELECT status_membership, COUNT(*) AS total FROM tbl_member GROUP BY status_membership");
-// $statusLabels = [];
-// $statusData = [];
-// while ($r = mysqli_fetch_assoc($queryStatus)) {
-//   $statusLabels[] = $r['status_membership'];
-//   $statusData[] = $r['total'];
-// }
+// Cek struktur tabel member untuk kolom yang tersedia
+$queryCheckColumns = mysqli_query($con, "SHOW COLUMNS FROM tbl_member");
+$availableColumns = [];
+while ($col = mysqli_fetch_assoc($queryCheckColumns)) {
+    $availableColumns[] = $col['Field'];
+}
+
+// Data untuk grafik Donut - menggunakan kolom yang tersedia
+$statusLabels = [];
+$statusData = [];
+$statusColors = [];
+
+// Pilih kolom yang mungkin ada untuk status
+if (in_array('status', $availableColumns)) {
+    $queryStatus = mysqli_query($con, "SELECT status, COUNT(*) AS total FROM tbl_member GROUP BY status");
+} elseif (in_array('status_aktif', $availableColumns)) {
+    $queryStatus = mysqli_query($con, "SELECT status_aktif, COUNT(*) AS total FROM tbl_member GROUP BY status_aktif");
+} elseif (in_array('is_active', $availableColumns)) {
+    $queryStatus = mysqli_query($con, "SELECT is_active, COUNT(*) AS total FROM tbl_member GROUP BY is_active");
+} else {
+    // Jika tidak ada kolom status, buat data dummy berdasarkan tanggal daftar
+    $queryStatus = mysqli_query($con, "
+        SELECT 
+            CASE 
+                WHEN tanggal_daftar >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 'Baru'
+                ELSE 'Lama'
+            END AS status_member,
+            COUNT(*) AS total 
+        FROM tbl_member 
+        GROUP BY 
+            CASE 
+                WHEN tanggal_daftar >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 'Baru'
+                ELSE 'Lama'
+            END
+    ");
+}
+
+if ($queryStatus) {
+    while ($r = mysqli_fetch_assoc($queryStatus)) {
+        $statusLabels[] = $r[array_keys($r)[0]]; // Ambil kolom pertama
+        $statusData[] = $r['total'];
+        
+        // Tentukan warna berdasarkan status
+        $statusValue = strtolower($r[array_keys($r)[0]]);
+        if (strpos($statusValue, 'aktif') !== false || strpos($statusValue, 'active') !== false || $statusValue == 'baru') {
+            $statusColors[] = '#28a745';
+        } elseif (strpos($statusValue, 'nonaktif') !== false || strpos($statusValue, 'inactive') !== false || $statusValue == 'lama') {
+            $statusColors[] = '#dc3545';
+        } else {
+            $statusColors[] = '#ffc107';
+        }
+    }
+}
+
+// Jika tidak ada data, beri nilai default
+if (empty($statusLabels)) {
+    $statusLabels = ['Aktif', 'Nonaktif'];
+    $statusData = [$jumlahMember, 0];
+    $statusColors = ['#28a745', '#dc3545'];
+}
 ?>
 
 <!-- Content Header -->
@@ -82,16 +130,35 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
 <!-- Main content -->
 <section class="content">
   <div class="container-fluid">
+    <!-- Welcome Card -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card bg-gradient-primary">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <h4 class="mb-1">Selamat Datang, <?php echo htmlspecialchars($username); ?>!</h4>
+                <p class="mb-0">Ini adalah panel admin untuk mengelola sistem gym. Pantau statistik dan aktivitas terbaru di sini.</p>
+              </div>
+              <div class="col-md-4 text-right">
+                <i class="fas fa-chart-line fa-3x opacity-50"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="row">
       <!-- Box Statistik -->
       <div class="col-12 col-sm-6 col-md-4">
         <div class="info-box">
           <span class="info-box-icon bg-info elevation-1">
-            <i class="fas fa-tachometer-alt"></i>
+            <i class="fas fa-calendar-day"></i>
           </span>
           <div class="info-box-content">
-            <span class="info-box-text">Dashboard</span>
-            <span class="info-box-number">-</span>
+            <span class="info-box-text">Hari Ini</span>
+            <span class="info-box-number"><?php echo date('d M Y'); ?></span>
           </div>
         </div>
       </div>
@@ -158,7 +225,7 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
     </div>
 
     <!-- Chart Tabs (AdminLTE Style) -->
-    <div class="card">
+    <div class="card mt-4">
       <div class="card-header">
         <h3 class="card-title">
           <i class="fas fa-chart-pie mr-1"></i>
@@ -229,7 +296,7 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
       labels: <?= json_encode($statusLabels) ?>,
       datasets: [{
         data: <?= json_encode($statusData) ?>,
-        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+        backgroundColor: <?= json_encode($statusColors) ?>
       }]
     },
     options: {

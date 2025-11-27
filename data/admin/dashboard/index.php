@@ -165,7 +165,7 @@ if (empty($statusLabels)) {
 
       <div class="col-12 col-sm-6 col-md-4">
         <div class="info-box">
-          <span class="info-box-icon bg-warning elevation-1">
+          <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-user-shield"></i>
           </span>
           <div class="info-box-content">

@@ -3,7 +3,7 @@ ob_start();
 session_start();
 require "../../../setting/koneksi.php";
 
-// Import PHPMailer di bagian paling atas
+// Import PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../vendor/autoload.php';
@@ -25,7 +25,7 @@ $success = "";
 if (isset($_POST['verifybtn'])) {
     $input_code = trim(htmlspecialchars($_POST['verification_code']));
     
-    // Query verifikasi yang lebih robust
+    // Query verifikasi - SESUAIKAN DENGAN STRUCTURE DATABASE
     $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
     $query->bind_param("ss", $email, $input_code);
     $query->execute();
@@ -47,10 +47,12 @@ if (isset($_POST['verifybtn'])) {
                 unset($_SESSION['verify_email']);
                 unset($_SESSION['registration_step']);
                 
+                // Set session success
                 $_SESSION['verification_success'] = true;
                 $_SESSION['verified_email'] = $email;
                 
-                header("Location: login.php");
+                // Redirect ke halaman login dengan pesan sukses
+                header("Location: login.php?verified=1");
                 exit();
             } else {
                 $error = "❌ Gagal memperbarui status verifikasi!";
@@ -65,7 +67,7 @@ if (isset($_POST['verifybtn'])) {
 
 // Kirim ulang kode verifikasi
 if (isset($_POST['resendbtn'])) {
-    // Generate kode baru dengan timezone Jakarta
+    // Generate kode baru
     $new_code = sprintf("%06d", mt_rand(1, 999999));
     $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
     
@@ -487,13 +489,8 @@ if (isset($_POST['resendbtn'])) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // Auto submit ketika 6 digit sudah diisi (optional)
-        codeInput.addEventListener('input', function(e) {
-            if (this.value.length === 6) {
-                // Auto focus ke tombol verify (opsional)
-                // document.querySelector('.btn-verify').focus();
-            }
-        });
+        // Auto focus ke input kode
+        codeInput.focus();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

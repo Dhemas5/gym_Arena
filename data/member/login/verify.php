@@ -54,6 +54,18 @@ if (isset($_POST['verifybtn'])) {
                 $update->bind_param("s", $email);
                 
                 if ($update->execute()) {
+                    // HAPUS BAGIAN NOTIFIKASI MANUAL - Biarkan trigger yang menangani
+                    // atau buat notifikasi sederhana tanpa kolom judul
+                    try {
+                        $notifikasi_query = $con->prepare("INSERT INTO tbl_notifikasi (pesan, tipe, id_referensi, jenis_referensi, dibuat_pada) VALUES (?, 'member_baru', ?, 'member', NOW())");
+                        $pesan_notifikasi = "Member " . $member['nama'] . " (" . $email . ") telah berhasil verifikasi email dan aktif.";
+                        $notifikasi_query->bind_param("si", $pesan_notifikasi, $member['id_member']);
+                        $notifikasi_query->execute();
+                    } catch (Exception $e) {
+                        // Skip error notifikasi jika masih bermasalah
+                        error_log("Error notifikasi: " . $e->getMessage());
+                    }
+                    
                     // Hapus session verifikasi
                     unset($_SESSION['verify_email']);
                     unset($_SESSION['registration_step']);
@@ -605,9 +617,6 @@ if ($status_result->num_rows === 1) {
         // Auto focus ke input kode dan select semua text
         codeInput.focus();
         codeInput.select();
-
-        // Auto pindah ke input berikutnya (jika ada multiple inputs)
-        // Tapi karena hanya satu input, kita tidak perlu fitur ini
 
         // Tambahkan event listener untuk keypress (Enter)
         codeInput.addEventListener('keypress', function(e) {

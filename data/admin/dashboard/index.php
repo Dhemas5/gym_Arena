@@ -1,14 +1,15 @@
 <?php
 require "../../../setting/session.php";
-checkSession("admin"); // hanya admin boleh masuk
+checkSession("admin");
+
+// PENTING: Load koneksi SEBELUM header!
+require "../../../setting/koneksi.php";
 ?>
+
 <?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/sidebar.php'; ?>
 
 <?php
-require "../../../setting/koneksi.php";
-require "../../../setting/session.php";
-
 // Ambil data user yang login
 $username = $_SESSION['username'] ?? 'User';
 
@@ -83,15 +84,14 @@ if (in_array('status', $availableColumns)) {
                 WHEN tanggal_daftar >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 'Baru'
                 ELSE 'Lama'
             END
-    ");
+    "); 
 }
 
 if ($queryStatus) {
     while ($r = mysqli_fetch_assoc($queryStatus)) {
-        $statusLabels[] = $r[array_keys($r)[0]]; // Ambil kolom pertama
+        $statusLabels[] = $r[array_keys($r)[0]];
         $statusData[] = $r['total'];
         
-        // Tentukan warna berdasarkan status
         $statusValue = strtolower($r[array_keys($r)[0]]);
         if (strpos($statusValue, 'aktif') !== false || strpos($statusValue, 'active') !== false || $statusValue == 'baru') {
             $statusColors[] = '#28a745';
@@ -103,7 +103,6 @@ if ($queryStatus) {
     }
 }
 
-// Jika tidak ada data, beri nilai default
 if (empty($statusLabels)) {
     $statusLabels = ['Aktif', 'Nonaktif'];
     $statusData = [$jumlahMember, 0];
@@ -127,6 +126,7 @@ if (empty($statusLabels)) {
     </div>
   </div>
 </section>
+
 <!-- Main content -->
 <section class="content">
   <div class="container-fluid">
@@ -224,7 +224,7 @@ if (empty($statusLabels)) {
       </div>
     </div>
 
-    <!-- Chart Tabs (AdminLTE Style) -->
+    <!-- Chart Tabs -->
     <div class="card mt-4">
       <div class="card-header">
         <h3 class="card-title">
@@ -252,63 +252,5 @@ if (empty($statusLabels)) {
 
   </div>
 </section>
-
-<!-- ChartJS Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Grafik Area (Line)
-  const ctxArea = document.getElementById('areaChart').getContext('2d');
-  new Chart(ctxArea, {
-    type: 'line',
-    data: {
-      labels: <?= json_encode($dataBulan) ?>,
-      datasets: [{
-        label: 'Jumlah Member',
-        data: <?= json_encode($dataJumlah) ?>,
-        borderColor: '#007bff',
-        backgroundColor: 'rgba(0,123,255,0.25)',
-        fill: true,
-        tension: 0.3,
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-  // Grafik Donut
-  const ctxDonut = document.getElementById('donutChart').getContext('2d');
-  new Chart(ctxDonut, {
-    type: 'doughnut',
-    data: {
-      labels: <?= json_encode($statusLabels) ?>,
-      datasets: [{
-        data: <?= json_encode($statusData) ?>,
-        backgroundColor: <?= json_encode($statusColors) ?>
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }
-  });
-</script>
 
 <?php include '../../../view/master/footer.php'; ?>

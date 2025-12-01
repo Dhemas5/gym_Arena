@@ -61,7 +61,7 @@ require "../../../setting/koneksi.php";
                                 </tr>
                                 <?php else:
                                 $no = 1;
-                                foreach ($members as $m): 
+                                foreach ($members as $m):
                                     // Ambil data foto dari tbl_member
                                     $query_foto = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
                                     $query_foto->bind_param("i", $m['id_member']);
@@ -76,14 +76,14 @@ require "../../../setting/koneksi.php";
                                         <td class="text-center">
                                             <div class="member-photo-container">
                                                 <?php if (!empty($foto) && $foto !== 'default.jpg'): ?>
-                                                    <img src="../../uploads/member/<?= $foto ?>" 
-                                                         alt="Foto <?= htmlspecialchars($m['nama']) ?>" 
-                                                         class="member-photo rounded-circle"
-                                                         style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #dee2e6;"
-                                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNlMmUyZTIiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5OTk5OTkiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Ik0yMCAyMXYtMmE0IDQgMCAwIDAtNC00SDhhNCA0IDAgMCAwLTQgNHYyIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iNyIgcj0iNCIvPgo8L3N2Zz4KPC9zdmc+'">
+                                                    <img src="../../uploads/member/<?= $foto ?>"
+                                                        alt="Foto <?= htmlspecialchars($m['nama']) ?>"
+                                                        class="member-photo rounded-circle"
+                                                        style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #dee2e6;"
+                                                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNlMmUyZTIiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5OTk5OTkiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Ik0yMCAyMXYtMmE0IDQgMCAwIDAtNC00SDhhNCA0IDAgMCAwLTQgNHYyIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iNyIgcj0iNCIvPgo8L3N2Zz4KPC9zdmc+'">
                                                 <?php else: ?>
                                                     <div class="member-initial rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-                                                         style="width: 50px; height: 50px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 1.2rem;">
+                                                        style="width: 50px; height: 50px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 1.2rem;">
                                                         <?= strtoupper(substr($m['nama'], 0, 1)) ?>
                                                     </div>
                                                 <?php endif; ?>
@@ -99,21 +99,36 @@ require "../../../setting/koneksi.php";
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                            if ($m['membership_status'] === 'aktif' && !empty($m['tgl_berakhir'])) {
+                                            if (!empty($m['tgl_berakhir'])):
                                                 $end = new DateTime($m['tgl_berakhir']);
                                                 $now = new DateTime();
-                                                $interval = $now->diff($end);
-                                                $sisa = $interval->days > 0 ? $interval->days . ' hari' : ($interval->h + ($interval->i > 0 ? 1 : 0)) . ' jam';
-                                                echo '<span class="badge badge-success">Aktif</span><br>';
-                                                echo '<small><strong>' . htmlspecialchars($m['nama_paket'] ?? '-') . '</strong><br>';
-                                                echo "Sisa: $sisa<br>";
-                                                echo 'Sampai: ' . date('d/m/Y H:i', strtotime($m['tgl_berakhir'])) . '</small>';
-                                            } elseif ($m['membership_status'] === 'expired') {
-                                                echo '<span class="badge badge-danger">Expired</span>';
-                                            } else {
-                                                echo '<span class="badge badge-light">Belum Aktif</span>';
-                                            }
-                                            ?>
+                                                if ($now < $end):
+                                                    // Masih aktif
+                                                    $interval = $now->diff($end);
+                                                    $jam_total = $interval->days * 24 + $interval->h;
+
+                                                    // Hitung sisa waktu
+                                                    if ($interval->days > 0) {
+                                                        $sisa = $interval->days . ' hari';
+                                                    } elseif ($jam_total > 0) {
+                                                        $sisa = $jam_total . ' jam';
+                                                    } else {
+                                                        $sisa = 'Kurang dari 1 jam';
+                                                    }
+
+                                                    echo '<span class="badge badge-success">Aktif</span><br>';
+                                                    echo '<small><strong>' . htmlspecialchars($m['nama_paket'] ?? '-') . '</strong><br>';
+                                                    echo "Sisa: $sisa<br>";
+                                                    echo 'Sampai: ' . date('d/m/Y H:i', strtotime($m['tgl_berakhir'])) . '</small>';
+                                                else:
+                                                    // Sudah expired
+                                                    echo '<span class="badge badge-danger">Expired</span><br>';
+                                                    echo '<small><strong>' . htmlspecialchars($m['nama_paket'] ?? '-') . '</strong><br>';
+                                                    echo 'Berakhir: ' . date('d/m/Y H:i', strtotime($m['tgl_berakhir'])) . '</small>';
+                                                endif;
+                                            else: ?>
+                                                <span class="badge badge-light">Belum Aktif</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td><?= date('d M Y', strtotime($m['tanggal_daftar'])) ?></td>
                                         <td class="text-center">
@@ -139,7 +154,7 @@ require "../../../setting/koneksi.php";
 </section>
 
 <!-- ========================= MODAL DETAIL ========================= -->
-<?php foreach ($members as $m): 
+<?php foreach ($members as $m):
     // Ambil data foto untuk modal detail
     $query_foto_detail = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
     $query_foto_detail->bind_param("i", $m['id_member']);
@@ -161,14 +176,14 @@ require "../../../setting/koneksi.php";
                         <div class="col-md-3 text-center">
                             <div class="member-photo-large mb-3">
                                 <?php if (!empty($foto_member) && $foto_member !== 'default.jpg'): ?>
-                                    <img src="../../uploads/member/<?= $foto_member ?>" 
-                                         alt="Foto <?= htmlspecialchars($m['nama']) ?>" 
-                                         class="rounded-circle img-fluid"
-                                         style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #dee2e6;"
-                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9Ijc1IiBjeT0iNzUiIHI9Ijc1IiBmaWxsPSIjZTJlMmUyIi8+Cjxzdmcgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMjAgMjF2LTJhNCA0IDAgMCAwLTQtNEg4YTQgNCAwIDAgMC00IDR2MiIvPgo8Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiLz4KPC9zdmc+Cjwvc3ZnPg=='">
+                                    <img src="../../uploads/member/<?= $foto_member ?>"
+                                        alt="Foto <?= htmlspecialchars($m['nama']) ?>"
+                                        class="rounded-circle img-fluid"
+                                        style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #dee2e6;"
+                                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9Ijc1IiBjeT0iNzUiIHI9Ijc1IiBmaWxsPSIjZTJlMmUyIi8+Cjxzdmcgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMjAgMjF2LTJhNCA0IDAgMCAwLTQtNEg4YTQgNCAwIDAgMC00IDR2MiIvPgo8Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiLz4KPC9zdmc+Cjwvc3ZnPg=='">
                                 <?php else: ?>
                                     <div class="member-initial-large rounded-circle d-flex align-items-center justify-content-center text-white fw-bold mx-auto"
-                                         style="width: 150px; height: 150px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 3rem;">
+                                        style="width: 150px; height: 150px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 3rem;">
                                         <?= strtoupper(substr($m['nama'], 0, 1)) ?>
                                     </div>
                                 <?php endif; ?>
@@ -225,10 +240,16 @@ require "../../../setting/koneksi.php";
                                                         $jam_total = $interval->days * 24 + $interval->h;
                                                         echo '<span class="badge badge-success">Aktif</span><br>';
                                                         echo '<strong>' . htmlspecialchars($m['nama_paket'] ?? '-') . '</strong><br>';
-                                                        echo $interval->days > 0 ? "Sisa: {$interval->days} hari" : "Sisa: {$jam_total} jam";
+                                                        if ($interval->days > 0) {
+                                                            echo "Sisa: {$interval->days} hari";
+                                                        } else {
+                                                            echo "Sisa: {$jam_total} jam";
+                                                        }
                                                         echo '<br>Sampai: ' . date('d/m/Y H:i', strtotime($m['tgl_berakhir']));
                                                     else:
-                                                        echo '<span class="badge badge-danger">Expired</span>';
+                                                        echo '<span class="badge badge-danger">Expired</span><br>';
+                                                        echo '<strong>' . htmlspecialchars($m['nama_paket'] ?? '-') . '</strong><br>';
+                                                        echo 'Berakhir: ' . date('d/m/Y H:i', strtotime($m['tgl_berakhir']));
                                                     endif;
                                                 else: ?>
                                                     <span class="badge badge-light">Belum Aktif</span>
@@ -247,7 +268,7 @@ require "../../../setting/koneksi.php";
 <?php endforeach; ?>
 
 <!-- ========================= MODAL EDIT ========================= -->
-<?php foreach ($members as $m): 
+<?php foreach ($members as $m):
     // Ambil data foto untuk modal edit
     $query_foto_edit = $con->prepare("SELECT foto FROM tbl_member WHERE id_member = ?");
     $query_foto_edit->bind_param("i", $m['id_member']);
@@ -273,16 +294,16 @@ require "../../../setting/koneksi.php";
                             <div class="col-md-3 text-center">
                                 <div class="member-photo-edit mb-3">
                                     <?php if (!empty($foto_member_edit) && $foto_member_edit !== 'default.jpg'): ?>
-                                        <img src="../../uploads/member/<?= $foto_member_edit ?>" 
-                                             alt="Foto <?= htmlspecialchars($m['nama']) ?>" 
-                                             class="rounded-circle img-fluid mb-2"
-                                             style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #dee2e6;"
-                                             id="fotoPreview<?= $m['id_member'] ?>"
-                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjYwIiBmaWxsPSIjZTJlMmUyIi8+Cjxzdmcgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMjAgMjF2LTJhNCA0IDAgMCAwLTQtNEg4YTQgNCAwIDAgMC00IDR2MiIvPgo8Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiLz4KPC9zdmc+Cjwvc3ZnPg=='">
+                                        <img src="../../uploads/member/<?= $foto_member_edit ?>"
+                                            alt="Foto <?= htmlspecialchars($m['nama']) ?>"
+                                            class="rounded-circle img-fluid mb-2"
+                                            style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #dee2e6;"
+                                            id="fotoPreview<?= $m['id_member'] ?>"
+                                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjYwIiBmaWxsPSIjZTJlMmUyIi8+Cjxzdmcgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMjAgMjF2LTJhNCA0IDAgMCAwLTQtNEg4YTQgNCAwIDAgMC00IDR2MiIvPgo8Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiLz4KPC9zdmc+Cjwvc3ZnPg=='">
                                     <?php else: ?>
                                         <div class="member-initial-edit rounded-circle d-flex align-items-center justify-content-center text-white fw-bold mx-auto mb-2"
-                                             style="width: 120px; height: 120px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 2.5rem;"
-                                             id="fotoPreview<?= $m['id_member'] ?>">
+                                            style="width: 120px; height: 120px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); font-size: 2.5rem;"
+                                            id="fotoPreview<?= $m['id_member'] ?>">
                                             <?= strtoupper(substr($m['nama'], 0, 1)) ?>
                                         </div>
                                     <?php endif; ?>
@@ -353,7 +374,7 @@ require "../../../setting/koneksi.php";
             const file = e.target.files[0];
             const memberId = $(this).attr('id').replace('foto', '');
             const preview = $('#fotoPreview' + memberId);
-            
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {

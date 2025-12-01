@@ -17,13 +17,17 @@ $username = $_SESSION['username'] ?? 'User';
 $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori");
 $jumlahKategori = mysqli_num_rows($queryKategori);
 
-// Jumlah user (admin + member)
+// Jumlah user (admin + staff)
 $queryUser = mysqli_query($con, "SELECT * FROM tbl_user");
 $jumlahUser = mysqli_num_rows($queryUser);
 
 // Jumlah member
 $queryMember = mysqli_query($con, "SELECT * FROM tbl_member");
 $jumlahMember = mysqli_num_rows($queryMember);
+
+// Jumlah member aktif (status_akun = 'aktif')
+$queryMemberAktif = mysqli_query($con, "SELECT * FROM tbl_member WHERE status_akun = 'aktif'");
+$jumlahMemberAktif = mysqli_num_rows($queryMemberAktif);
 
 // Jumlah pelatih
 $queryPelatih = mysqli_query($con, "SELECT * FROM tbl_instruktur");
@@ -33,91 +37,110 @@ $jumlahPelatih = mysqli_num_rows($queryPelatih);
 $queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
 $jumlahJadwal = mysqli_num_rows($queryJadwal);
 
-// Data untuk grafik pendaftaran member per bulan
+// Jumlah member hari ini
+$queryMemberHariIni = mysqli_query($con, "SELECT * FROM tbl_member WHERE DATE(tanggal_daftar) = CURDATE()");
+$jumlahMemberHariIni = mysqli_num_rows($queryMemberHariIni);
+
+// Jumlah transaksi online pending
+$queryTransaksiPending = mysqli_query($con, "SELECT * FROM tbl_transaksi_online WHERE status = 'pending'");
+$jumlahTransaksiPending = mysqli_num_rows($queryTransaksiPending);
+
+// Data untuk grafik pendaftaran member per bulan (tahun ini)
 $dataBulan = [];
 $dataJumlah = [];
+$bulanNama = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+// Inisialisasi semua bulan dengan 0
+for ($i = 1; $i <= 12; $i++) {
+  $dataBulan[] = $bulanNama[$i - 1];
+  $dataJumlah[] = 0;
+}
+
+// Query data aktual
 $queryGrafik = mysqli_query($con, "
     SELECT MONTH(tanggal_daftar) AS bulan, COUNT(*) AS jumlah 
     FROM tbl_member 
     WHERE YEAR(tanggal_daftar) = YEAR(CURDATE())
     GROUP BY MONTH(tanggal_daftar)
+    ORDER BY bulan ASC
 ");
 
-$bulanNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-
+// Update data yang ada
 while ($row = mysqli_fetch_assoc($queryGrafik)) {
-  $dataBulan[] = $bulanNama[$row['bulan'] - 1];
-  $dataJumlah[] = $row['jumlah'];
+  $index = $row['bulan'] - 1;
+  if (isset($dataJumlah[$index])) {
+    $dataJumlah[$index] = $row['jumlah'];
+  }
 }
 
-<<<<<<< HEAD
-// Cek struktur tabel member untuk kolom yang tersedia
-$queryCheckColumns = mysqli_query($con, "SHOW COLUMNS FROM tbl_member");
-$availableColumns = [];
-while ($col = mysqli_fetch_assoc($queryCheckColumns)) {
-    $availableColumns[] = $col['Field'];
-}
+// Data untuk grafik Donut - status membership
+$statusLabels = ['Aktif', 'Expired', 'Belum Aktif'];
+$statusData = [0, 0, 0];
+$statusColors = ['#28a745', '#dc3545', '#ffc107'];
 
-// Data untuk grafik Donut - menggunakan kolom yang tersedia
-$statusLabels = [];
-$statusData = [];
-$statusColors = [];
-
-// Pilih kolom yang mungkin ada untuk status
-if (in_array('status', $availableColumns)) {
-    $queryStatus = mysqli_query($con, "SELECT status, COUNT(*) AS total FROM tbl_member GROUP BY status");
-} elseif (in_array('status_aktif', $availableColumns)) {
-    $queryStatus = mysqli_query($con, "SELECT status_aktif, COUNT(*) AS total FROM tbl_member GROUP BY status_aktif");
-} elseif (in_array('is_active', $availableColumns)) {
-    $queryStatus = mysqli_query($con, "SELECT is_active, COUNT(*) AS total FROM tbl_member GROUP BY is_active");
-} else {
-    // Jika tidak ada kolom status, buat data dummy berdasarkan tanggal daftar
-    $queryStatus = mysqli_query($con, "
-        SELECT 
-            CASE 
-                WHEN tanggal_daftar >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 'Baru'
-                ELSE 'Lama'
-            END AS status_member,
-            COUNT(*) AS total 
-        FROM tbl_member 
-        GROUP BY 
-            CASE 
-                WHEN tanggal_daftar >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 'Baru'
-                ELSE 'Lama'
-            END
-    "); 
-}
+$queryStatus = mysqli_query($con, "
+    SELECT 
+        CASE 
+            WHEN membership_status = 'aktif' THEN 'Aktif'
+            WHEN membership_status = 'expired' THEN 'Expired'
+            WHEN membership_status = 'belum_aktif' THEN 'Belum Aktif'
+            ELSE 'Belum Aktif'
+        END as status_group,
+        COUNT(*) as total
+    FROM tbl_member 
+    GROUP BY 
+        CASE 
+            WHEN membership_status = 'aktif' THEN 'Aktif'
+            WHEN membership_status = 'expired' THEN 'Expired'
+            WHEN membership_status = 'belum_aktif' THEN 'Belum Aktif'
+            ELSE 'Belum Aktif'
+        END
+");
 
 if ($queryStatus) {
-    while ($r = mysqli_fetch_assoc($queryStatus)) {
-        $statusLabels[] = $r[array_keys($r)[0]];
-        $statusData[] = $r['total'];
-        
-        $statusValue = strtolower($r[array_keys($r)[0]]);
-        if (strpos($statusValue, 'aktif') !== false || strpos($statusValue, 'active') !== false || $statusValue == 'baru') {
-            $statusColors[] = '#28a745';
-        } elseif (strpos($statusValue, 'nonaktif') !== false || strpos($statusValue, 'inactive') !== false || $statusValue == 'lama') {
-            $statusColors[] = '#dc3545';
-        } else {
-            $statusColors[] = '#ffc107';
-        }
+  // Reset data
+  $statusLabels = [];
+  $statusData = [];
+  $statusColors = [];
+
+  while ($row = mysqli_fetch_assoc($queryStatus)) {
+    $statusLabels[] = $row['status_group'];
+    $statusData[] = $row['total'];
+
+    // Tentukan warna
+    if ($row['status_group'] == 'Aktif') {
+      $statusColors[] = '#28a745';
+    } elseif ($row['status_group'] == 'Expired') {
+      $statusColors[] = '#dc3545';
+    } else {
+      $statusColors[] = '#ffc107';
     }
+  }
 }
 
-if (empty($statusLabels)) {
-    $statusLabels = ['Aktif', 'Nonaktif'];
-    $statusData = [$jumlahMember, 0];
-    $statusColors = ['#28a745', '#dc3545'];
-=======
-// Data untuk grafik Donut (status membership)
-$queryStatus = mysqli_query($con, "SELECT membership_status, COUNT(*) AS total FROM tbl_member GROUP BY membership_status");
-$statusLabels = [];
-$statusData = [];
-while ($r = mysqli_fetch_assoc($queryStatus)) {
-    $statusLabels[] = $r['membership_status'];
-    $statusData[] = $r['total'];
->>>>>>> origin/main
-}
+// Ambil member terbaru (5 terakhir)
+$queryMemberTerbaru = mysqli_query($con, "
+    SELECT id_member, nama, email, tanggal_daftar, membership_status
+    FROM tbl_member 
+    ORDER BY tanggal_daftar DESC 
+    LIMIT 5
+");
+
+// Ambil transaksi terbaru - PERBAIKAN DI SINI: ganti alias 'to' menjadi 't'
+$queryTransaksiTerbaru = mysqli_query($con, "
+    SELECT 
+        t.id_transaksi,
+        m.nama as nama_member,
+        p.nama_paket,
+        t.total,
+        t.status,
+        t.tgl_transaksi
+    FROM tbl_transaksi_online t
+    JOIN tbl_member m ON t.id_member = m.id_member
+    LEFT JOIN tbl_paket p ON t.id_paket = p.id_paket
+    ORDER BY t.tgl_transaksi DESC 
+    LIMIT 5
+");
 ?>
 
 <!-- Content Header -->
@@ -158,10 +181,10 @@ while ($r = mysqli_fetch_assoc($queryStatus)) {
         </div>
       </div>
     </div>
-    
+
     <div class="row">
       <!-- Box Statistik -->
-      <div class="col-12 col-sm-6 col-md-4">
+      <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
           <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-calendar-day"></i>
@@ -173,43 +196,33 @@ while ($r = mysqli_fetch_assoc($queryStatus)) {
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-4">
-        <div class="info-box">
-          <span class="info-box-icon bg-info elevation-1">
-            <i class="fas fa-user-shield"></i>
-          </span>
-          <div class="info-box-content">
-            <span class="info-box-text">User</span>
-            <span class="info-box-number"><?php echo $jumlahUser; ?></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4">
+      <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
           <span class="info-box-icon bg-success elevation-1">
             <i class="fas fa-users"></i>
           </span>
           <div class="info-box-content">
-            <span class="info-box-text">Member</span>
+            <span class="info-box-text">Total Member</span>
             <span class="info-box-number"><?php echo $jumlahMember; ?></span>
+            <small><?php echo $jumlahMemberHariIni; ?> baru hari ini</small>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-4">
+      <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
-          <span class="info-box-icon bg-danger elevation-1">
-            <i class="fas fa-layer-group"></i>
+          <span class="info-box-icon bg-warning elevation-1">
+            <i class="fas fa-shopping-cart"></i>
           </span>
           <div class="info-box-content">
-            <span class="info-box-text">Kategori Gym</span>
-            <span class="info-box-number"><?php echo $jumlahKategori; ?></span>
+            <span class="info-box-text">Transaksi Pending</span>
+            <span class="info-box-number"><?php echo $jumlahTransaksiPending; ?></span>
+            <small>Menunggu verifikasi</small>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-4">
+      <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
           <span class="info-box-icon bg-primary elevation-1">
             <i class="fas fa-chalkboard-teacher"></i>
@@ -220,62 +233,208 @@ while ($r = mysqli_fetch_assoc($queryStatus)) {
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-12 col-sm-6 col-md-4">
-        <div class="info-box">
-          <span class="info-box-icon bg-secondary elevation-1">
-            <i class="fas fa-calendar-alt"></i>
-          </span>
-          <div class="info-box-content">
-            <span class="info-box-text">Jadwal Kelas</span>
-            <span class="info-box-number"><?php echo $jumlahJadwal; ?></span>
+    <div class="row">
+      <!-- Chart Section -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <i class="fas fa-chart-line mr-2"></i> Statistik Pendaftaran Member Tahun <?= date('Y') ?>
+          </div>
+          <div class="card-body" style="height: 350px;">
+            <canvas id="areaChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Membership -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <i class="fas fa-chart-pie mr-2"></i> Status Membership
+          </div>
+          <div class="card-body" style="height: 350px;">
+            <canvas id="donutChart"></canvas>
           </div>
         </div>
       </div>
     </div>
 
-<<<<<<< HEAD
-    <!-- Chart Tabs -->
-    <div class="card mt-4">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-chart-pie mr-1"></i>
-          Statistik Member Tahun <?= date('Y') ?>
-        </h3>
-        <div class="card-tools">
-          <ul class="nav nav-pills ml-auto">
-            <li class="nav-item"><a class="nav-link active" href="#area-chart" data-toggle="tab">Pendaftaran</a></li>
-            <li class="nav-item"><a class="nav-link" href="#donut-chart" data-toggle="tab">Status</a></li>
-          </ul>
+    <div class="row mt-4">
+      <!-- Member Terbaru -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i> Member Terbaru</h3>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Tanggal Daftar</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php while ($member = mysqli_fetch_assoc($queryMemberTerbaru)): ?>
+                    <tr>
+                      <td><?php echo htmlspecialchars($member['nama']); ?></td>
+                      <td><?php echo htmlspecialchars($member['email']); ?></td>
+                      <td><?php echo date('d M Y', strtotime($member['tanggal_daftar'])); ?></td>
+                      <td>
+                        <?php if ($member['membership_status'] == 'aktif'): ?>
+                          <span class="badge badge-success">Aktif</span>
+                        <?php elseif ($member['membership_status'] == 'expired'): ?>
+                          <span class="badge badge-danger">Expired</span>
+                        <?php else: ?>
+                          <span class="badge badge-warning">Belum Aktif</span>
+                        <?php endif; ?>
+                      </td>
+                    </tr>
+                  <?php endwhile; ?>
+                  <?php if (mysqli_num_rows($queryMemberTerbaru) == 0): ?>
+                    <tr>
+                      <td colspan="4" class="text-center">Tidak ada data member</td>
+                    </tr>
+                  <?php endif; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-=======
-        <!-- Chart Section: Line dan Donut Berdampingan -->
-        <div class="row">
-  <!-- Grafik Line (lebih panjang) -->
-  <div class="col-md-8 mb-4">
-    <div class="card">
-      <div class="card-header bg-primary text-white">
-        <i class="fas fa-chart-line mr-2"></i> Statistik Pendaftaran Member Tahun <?= date('Y') ?>
->>>>>>> origin/main
       </div>
-      <div class="card-body" style="height: 350px;">
-        <canvas id="areaChart"></canvas>
-      </div>
-    </div>
-  </div>
 
-  <!-- Grafik Donut (lebih kecil, menyesuaikan) -->
-  <div class="col-md-4 mb-4">
-    <div class="card">
-      <div class="card-header bg-primary text-white">
-        <i class="fas fa-chart-pie mr-2"></i> Status Member Tahun <?= date('Y') ?>
-      </div>
-      <div class="card-body" style="height: 350px;">
-        <canvas id="donutChart"></canvas>
+      <!-- Transaksi Terbaru -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-exchange-alt mr-2"></i> Transaksi Terbaru</h3>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>ID Transaksi</th>
+                    <th>Member</th>
+                    <th>Paket</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php while ($transaksi = mysqli_fetch_assoc($queryTransaksiTerbaru)): ?>
+                    <tr>
+                      <td><?php echo substr($transaksi['id_transaksi'], 0, 10) . '...'; ?></td>
+                      <td><?php echo htmlspecialchars($transaksi['nama_member']); ?></td>
+                      <td><?php echo htmlspecialchars($transaksi['nama_paket']); ?></td>
+                      <td>Rp <?php echo number_format($transaksi['total'], 0, ',', '.'); ?></td>
+                      <td>
+                        <?php if ($transaksi['status'] == 'approved'): ?>
+                          <span class="badge badge-success">Disetujui</span>
+                        <?php elseif ($transaksi['status'] == 'pending'): ?>
+                          <span class="badge badge-warning">Pending</span>
+                        <?php else: ?>
+                          <span class="badge badge-danger">Ditolak</span>
+                        <?php endif; ?>
+                      </td>
+                    </tr>
+                  <?php endwhile; ?>
+                  <?php if (mysqli_num_rows($queryTransaksiTerbaru) == 0): ?>
+                    <tr>
+                      <td colspan="5" class="text-center">Tidak ada data transaksi</td>
+                    </tr>
+                  <?php endif; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </section>
+
+<!-- JavaScript untuk Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Data untuk area chart
+    const bulanLabels = <?php echo json_encode($dataBulan); ?>;
+    const jumlahData = <?php echo json_encode($dataJumlah); ?>;
+
+    // Area Chart
+    const areaCtx = document.getElementById('areaChart').getContext('2d');
+    const areaChart = new Chart(areaCtx, {
+      type: 'line',
+      data: {
+        labels: bulanLabels,
+        datasets: [{
+          label: 'Jumlah Pendaftaran',
+          data: jumlahData,
+          backgroundColor: 'rgba(40, 167, 69, 0.1)',
+          borderColor: 'rgba(40, 167, 69, 1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+
+    // Data untuk donut chart
+    const statusLabels = <?php echo json_encode($statusLabels); ?>;
+    const statusData = <?php echo json_encode($statusData); ?>;
+    const statusColors = <?php echo json_encode($statusColors); ?>;
+
+    // Donut Chart
+    const donutCtx = document.getElementById('donutChart').getContext('2d');
+    const donutChart = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          data: statusData,
+          backgroundColor: statusColors,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20
+            }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+  });
+</script>
 
 <?php include '../../../view/master/footer.php'; ?>

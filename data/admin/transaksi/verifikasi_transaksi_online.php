@@ -3,7 +3,74 @@ require "../../../setting/session.php";
 checkSession("admin");
 require "../../../setting/koneksi.php";
 
-// Proses Approve / Reject
+// ============================================
+// FUNGSI NOTIFIKASI (INLINE - TIDAK PERLU FILE LAIN)
+// ============================================
+
+/**
+ * Fungsi untuk membuat notifikasi transaksi
+ * @param mysqli $con Koneksi database
+ * @param string $id_transaksi ID transaksi
+ * @param string $action 'approve' atau 'reject'
+ * @param string $nama_member Nama member
+ * @param float $total Total transaksi (hanya untuk approve)
+ * @param string $nama_paket Nama paket (hanya untuk approve)
+ * @return bool true jika berhasil
+ */
+function buatNotifikasiTransaksi($con, $id_transaksi, $action, $nama_member, $total = 0, $nama_paket = '')
+{
+    // 1. Cek apakah tabel notifikasi ada
+    $check_table = $con->query("SHOW TABLES LIKE 'tbl_notifikasi'");
+    if (!$check_table || $check_table->num_rows == 0) {
+        // Tabel tidak ada, skip notifikasi (tidak error)
+        return true;
+    }
+
+    // 2. Siapkan data notifikasi berdasarkan action
+    if ($action === 'approve') {
+        $judul = 'Transaksi Online Disetujui';
+        $pesan = sprintf(
+            "Transaksi #%s dari member \"%s\" untuk paket \"%s\" telah disetujui. Total: Rp %s",
+            $id_transaksi,
+            $nama_member,
+            $nama_paket,
+            number_format($total, 0, ',', '.')
+        );
+        $tipe = 'new_membership';
+    } else { // reject
+        $judul = 'Transaksi Online Ditolak';
+        $pesan = sprintf(
+            "Transaksi #%s dari member \"%s\" telah ditolak.",
+            $id_transaksi,
+            $nama_member
+        );
+        $tipe = 'warning';
+    }
+
+    $link = "/data/admin/transaksi_online/detail.php?id=" . $id_transaksi;
+
+    // 3. Insert notifikasi ke database
+    try {
+        // Gunakan parameter kosong untuk id_referensi jika null
+        $id_referensi = 0;
+
+        $stmt = $con->prepare("INSERT INTO tbl_notifikasi (judul, pesan, tipe, link, id_referensi) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssi", $judul, $pesan, $tipe, $link, $id_referensi);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        return $result;
+    } catch (Exception $e) {
+        // Log error tapi jangan gagalkan proses utama
+        error_log("Error membuat notifikasi: " . $e->getMessage());
+        return false;
+    }
+}
+
+// ============================================
+// PROSES APPROVE / REJECT (AJAX HANDLER)
+// ============================================
+
 if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
     header('Content-Type: application/json');
     $id_trx = $_POST['id_transaksi'];
@@ -13,51 +80,80 @@ if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
         $con->begin_transaction();
 
         if ($action === 'approve') {
+            // 1. Ambil data transaksi pending
             $stmt = $con->prepare("SELECT id_member, id_paket, total FROM tbl_transaksi_online WHERE id_transaksi = ? AND status = 'pending'");
             $stmt->bind_param("s", $id_trx);
             $stmt->execute();
             $result = $stmt->get_result();
+
             if ($result->num_rows === 0) {
                 throw new Exception("Transaksi tidak ditemukan atau sudah diproses");
             }
+
             $trx = $result->fetch_assoc();
             $stmt->close();
 
             $id_member = $trx['id_member'];
             $id_paket  = $trx['id_paket'];
+            $total_trx = $trx['total'];
 
-            // Ambil durasi paket
-            $stmt = $con->prepare("SELECT durasi_hari FROM tbl_paket WHERE id_paket = ?");
-            $stmt->bind_param("i", $id_paket);
+            // 2. Ambil data member
+            $stmt = $con->prepare("SELECT nama FROM tbl_member WHERE id_member = ?");
+            $stmt->bind_param("i", $id_member);
             $stmt->execute();
-            $durasi = $stmt->get_result()->fetch_assoc()['durasi_hari'] ?? 30;
+            $member_result = $stmt->get_result();
+            $member_data = $member_result->fetch_assoc();
+            $nama_member = $member_data['nama'] ?? 'Member';
             $stmt->close();
 
-            // Hitung tanggal berakhir
+            // 3. Ambil data paket
+            $stmt = $con->prepare("SELECT nama_paket, durasi_hari FROM tbl_paket WHERE id_paket = ?");
+            $stmt->bind_param("i", $id_paket);
+            $stmt->execute();
+            $paket_result = $stmt->get_result();
+            $paket_data = $paket_result->fetch_assoc();
+            $nama_paket = $paket_data['nama_paket'] ?? 'Paket';
+            $durasi = $paket_data['durasi_hari'] ?? 30;
+            $stmt->close();
+
+            // 4. Hitung tanggal berakhir membership
             $tgl_mulai = date('Y-m-d H:i:s');
             $tgl_berakhir = date('Y-m-d 23:59:59', strtotime("+$durasi days"));
 
-            // Insert ke tbl_membership
+            // 5. Insert ke tabel membership
             $stmt = $con->prepare("INSERT INTO tbl_membership (id_member, id_transaksi, id_paket, tgl_mulai, tgl_berakhir, sumber) VALUES (?, ?, ?, ?, ?, 'online')");
             $stmt->bind_param("isiss", $id_member, $id_trx, $id_paket, $tgl_mulai, $tgl_berakhir);
             $stmt->execute();
             $stmt->close();
 
-            // Update status member menjadi aktif
+            // 6. Update status member menjadi aktif
             $stmt = $con->prepare("UPDATE tbl_member SET membership_status = 'aktif' WHERE id_member = ?");
             $stmt->bind_param("i", $id_member);
             $stmt->execute();
             $stmt->close();
 
-            // Update status transaksi online
+            // 7. Update status transaksi online
             $stmt = $con->prepare("UPDATE tbl_transaksi_online SET status = 'approved', admin_verifikasi = ?, tgl_verifikasi = NOW() WHERE id_transaksi = ?");
             $stmt->bind_param("is", $_SESSION['id_user'], $id_trx);
             $stmt->execute();
             $stmt->close();
 
+            // 8. Buat notifikasi (jangan gagalkan jika notifikasi error)
+            buatNotifikasiTransaksi($con, $id_trx, 'approve', $nama_member, $total_trx, $nama_paket);
+
             $con->commit();
             echo json_encode(['success' => true, 'msg' => 'Transaksi berhasil disetujui & membership diaktifkan!']);
         } elseif ($action === 'reject') {
+            // 1. Ambil data member untuk notifikasi
+            $stmt = $con->prepare("SELECT m.nama FROM tbl_transaksi_online t JOIN tbl_member m ON t.id_member = m.id_member WHERE t.id_transaksi = ?");
+            $stmt->bind_param("s", $id_trx);
+            $stmt->execute();
+            $member_result = $stmt->get_result();
+            $member_data = $member_result->fetch_assoc();
+            $nama_member = $member_data['nama'] ?? 'Member';
+            $stmt->close();
+
+            // 2. Update status transaksi menjadi rejected
             $stmt = $con->prepare("UPDATE tbl_transaksi_online SET status = 'rejected', admin_verifikasi = ?, tgl_verifikasi = NOW() WHERE id_transaksi = ? AND status = 'pending'");
             $stmt->bind_param("is", $_SESSION['id_user'], $id_trx);
             $stmt->execute();
@@ -66,6 +162,9 @@ if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
                 throw new Exception("Transaksi tidak ditemukan atau sudah diproses");
             }
             $stmt->close();
+
+            // 3. Buat notifikasi
+            buatNotifikasiTransaksi($con, $id_trx, 'reject', $nama_member);
 
             $con->commit();
             echo json_encode(['success' => true, 'msg' => 'Transaksi berhasil ditolak']);
@@ -76,6 +175,10 @@ if (isset($_POST['action']) && isset($_POST['id_transaksi'])) {
     }
     exit;
 }
+
+// ============================================
+// TAMPILAN HALAMAN (NON-AJAX)
+// ============================================
 
 // Filter status
 $status_filter = $_GET['status'] ?? 'pending';
@@ -262,14 +365,11 @@ $transaksi = $con->query($sql);
         </div>
 
         <!-- Main Table Card -->
-
         <div class="card">
-            <div class="card-header bg-<?=
-                                        $status_filter == 'pending' ? 'primary' : ($status_filter == 'approved' ? 'success' : ($status_filter == 'rejected' ? 'danger' : 'secondary')) ?> text-white">
+            <div class="card-header bg-<?= $status_filter == 'pending' ? 'primary' : ($status_filter == 'approved' ? 'success' : ($status_filter == 'rejected' ? 'danger' : 'secondary')) ?> text-white">
                 <h3 class="card-title">
                     <i class="fas fa-list"></i>
-                    Daftar Transaksi -
-                    <?= $status_filter == 'all' ? 'Semua Status' : ucfirst($status_filter) ?>
+                    Daftar Transaksi - <?= $status_filter == 'all' ? 'Semua Status' : ucfirst($status_filter) ?>
                 </h3>
                 <div class="card-tools">
                     <span class="badge badge-light badge-lg"><?= $transaksi->num_rows ?> transaksi</span>
@@ -403,7 +503,7 @@ $transaksi = $con->query($sql);
                                                 </div>
                                             <?php else: ?>
                                                 <span class="badge badge-<?= $row['status'] == 'approved' ? 'success' : 'danger' ?>">
-                                                    <?= $row['status'] == 'approved' ? 'Check' : 'Cross' ?>
+                                                    <?= $row['status'] == 'approved' ? '✓' : '✗' ?>
                                                 </span>
                                             <?php endif; ?>
                                         </td>
@@ -445,7 +545,6 @@ $transaksi = $con->query($sql);
 <?php include '../../../view/master/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 <script>
     $(document).ready(function() {
@@ -527,7 +626,7 @@ $transaksi = $con->query($sql);
             const originalHtml = button.html();
 
             // Disable button and show loading
-            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
 
             // Send AJAX request
             $.ajax({
@@ -545,7 +644,9 @@ $transaksi = $con->query($sql);
                             text: response.msg,
                             icon: 'success',
                             confirmButtonColor: '#28a745',
-                            confirmButtonText: 'OK'
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            timerProgressBar: true
                         }).then(() => {
                             location.reload();
                         });
@@ -576,6 +677,7 @@ $transaksi = $con->query($sql);
         // Auto refresh every 30 seconds if there are pending transactions
         <?php if ($status_filter == 'pending' && $transaksi->num_rows > 0): ?>
             setInterval(() => {
+                console.log('Auto-refresh untuk transaksi pending...');
                 location.reload();
             }, 30000);
         <?php endif; ?>

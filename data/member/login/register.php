@@ -186,12 +186,12 @@ if (isset($_POST['registerbtn'])) {
 
         <!-- Step Indicator - Hanya 2 Step -->
         <div class="step-indicator">
-            <div class="step active">
+            <div class="step <?= !isset($_SESSION['registration_step']) || $_SESSION['registration_step'] == 1 ? 'active' : '' ?>">
                 <div class="step-circle">1</div>
                 <span>Data Diri</span>
             </div>
             <span class="step-arrow">→</span>
-            <div class="step">
+            <div class="step <?= isset($_SESSION['registration_step']) && $_SESSION['registration_step'] == 2 ? 'active' : '' ?>">
                 <div class="step-circle">2</div>
                 <span>Verifikasi Email</span>
             </div>
@@ -552,6 +552,20 @@ if (isset($_POST['registerbtn'])) {
                 uploadKtmSection.style.display = 'block';
                 buktiKtmInput.setAttribute('required', 'required');
             }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (tipeMemberSelect.value === 'mahasiswa') {
+                uploadKtmSection.style.display = 'block';
+                buktiKtmInput.setAttribute('required', 'required');
+            }
+        });
+
+        // Auto-format phone number
+        const phoneInput = document.querySelector('input[name="no_hp"]');
+        phoneInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
         });
     </script>
     

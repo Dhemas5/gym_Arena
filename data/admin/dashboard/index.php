@@ -185,7 +185,7 @@ $queryTransaksiTerbaru = mysqli_query($con, "
     <div class="row">
       <!-- Box Statistik -->
       <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box">
+        <div class="info-box bg-dark">
           <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-calendar-day"></i>
           </span>
@@ -197,33 +197,31 @@ $queryTransaksiTerbaru = mysqli_query($con, "
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box">
+        <div class="info-box bg-dark">
           <span class="info-box-icon bg-success elevation-1">
             <i class="fas fa-users"></i>
           </span>
           <div class="info-box-content">
             <span class="info-box-text">Total Member</span>
             <span class="info-box-number"><?php echo $jumlahMember; ?></span>
-            <small><?php echo $jumlahMemberHariIni; ?> baru hari ini</small>
           </div>
         </div>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box">
+        <div class="info-box bg-dark">
           <span class="info-box-icon bg-warning elevation-1">
             <i class="fas fa-shopping-cart"></i>
           </span>
           <div class="info-box-content">
             <span class="info-box-text">Transaksi Pending</span>
             <span class="info-box-number"><?php echo $jumlahTransaksiPending; ?></span>
-            <small>Menunggu verifikasi</small>
           </div>
         </div>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box">
+        <div class="info-box bg-dark">
           <span class="info-box-icon bg-primary elevation-1">
             <i class="fas fa-chalkboard-teacher"></i>
           </span>

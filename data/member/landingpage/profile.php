@@ -50,7 +50,7 @@ $stmt_membership->close();
 
 // Tentukan status member untuk badge
 $status_member = $membership_aktif ? "Aktif" : "Tidak Aktif";
-$status_class = $membership_aktif ? "success" : "danger";
+$status_class = $membership_aktif ? "aktif" : "tidak-aktif";
 
 // Proses update profil jika form dikirim
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profil'])) {
@@ -194,7 +194,118 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/stylemember.css">
     <link rel="stylesheet" href="assets/css/styleprofilemember.css">
-
+    <style>
+        .ktm-preview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .ktm-preview:hover {
+            transform: scale(1.02);
+        }
+        .modal-body.ktm-modal {
+            padding: 20px;
+            text-align: center;
+        }
+        .btn-view-ktm {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-view-ktm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .btn-view-ktm i {
+            font-size: 1.1rem;
+        }
+        
+        /* Fullscreen Image Modal */
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.95);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fullscreen-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 85vh;
+            object-fit: contain;
+            animation: zoomIn 0.3s ease;
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .close-fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 10000;
+        }
+        
+        .close-fullscreen:hover,
+        .close-fullscreen:focus {
+            color: #bbb;
+        }
+        
+        .fullscreen-caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        
+        .zoom-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <!-- NAVBAR -->
@@ -294,6 +405,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
                                 <span class="info-value"><?= htmlspecialchars($member['email']) ?></span>
                             </div>
                             <div class="info-item">
+                                <span class="info-label">Tipe Member</span>
+                                <span class="info-value">
+                                    <span class="status-badge <?= $member['is_mahasiswa'] ? 'status-info' : 'status-primary' ?>">
+                                        <?= $member['is_mahasiswa'] ? '🎓 Pelajar/Mahasiswa' : '👤 Umum' ?>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="info-item">
                                 <span class="info-label">Nomor Telepon</span>
                                 <span class="info-value"><?= $member['no_hp'] ? htmlspecialchars($member['no_hp']) : '-' ?></span>
                             </div>
@@ -301,6 +420,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
                                 <span class="info-label">Alamat</span>
                                 <span class="info-value"><?= $member['alamat'] ? htmlspecialchars($member['alamat']) : '-' ?></span>
                             </div>
+                            
+                            <!-- Tampilkan KTM jika mahasiswa -->
+                            <?php if ($member['is_mahasiswa'] && !empty($member['ktm_file'])): ?>
+                            <div class="info-item">
+                                <span class="info-label">Kartu Mahasiswa</span>
+                                <span class="info-value">
+                                    <button type="button" class="btn-view-ktm" data-bs-toggle="modal" data-bs-target="#ktmModal">
+                                        <i class="fas fa-id-card"></i> Lihat KTM
+                                    </button>
+                                </span>
+                            </div>
+                            <?php endif; ?>
+                            
                             <div class="info-item">
                                 <span class="info-label">Tanggal Bergabung</span>
                                 <span class="info-value"><?= $tanggal_daftar ?></span>
@@ -331,6 +463,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
             </div>
         </div>
     </section>
+
+    <!-- Modal Lihat KTM -->
+    <?php if ($member['is_mahasiswa'] && !empty($member['ktm_file'])): ?>
+    <div class="modal fade" id="ktmModal" tabindex="-1" aria-labelledby="ktmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ktmModalLabel">
+                        <i class="fas fa-id-card me-2"></i>Kartu Tanda Mahasiswa
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body ktm-modal">
+                    <img src="../../uploads/ktm/<?= $member['ktm_file'] ?>" alt="KTM" class="ktm-preview" id="ktmImage" onclick="openFullscreen()">
+                    <div class="mt-3">
+                        <small class="text-muted d-block mb-2">
+                            <i class="fas fa-info-circle me-1"></i>Klik gambar untuk melihat ukuran penuh
+                        </small>
+                        <a href="../../uploads/ktm/<?= $member['ktm_file'] ?>" download class="btn btn-primary">
+                            <i class="fas fa-download me-2"></i>Download KTM
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Fullscreen Image Viewer -->
+    <div id="fullscreenModal" class="fullscreen-modal" onclick="closeFullscreen()">
+        <span class="close-fullscreen" onclick="closeFullscreen()">&times;</span>
+        <img class="fullscreen-content" id="fullscreenImage">
+        <div class="fullscreen-caption" id="caption">Kartu Tanda Mahasiswa</div>
+        <div class="zoom-hint">
+            <i class="fas fa-search-plus me-2"></i>Klik untuk menutup
+        </div>
+    </div>
 
     <!-- Modal Edit Profil -->
     <div class="modal fade" id="editProfilModal" tabindex="-1" aria-labelledby="editProfilModalLabel" aria-hidden="true">
@@ -460,6 +629,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Fullscreen Image Viewer Functions
+        function openFullscreen() {
+            var modal = document.getElementById("fullscreenModal");
+            var img = document.getElementById("ktmImage");
+            var modalImg = document.getElementById("fullscreenImage");
+            
+            modal.style.display = "block";
+            modalImg.src = img.src;
+            
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeFullscreen() {
+            var modal = document.getElementById("fullscreenModal");
+            modal.style.display = "none";
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close fullscreen on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeFullscreen();
+            }
+        });
+        
         // Inisialisasi tab jika ada error pada tab ubah password
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (isset($error_password) || isset($success_password)): ?>
@@ -499,4 +696,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hapus_foto'])) {
         });
     </script>
 </body>
-</html>
+</html> 

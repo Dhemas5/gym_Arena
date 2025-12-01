@@ -1,17 +1,18 @@
 :root {
-    --primary: #1976d2;
-    --secondary: #1565c0;
-    --success: #22c55e;
-    --info: #42a5f5;
-    --warning: #ffc107;
+    --primary: #415a77;
+    --secondary: #778da9;
+    --success: #4ade80;
+    --info: #06b6d4;
+    --warning: #f59e0b;
     --danger: #ef4444;
-    --light: #e3f2fd;
+    --light: #1b263b;
     --dark: #0d1b2a;
-    --gradient-primary: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-    --gradient-success: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    --gradient-warning: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-    --gradient-light: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    --gradient-paket: linear-gradient(135deg, #0d1b2a 0%, #1976d2 100%);
+    --gradient-primary: linear-gradient(135deg, #415a77 0%, #0d1b2a 100%);
+    --gradient-secondary: linear-gradient(135deg, #778da9 0%, #415a77 100%);
+    --gradient-success: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-light: linear-gradient(135deg, #1b263b 0%, #415a77 100%);
+    --gradient-paket: linear-gradient(135deg, #0d1b2a 0%, #415a77 100%);
 }
 
 .select2-hidden-accessible {
@@ -21,34 +22,34 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0d1b2a 0%, #0a1929 100%);
+    background: #0d1b2a;
     color: #ffffff;
 }
 
 .content-wrapper {
-    background: linear-gradient(135deg, #0d1b2a 0%, #0a1929 100%);
+    background: #0d1b2a;
 }
 
 .card {
     border-radius: 12px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(66, 165, 245, 0.3);
+    box-shadow: 0 5px 25px rgba(13, 27, 42, 0.3);
+    border: 1px solid #1b263b;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
-    background: rgba(13, 27, 42, 0.8);
+    background: #0d1b2a;
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(66, 165, 245, 0.2);
-    border-color: rgba(66, 165, 245, 0.6);
+    box-shadow: 0 10px 30px rgba(65, 90, 119, 0.2);
+    border-color: #415a77;
 }
 
 .card-header {
     border-radius: 12px 12px 0 0 !important;
     padding: 15px 20px;
     font-weight: 600;
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
     color: #ffffff;
     border-bottom: none;
 }
@@ -62,16 +63,16 @@ body {
 .info-box {
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(66, 165, 245, 0.3);
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #1b263b;
+    box-shadow: 0 3px 15px rgba(13, 27, 42, 0.2);
     transition: all 0.3s ease;
-    background: rgba(13, 27, 42, 0.8);
+    background: #0d1b2a;
 }
 
 .info-box:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 20px rgba(66, 165, 245, 0.2);
-    border-color: rgba(66, 165, 245, 0.6);
+    box-shadow: 0 5px 20px rgba(65, 90, 119, 0.2);
+    border-color: #415a77;
 }
 
 .info-box-icon {
@@ -79,7 +80,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
 }
 
 .info-box:hover .info-box-icon {
@@ -91,13 +92,13 @@ body {
     font-weight: 500;
     transition: all 0.3s;
     padding: 8px 16px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 10px rgba(13, 27, 42, 0.2);
     border: none;
 }
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 15px rgba(13, 27, 42, 0.3);
 }
 
 .btn:active {
@@ -105,34 +106,54 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+    background: var(--gradient-secondary);
+}
+
+.btn-success {
+    background: var(--gradient-success);
+    color: #ffffff;
+}
+
+.btn-warning {
+    background: var(--gradient-warning);
+    color: #ffffff;
+}
+
+.btn-danger {
+    background: var(--gradient-danger);
+    color: #ffffff;
+}
+
+.btn-info {
+    background: var(--gradient-info);
+    color: #ffffff;
 }
 
 #grand_total_display {
     font-size: 2.5rem;
     font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    color: #42a5f5;
+    text-shadow: 0 2px 5px rgba(13, 27, 42, 0.3);
+    color: #415a77;
 }
 
 .form-control, .select2-container--bootstrap4 .select2-selection {
     border-radius: 8px;
-    border: 1px solid rgba(66, 165, 245, 0.3);
+    border: 1px solid #1b263b;
     transition: all 0.3s;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #1b263b;
     color: #ffffff;
 }
 
 .form-control:focus, .select2-container--bootstrap4 .select2-selection--single:focus {
-    border-color: #42a5f5;
-    box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.15);
-    background: rgba(255, 255, 255, 0.15);
+    border-color: #415a77;
+    box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.15);
+    background: #22334d;
     color: #ffffff;
 }
 
@@ -142,8 +163,8 @@ body {
 
 .input-group-text {
     border-radius: 8px;
-    background: rgba(66, 165, 245, 0.2);
-    border: 1px solid rgba(66, 165, 245, 0.3);
+    background: rgba(65, 90, 119, 0.2);
+    border: 1px solid #1b263b;
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -161,7 +182,10 @@ body {
 
 .content-header h1 {
     font-weight: 700;
-    color: #ffffff;
+    background: linear-gradient(135deg, #415a77 0%, #778da9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .badge {
@@ -174,7 +198,7 @@ body {
     border-top: none;
     font-weight: 600;
     color: #ffffff;
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
 }
 
 .table {
@@ -183,14 +207,14 @@ body {
 
 .modal-header {
     border-radius: 12px 12px 0 0;
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
     color: #ffffff;
 }
 
 .select2-container--bootstrap4 .select2-selection--single {
     height: calc(2.25rem + 2px);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(66, 165, 245, 0.3);
+    background: #1b263b;
+    border: 1px solid #1b263b;
 }
 
 .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
@@ -199,7 +223,7 @@ body {
 }
 
 .shadow-xl {
-    box-shadow: 0 10px 40px rgba(66, 165, 245, 0.15) !important;
+    box-shadow: 0 10px 40px rgba(65, 90, 119, 0.15) !important;
 }
 
 .animate-fade-in {
@@ -222,7 +246,7 @@ body {
 }
 
 .highlight {
-    background: linear-gradient(120deg, rgba(66, 165, 245, 0.1) 0%, rgba(66, 165, 245, 0.3) 50%, rgba(66, 165, 245, 0.1) 100%);
+    background: linear-gradient(120deg, rgba(65, 90, 119, 0.1) 0%, rgba(65, 90, 119, 0.3) 50%, rgba(65, 90, 119, 0.1) 100%);
     background-size: 200% 100%;
     animation: highlight 3s infinite;
 }
@@ -235,7 +259,7 @@ body {
 .total-card {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
     color: #ffffff;
 }
 
@@ -274,7 +298,7 @@ body {
 .floating-label .form-control:not(:placeholder-shown) ~ label {
     top: 0.1rem;
     font-size: 0.7rem;
-    color: #42a5f5;
+    color: #415a77;
 }
 
 .step-indicator {
@@ -291,7 +315,7 @@ body {
     left: 0;
     right: 0;
     height: 2px;
-    background-color: rgba(66, 165, 245, 0.3);
+    background-color: rgba(65, 90, 119, 0.3);
     z-index: 1;
 }
 
@@ -307,7 +331,7 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: rgba(66, 165, 245, 0.3);
+    background-color: rgba(65, 90, 119, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,9 +342,9 @@ body {
 }
 
 .step.active .step-number {
-    background-color: #42a5f5;
+    background-color: #415a77;
     color: white;
-    box-shadow: 0 0 0 5px rgba(66, 165, 245, 0.2);
+    box-shadow: 0 0 0 5px rgba(65, 90, 119, 0.2);
 }
 
 .step-label {
@@ -330,7 +354,7 @@ body {
 }
 
 .step.active .step-label {
-    color: #42a5f5;
+    color: #415a77;
     font-weight: 600;
 }
 
@@ -414,9 +438,9 @@ body {
 
 /* Style untuk dropdown Select2 */
 .card-paket .select2-container--bootstrap4 .select2-dropdown {
-    border: 1px solid rgba(66, 165, 245, 0.3);
+    border: 1px solid #1b263b;
     border-radius: 8px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 25px rgba(13, 27, 42, 0.3);
     background: #0d1b2a;
 }
 
@@ -426,13 +450,13 @@ body {
 }
 
 .card-paket .select2-container--bootstrap4 .select2-results__option--highlighted {
-    background-color: #1976d2;
+    background-color: #415a77;
     color: white;
 }
 
 /* Style untuk card Info Paket Dipilih */
 .card-info-paket {
-    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%) !important;
+    background: var(--gradient-primary) !important;
     color: white;
 }
 
@@ -447,7 +471,7 @@ body {
 
 .card-info-paket .badge {
     background: rgba(255, 255, 255, 0.9) !important;
-    color: #1976d2 !important;
+    color: #415a77 !important;
 }
 
 .card-info-paket .form-control {
@@ -468,7 +492,7 @@ body {
 
 /* Style untuk card Pembayaran */
 .card-pembayaran {
-    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%) !important;
+    background: var(--gradient-primary) !important;
     color: white;
 }
 
@@ -483,7 +507,7 @@ body {
 
 .card-pembayaran .badge {
     background: rgba(255, 255, 255, 0.9) !important;
-    color: #1976d2 !important;
+    color: #415a77 !important;
 }
 
 .card-pembayaran .form-control {
@@ -592,15 +616,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(13, 27, 42, 0.8);
+    background: #0d1b2a;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    background: var(--gradient-primary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+    background: var(--gradient-secondary);
 }

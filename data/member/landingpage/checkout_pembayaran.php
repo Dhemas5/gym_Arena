@@ -10,50 +10,38 @@ if (!isset($_SESSION['login']) || $_SESSION['user_type'] !== 'member') {
 $id_member = $_SESSION['id_member'];
 $nama_member = $_SESSION['nama'];
 
-// Ambil data paket dari POST
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
-    $id_paket = $_POST['id_paket'];
-    $harga_paket = $_POST['harga_paket'] ?? 0;
-    $nama_paket = $_POST['nama_paket'] ?? 'Paket Tidak Diketahui';
-    $tipe_member = $_POST['tipe_member'] ?? 'umum';
-    $durasi_hari = $_POST['durasi_hari'] ?? 1;
-
-    // Cek apakah ini paket dari database
-    if (is_numeric($id_paket)) {
-        $query = "SELECT * FROM tbl_paket WHERE id_paket = ?";
-        $stmt = $con->prepare($query);
-        $stmt->bind_param("i", $id_paket);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $paket_db = $result->fetch_assoc();
-            $paket = [
-                'id_paket' => $paket_db['id_paket'],
-                'nama_paket' => $paket_db['nama_paket'],
-                'durasi_hari' => $paket_db['durasi_hari'],
-                'harga' => $harga_paket,
-                'tipe_penjualan' => 'membership'
-            ];
-        } else {
-            $_SESSION['error'] = "Paket tidak ditemukan!";
-            header("Location: indexmemberr.php");
-            exit;
-        }
-        $stmt->close();
-    } else {
-        // Paket custom
+// Ambil data paket dari GET parameters
+if (isset($_GET['id_paket']) && isset($_GET['harga']) && isset($_GET['tipe'])) {
+    $id_paket = $_GET['id_paket'];
+    $harga_paket = $_GET['harga'];
+    $tipe_member = $_GET['tipe'];
+    
+    // Ambil detail paket dari database
+    $query = "SELECT * FROM tbl_paket WHERE id_paket = ?";
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("i", $id_paket);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $paket_db = $result->fetch_assoc();
         $paket = [
-            'id_paket' => $id_paket,
-            'nama_paket' => $nama_paket,
-            'durasi_hari' => $durasi_hari,
-            'tipe_penjualan' => 'custom',
-            'harga' => $harga_paket
+            'id_paket' => $paket_db['id_paket'],
+            'nama_paket' => $paket_db['nama_paket'],
+            'durasi_hari' => $paket_db['durasi_hari'],
+            'harga' => $harga_paket,
+            'tipe_penjualan' => 'membership'
         ];
+        
+        // Simpan ke session
+        $_SESSION['checkout_paket'] = $paket;
+        $_SESSION['tipe_member'] = $tipe_member;
+    } else {
+        $_SESSION['error'] = "Paket tidak ditemukan!";
+        header("Location: indexmemberr.php");
+        exit;
     }
-
-    // Simpan ke session
-    $_SESSION['checkout_paket'] = $paket;
-    $_SESSION['tipe_member'] = $tipe_member;
+    $stmt->close();
 } elseif (isset($_SESSION['checkout_paket'])) {
     $paket = $_SESSION['checkout_paket'];
     $tipe_member = $_SESSION['tipe_member'] ?? 'umum';
@@ -62,6 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
     header("Location: indexmemberr.php");
     exit;
 }
+
+// Konversi durasi ke teks
+$durasi_text = match ((int)$paket['durasi_hari']) {
+    1    => '1 Hari',
+    30   => '1 Bulan',
+    90   => '3 Bulan',
+    180  => '6 Bulan',
+    365  => '1 Tahun',
+    default => $paket['durasi_hari'] . ' Hari'
+};
 ?>
 
 <!DOCTYPE html>
@@ -74,93 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Price Option Styles */
-        .price-option {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .price-option:hover {
-            border-color: #42a5f5;
-            background-color: rgba(66, 165, 245, 0.05);
-        }
-
-        .price-option.selected {
-            border-color: #42a5f5;
-            background-color: rgba(66, 165, 245, 0.1);
-        }
-
-        .price-option.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .price-label {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 5px;
-        }
-
-        .price-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #198754;
-        }
-
-        .price-value.mahasiswa {
-            color: #0d6efd;
-        }
-
-        .badge-mahasiswa {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-        }
-
-        .badge-umum {
-            background: linear-gradient(135deg, #48c78e, #00a76f);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-        }
-
-        .package-actions {
-            margin-top: 20px;
-        }
-
-        .btn-beli {
-            width: 100%;
-            padding: 12px;
-            font-weight: 600;
-        }
-
-        /* Hide radio button visually but keep accessible */
-        .price-option .form-check-input {
-            position: relative;
-            margin-top: 0;
-        }
-
-        /* Style untuk gym package card yang sudah ada */
-        .gym-package-card {
-            position: relative;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .gym-package-card:hover {
-            transform: translateY(-5px);
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
@@ -253,11 +164,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
             font-size: 1.1rem;
             width: 100%;
             transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
 
         .btn-lanjut:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+            color: white;
         }
 
         .btn-back {
@@ -298,93 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
             font-weight: 600;
             margin-left: 10px;
         }
-
-        /* Price Option Styles */
-        .price-option {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .price-option:hover {
-            border-color: #42a5f5;
-            background-color: rgba(66, 165, 245, 0.05);
-        }
-
-        .price-option.selected {
-            border-color: #42a5f5;
-            background-color: rgba(66, 165, 245, 0.1);
-        }
-
-        .price-option.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .price-label {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 5px;
-        }
-
-        .price-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #198754;
-        }
-
-        .price-value.mahasiswa {
-            color: #0d6efd;
-        }
-
-        .badge-mahasiswa {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-        }
-
-        .badge-umum {
-            background: linear-gradient(135deg, #48c78e, #00a76f);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-        }
-
-        .package-actions {
-            margin-top: 20px;
-        }
-
-        .btn-beli {
-            width: 100%;
-            padding: 12px;
-            font-weight: 600;
-        }
-
-        /* Hide radio button visually but keep accessible */
-        .price-option .form-check-input {
-            position: relative;
-            margin-top: 0;
-        }
-
-        /* Style untuk gym package card yang sudah ada */
-        .gym-package-card {
-            position: relative;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .gym-package-card:hover {
-            transform: translateY(-5px);
-        }
     </style>
 </head>
 
@@ -411,14 +239,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
                 </div>
                 <div class="paket-detail">
                     <span class="paket-label">Durasi</span>
-                    <span class="paket-value"><?= isset($paket['durasi_hari']) ? $paket['durasi_hari'] . ' Hari' : '1 Sesi' ?></span>
+                    <span class="paket-value"><?= $durasi_text ?></span>
                 </div>
-                <?php if (isset($paket['tipe_penjualan'])): ?>
-                    <div class="paket-detail">
-                        <span class="paket-label">Tipe</span>
-                        <span class="paket-value text-capitalize"><?= htmlspecialchars($paket['tipe_penjualan']) ?></span>
-                    </div>
-                <?php endif; ?>
+                <div class="paket-detail">
+                    <span class="paket-label">Tipe</span>
+                    <span class="paket-value text-capitalize">Membership</span>
+                </div>
                 <div class="paket-detail">
                     <span class="paket-label">Harga</span>
                     <span class="paket-value">Rp <?= number_format($paket['harga'], 0, ',', '.') ?></span>
@@ -436,12 +262,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_paket'])) {
                 <h3>Rp <?= number_format($paket['harga'], 0, ',', '.') ?></h3>
             </div>
 
-            <form method="POST" action="proses_pembayaran.php">
-                <input type="hidden" name="konfirmasi_pembayaran" value="1">
-                <button type="submit" class="btn-lanjut">
-                    <i class="fas fa-arrow-right"></i> Lanjut ke Pembayaran
-                </button>
-            </form>
+            <a href="proses_pembayaran.php" class="btn-lanjut">
+                <i class="fas fa-arrow-right"></i> Lanjut ke Pembayaran
+            </a>
 
             <a href="indexmemberr.php" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali ke Beranda

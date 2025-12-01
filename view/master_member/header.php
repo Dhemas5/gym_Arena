@@ -98,7 +98,7 @@ checkSession('member');
                                 <i class="fas fa-percent mr-2"></i> Promo membership baru!
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item dropdown-footer">Lihat semua notifikasi</a>
+                            <a href="../../../data/member/notifikasi/semua_notifikasi.php" class="dropdown-item dropdown-footer">Lihat semua notifikasi</a>
                         </div>
                     </li>
 

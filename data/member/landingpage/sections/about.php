@@ -5,9 +5,11 @@
       
       <!-- Teks -->
       <div class="col-lg-6 mb-4 mb-lg-0">
-        <h1>
-          Tentang <span class="text-danger">Arena FIT</span>
-        </h1>
+       <h1>
+        <span class="text-white">Tentang</span> 
+        <span class="text-danger">Arena FIT</span>
+      </h1>
+
 
         <p>
           Arena FIT Gym and Class adalah pusat kebugaran modern yang berkomitmen untuk membantu Anda

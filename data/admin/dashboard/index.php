@@ -32,14 +32,15 @@ $jumlahPelatih = mysqli_num_rows($queryPelatih);
 $queryJadwal = mysqli_query($con, "SELECT * FROM tbl_jadwal_kelas");
 $jumlahJadwal = mysqli_num_rows($queryJadwal);
 
-// Data untuk grafik pendaftaran member per bulan
+// Data untuk grafik pendaftaran membership per bulan
 $dataBulan = [];
 $dataJumlah = [];
+
 $queryGrafik = mysqli_query($con, "
-    SELECT MONTH(tanggal_daftar) AS bulan, COUNT(*) AS jumlah 
-    FROM tbl_member 
-    WHERE YEAR(tanggal_daftar) = YEAR(CURDATE())
-    GROUP BY MONTH(tanggal_daftar)
+    SELECT MONTH(tgl_mulai) AS bulan, COUNT(*) AS jumlah
+    FROM tbl_membership
+    WHERE YEAR(tgl_mulai) = YEAR(CURDATE())
+    GROUP BY MONTH(tgl_mulai)
 ");
 
 $bulanNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -49,14 +50,27 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
   $dataJumlah[] = $row['jumlah'];
 }
 
-// Data untuk grafik Donut (status membership)
-$queryStatus = mysqli_query($con, "SELECT membership_status, COUNT(*) AS total FROM tbl_member GROUP BY membership_status");
+
+// Data untuk grafik Donut Status Membership (Aktif / Nonaktif)
+$queryStatus = mysqli_query($con, "
+    SELECT 
+        CASE 
+            WHEN tgl_berakhir >= NOW() THEN 'Aktif'
+            ELSE 'Nonaktif'
+        END AS status,
+        COUNT(*) AS total
+    FROM tbl_membership
+    GROUP BY status
+");
+
 $statusLabels = [];
 $statusData = [];
+
 while ($r = mysqli_fetch_assoc($queryStatus)) {
-    $statusLabels[] = $r['membership_status'];
+    $statusLabels[] = $r['status'];
     $statusData[] = $r['total'];
 }
+
 ?>
 
 <!-- Content Header -->

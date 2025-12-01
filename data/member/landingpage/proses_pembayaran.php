@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
     // Simpan ke tbl_transaksi_online
     $stmt = $con->prepare("
         INSERT INTO tbl_transaksi_online 
-        (id_transaksi, tgl_transaksi, id_member, id_paket, total, bukti_transfer, catatan, status) 
+        (id_transaksi, tgl_transaksi, id_member, id_paket, total, bukti_pembayaran, catatan, status) 
         VALUES (?, NOW(), ?, ?, ?, ?, ?, 'pending')
     ");
     $stmt->bind_param("siisss", $id_transaksi, $id_member, $paket['id_paket'], $paket['harga'], $new_filename, $catatan);
@@ -407,7 +407,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.95);
+            background-color: rgba(0, 0, 0, 0.95);
             animation: fadeIn 0.3s ease;
         }
 
@@ -437,13 +437,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes zoomIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -533,7 +545,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
                             </label>
                         </div>
                         <div class="file-name" id="fileName"></div>
-                        
+
                         <!-- Image Preview Container -->
                         <div class="image-preview-container" id="imagePreviewContainer">
                             <button type="button" class="btn-remove-image" onclick="removeImage()" title="Hapus gambar">
@@ -572,7 +584,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
         // Image Preview Function
         document.getElementById('bukti_pembayaran').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            
+
             if (file) {
                 // Validasi ukuran file
                 if (file.size > 5 * 1024 * 1024) {
@@ -580,7 +592,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
                     this.value = '';
                     return;
                 }
-                
+
                 // Validasi tipe file
                 const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
                 if (!allowedTypes.includes(file.type)) {
@@ -588,19 +600,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
                     this.value = '';
                     return;
                 }
-                
+
                 // Update file name
                 document.getElementById('fileName').innerHTML = '<i class="fas fa-file-image"></i> ' + file.name;
-                
+
                 // Show preview
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById('imagePreview');
                     const container = document.getElementById('imagePreviewContainer');
-                    
+
                     preview.src = e.target.result;
                     container.classList.add('show');
-                    
+
                     // Hide upload label
                     document.getElementById('uploadLabel').style.display = 'none';
                 }
@@ -614,16 +626,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
             const container = document.getElementById('imagePreviewContainer');
             const uploadLabel = document.getElementById('uploadLabel');
             const fileName = document.getElementById('fileName');
-            
+
             // Reset file input
             fileInput.value = '';
-            
+
             // Hide preview
             container.classList.remove('show');
-            
+
             // Show upload label again
             uploadLabel.style.display = 'block';
-            
+
             // Clear file name
             fileName.innerHTML = '';
         }
@@ -633,7 +645,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
             const modal = document.getElementById("fullscreenModal");
             const preview = document.getElementById("imagePreview");
             const modalImg = document.getElementById("fullscreenImage");
-            
+
             modal.style.display = "block";
             modalImg.src = preview.src;
             document.body.style.overflow = 'hidden';
@@ -642,7 +654,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
         function openFullscreenQRIS(img) {
             const modal = document.getElementById("fullscreenModal");
             const modalImg = document.getElementById("fullscreenImage");
-            
+
             modal.style.display = "block";
             modalImg.src = img.src;
             document.body.style.overflow = 'hidden';

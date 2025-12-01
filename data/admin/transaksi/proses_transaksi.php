@@ -23,8 +23,16 @@ $metode_pembayaran = $con->real_escape_string($_POST['metode_pembayaran']);
 $jumlah_dibayar = floatval($_POST['jumlah_dibayar']);
 $durasi_hari = intval($_POST['durasi_hari']);
 
+// HITUNG GRAND TOTAL DAN KEMBALIAN - INI YANG TAMBAH
+$grand_total = $harga_paket - $diskon;
+if ($grand_total < 0) {
+    $grand_total = 0;
+}
+
+$kembalian = $jumlah_dibayar - $grand_total;
+
 // Debug log (hapus di production)
-error_log("Data received - diskon: " . $diskon);
+error_log("Data received - harga: $harga_paket, diskon: $diskon, total: $grand_total, bayar: $jumlah_dibayar, kembali: $kembalian");
 
 // Validasi nominal
 if ($harga_paket < 0 || $diskon < 0 || $jumlah_dibayar < 0) {
@@ -32,8 +40,15 @@ if ($harga_paket < 0 || $diskon < 0 || $jumlah_dibayar < 0) {
     exit;
 }
 
-if ($kembalian < 0) {
-    echo json_encode(['success' => false, 'error' => 'Jumlah pembayaran kurang']);
+if ($jumlah_dibayar < $grand_total) {
+    echo json_encode(['success' => false, 'error' => 'Jumlah pembayaran kurang. Kurang: Rp ' . number_format($grand_total - $jumlah_dibayar, 0, ',', '.')]);
+    exit;
+}
+
+// Validasi metode pembayaran
+$valid_metode = ['tunai', 'qris', 'transfer', 'debit'];
+if (!in_array(strtolower($metode_pembayaran), $valid_metode)) {
+    echo json_encode(['success' => false, 'error' => 'Metode pembayaran tidak valid']);
     exit;
 }
 
@@ -44,13 +59,30 @@ try {
     // 1. Generate ID Transaksi
     $id_transaksi = 'TRX' . date('YmdHis') . rand(100, 999);
 
-    // 2. Insert ke tabel transaksi_offline (sesuai struktur database)
+    // 2. Ambil nama paket
+    $sql_paket = "SELECT nama_paket FROM tbl_paket WHERE id_paket = ?";
+    $stmt = $con->prepare($sql_paket);
+    $stmt->bind_param("i", $id_paket);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $paket = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$paket) {
+        throw new Exception("Paket tidak ditemukan");
+    }
+
+    $nama_paket = $paket['nama_paket'];
+
+    // 3. Insert ke tabel transaksi_offline (sesuai struktur database Anda)
     $sql_transaksi = "INSERT INTO tbl_transaksi_offline (
         id_transaksi, id_member, id_kasir, id_paket, total, 
         metode_pembayaran, jumlah_bayar, kembalian, tgl_transaksi
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt = $con->prepare($sql_transaksi);
+
+    // Bind parameters sesuai urutan
     $stmt->bind_param(
         "siiidddd",
         $id_transaksi,
@@ -69,25 +101,13 @@ try {
 
     $stmt->close();
 
-    // 3. Insert ke tabel transaksi_offline_detail
+    // 4. Insert ke tabel transaksi_offline_detail
     $sql_detail = "INSERT INTO tbl_transaksi_offline_detail (
         id_transaksi, id_paket, nama_paket, harga_satuan, qty, potongan_diskon_item, sub_total
     ) VALUES (?, ?, ?, ?, 1, ?, ?)";
 
-    // Ambil nama paket
-    $sql_paket = "SELECT nama_paket FROM tbl_paket WHERE id_paket = ?";
-    $stmt = $con->prepare($sql_paket);
-    $stmt->bind_param("i", $id_paket);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $paket = $result->fetch_assoc();
-    $stmt->close();
-
-    $nama_paket = $paket['nama_paket'];
-    $sub_total = $grand_total;
-
     $stmt = $con->prepare($sql_detail);
-    $stmt->bind_param("sisddd", $id_transaksi, $id_paket, $nama_paket, $harga_paket, $diskon, $sub_total);
+    $stmt->bind_param("sisddd", $id_transaksi, $id_paket, $nama_paket, $harga_paket, $diskon, $grand_total);
 
     if (!$stmt->execute()) {
         throw new Exception("Gagal menyimpan detail transaksi: " . $stmt->error);
@@ -95,11 +115,14 @@ try {
 
     $stmt->close();
 
-    // 4. Jika ada member, insert ke tabel membership dan update status
+    // 5. Jika ada member, insert ke tabel membership dan update status
     $member_aktif = false;
     if ($id_member) {
         $tgl_mulai = date('Y-m-d H:i:s');
         $tgl_berakhir = date('Y-m-d H:i:s', strtotime("+$durasi_hari days"));
+
+        // Set waktu berakhir ke akhir hari (23:59:59)
+        $tgl_berakhir = date('Y-m-d', strtotime("+$durasi_hari days")) . " 23:59:59";
 
         // Insert ke tabel membership
         $sql_membership = "INSERT INTO tbl_membership (
@@ -144,12 +167,25 @@ try {
         $stmt->close();
     }
 
+    // Ambil nama kasir
+    $nama_kasir = 'Kasir';
+    $sql_kasir = "SELECT username FROM tbl_user WHERE id_user = ?";
+    $stmt = $con->prepare($sql_kasir);
+    $stmt->bind_param("i", $id_user_kasir);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $kasir = $result->fetch_assoc();
+    if ($kasir) {
+        $nama_kasir = $kasir['username'];
+    }
+    $stmt->close();
+
     // Response sukses
     echo json_encode([
         'success' => true,
         'id_transaksi' => $id_transaksi,
         'tanggal_transaksi' => date('d/m/Y H:i'),
-        'nama_kasir' => $_SESSION['nama'] ?? 'Admin',
+        'nama_kasir' => $nama_kasir,
         'nama_member' => $nama_member,
         'nama_paket' => $nama_paket,
         'durasi_hari' => $durasi_hari,
@@ -159,7 +195,9 @@ try {
         'jumlah_dibayar' => $jumlah_dibayar,
         'kembalian' => $kembalian,
         'metode_pembayaran' => $metode_pembayaran,
-        'member_aktif' => $member_aktif
+        'member_aktif' => $member_aktif,
+        'tgl_mulai' => isset($tgl_mulai) ? $tgl_mulai : '',
+        'tgl_berakhir' => isset($tgl_berakhir) ? $tgl_berakhir : ''
     ]);
 } catch (Exception $e) {
     // Rollback transaksi jika ada error

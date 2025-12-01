@@ -9,11 +9,111 @@ date_default_timezone_set('Asia/Jakarta');
 $tgl_awal = $_GET['tgl_awal'] ?? date('Y-m-d');
 $tgl_akhir = $_GET['tgl_akhir'] ?? date('Y-m-d');
 
+// Fungsi Export Excel
+if (isset($_GET['export']) && $_GET['export'] == 'excel') {
+    exportToExcel($con, $tgl_awal, $tgl_akhir);
+    exit;
+}
+
+function exportToExcel($con, $tgl_awal, $tgl_akhir) {
+    // Query data untuk export - DIPERBAIKI sesuai struktur database
+    $stmt = $con->prepare("
+        SELECT 
+            th.id_transaksi,
+            th.tgl_transaksi,
+            m.nama AS nama_member,
+            u.username AS nama_kasir,
+            p.nama_paket,
+            th.metode_pembayaran,
+            th.total,
+            th.jumlah_bayar,
+            th.kembalian
+        FROM tbl_transaksi_offline th
+        LEFT JOIN tbl_member m ON th.id_member = m.id_member
+        LEFT JOIN tbl_user u ON th.id_kasir = u.id_user
+        LEFT JOIN tbl_paket p ON th.id_paket = p.id_paket
+        WHERE DATE(th.tgl_transaksi) BETWEEN ? AND ?
+        ORDER BY th.tgl_transaksi DESC
+    ");
+    $stmt->bind_param('ss', $tgl_awal, $tgl_akhir);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    // Hitung total
+    $totalPendapatan = 0;
+    foreach ($data as $row) {
+        $totalPendapatan += $row['total'];
+    }
+    
+    // Header Excel
+    header("Content-Type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment; filename=\"Data_Transaksi_Offline_{$tgl_awal}_sd_{$tgl_akhir}.xls\"");
+    header("Cache-Control: max-age=0");
+    
+    echo "<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=\"UTF-8\">
+        <style>
+            table { border-collapse: collapse; width: 100%; }
+            th { background-color: #4CAF50; color: white; font-weight: bold; }
+            td, th { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            .total { font-weight: bold; background-color: #e8f5e9; }
+            .header { background-color: #2196F3; color: white; padding: 10px; }
+        </style>
+    </head>
+    <body>";
+    
+    echo "<h2>DATA TRANSAKSI OFFLINE ARENA FIT</h2>";
+    echo "<h3>Periode: " . date('d/m/Y', strtotime($tgl_awal)) . " - " . date('d/m/Y', strtotime($tgl_akhir)) . "</h3>";
+    echo "<h4>Total Pendapatan: Rp " . number_format($totalPendapatan, 0, ',', '.') . "</h4>";
+    echo "<h4>Jumlah Transaksi: " . count($data) . "</h4>";
+    echo "<br>";
+    
+    echo "<table border='1'>
+        <tr>
+            <th>No</th>
+            <th>ID Transaksi</th>
+            <th>Tanggal</th>
+            <th>Member</th>
+            <th>Kasir</th>
+            <th>Paket</th>
+            <th>Metode Pembayaran</th>
+            <th>Total</th>
+            <th>Dibayar</th>
+            <th>Kembalian</th>
+        </tr>";
+    
+    $no = 1;
+    foreach ($data as $row) {
+        echo "<tr>";
+        echo "<td>" . $no++ . "</td>";
+        echo "<td>" . htmlspecialchars($row['id_transaksi']) . "</td>";
+        echo "<td>" . date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) . "</td>";
+        echo "<td>" . htmlspecialchars($row['nama_member'] ?? 'Pelanggan Umum') . "</td>";
+        echo "<td>" . htmlspecialchars($row['nama_kasir'] ?? '-') . "</td>";
+        echo "<td>" . htmlspecialchars($row['nama_paket'] ?? '-') . "</td>";
+        echo "<td>" . htmlspecialchars($row['metode_pembayaran']) . "</td>";
+        echo "<td>Rp " . number_format($row['total'], 0, ',', '.') . "</td>";
+        echo "<td>Rp " . number_format($row['jumlah_bayar'], 0, ',', '.') . "</td>";
+        echo "<td>Rp " . number_format($row['kembalian'] ?? 0, 0, ',', '.') . "</td>";
+        echo "</tr>";
+    }
+    
+    echo "</table>";
+    echo "</body></html>";
+    exit;
+}
+
+// Query untuk tampilan normal - DIPERBAIKI
 $stmt = $con->prepare("
-    SELECT th.*, m.nama AS nama_member, u.username AS nama_kasir 
+    SELECT th.*, m.nama AS nama_member, u.username AS nama_kasir, p.nama_paket 
     FROM tbl_transaksi_offline th
     LEFT JOIN tbl_member m ON th.id_member = m.id_member
     LEFT JOIN tbl_user u ON th.id_kasir = u.id_user
+    LEFT JOIN tbl_paket p ON th.id_paket = p.id_paket
     WHERE DATE(th.tgl_transaksi) BETWEEN ? AND ?
     ORDER BY th.tgl_transaksi DESC
 ");
@@ -200,7 +300,7 @@ include '../../../view/master/sidebar.php';
                     <?php
                     $totalPendapatan = 0;
                     foreach ($data as $row) {
-                        $totalPendapatan += $row['grand_total'];
+                        $totalPendapatan += $row['total'];
                     }
                     ?>
                     <div class="stat-number">Rp <?= number_format($totalPendapatan, 0, ',', '.') ?></div>
@@ -253,9 +353,10 @@ include '../../../view/master/sidebar.php';
                         </a>
                     </div>
                     <div class="col-md-2">
-                        <button type="button" class="btn btn-warning btn-modern btn-block mt-2" id="btnExport">
-                            <i class="fas fa-file-export mr-1"></i> Export
-                        </button>
+                        <a href="?export=excel&tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>" 
+                           class="btn btn-warning btn-modern btn-block mt-2">
+                            <i class="fas fa-file-export mr-1"></i> Export Excel
+                        </a>
                     </div>
                 </div>
             </form>
@@ -273,6 +374,7 @@ include '../../../view/master/sidebar.php';
                                 <th>Tanggal</th>
                                 <th>Member</th>
                                 <th>Kasir</th>
+                                <th>Paket</th>
                                 <th>Metode</th>
                                 <th>Total</th>
                                 <th>Aksi</th>
@@ -281,7 +383,7 @@ include '../../../view/master/sidebar.php';
                         <tbody>
                             <?php if (empty($data)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">
+                                    <td colspan="9" class="text-center text-muted py-4">
                                         <i class="fas fa-receipt fa-2x mb-3 d-block"></i>
                                         Tidak ada transaksi pada periode yang dipilih.
                                     </td>
@@ -301,6 +403,7 @@ include '../../../view/master/sidebar.php';
                                             <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($row['nama_kasir'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($row['nama_paket'] ?? '-') ?></td>
                                         <td>
                                             <?php
                                             $metode = strtoupper($row['metode_pembayaran']);
@@ -315,7 +418,7 @@ include '../../../view/master/sidebar.php';
                                             }
                                             ?>
                                         </td>
-                                        <td class="text-right total-highlight">Rp <?= number_format($row['grand_total'], 0, ',', '.') ?></td>
+                                        <td class="text-right total-highlight">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
                                         <td class="text-center">
                                             <button class="btn btn-detail btn-detail-transaksi" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
                                                 <i class="fas fa-eye mr-1"></i> Detail
@@ -388,7 +491,14 @@ include '../../../view/master/sidebar.php';
             "buttons": [{
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel mr-1"></i> Excel',
-                    className: 'btn btn-success btn-modern'
+                    className: 'btn btn-success btn-modern',
+                    filename: 'Data_Transaksi_Offline_<?= $tgl_awal ?>_sd_<?= $tgl_akhir ?>',
+                    title: 'DATA TRANSAKSI OFFLINE ARENA FIT',
+                    messageTop: 'Periode: <?= date("d/m/Y", strtotime($tgl_awal)) ?> - <?= date("d/m/Y", strtotime($tgl_akhir)) ?>',
+                    customize: function(xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('row c', sheet).attr('s', '55');
+                    }
                 },
                 {
                     extend: 'pdf',
@@ -401,11 +511,6 @@ include '../../../view/master/sidebar.php';
                     className: 'btn btn-warning btn-modern'
                 }
             ]
-        });
-
-        // Tombol Export Manual
-        $('#btnExport').click(function() {
-            $('.buttons-excel').click();
         });
 
         // Detail Transaksi
@@ -444,18 +549,20 @@ include '../../../view/master/sidebar.php';
                     let detailItems = '';
                     let totalItems = 0;
 
-                    details.forEach(detail => {
-                        totalItems += detail.qty;
-                        detailItems += `
+                    // Perbaikan: Karena database Anda hanya menyimpan 1 paket per transaksi offline
+                    // Kita buat detail dari data header
+                    if (h.nama_paket) {
+                        detailItems = `
                             <tr>
-                                <td>${detail.nama_paket}</td>
-                                <td class="text-center">${detail.qty}</td>
-                                <td class="text-right">Rp ${parseInt(detail.harga_satuan).toLocaleString('id-ID')}</td>
-                                <td class="text-right">Rp ${parseInt(detail.potongan_diskon_item || 0).toLocaleString('id-ID')}</td>
-                                <td class="text-right">Rp ${parseInt(detail.sub_total).toLocaleString('id-ID')}</td>
+                                <td>${h.nama_paket}</td>
+                                <td class="text-center">1</td>
+                                <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
+                                <td class="text-right">Rp 0</td>
+                                <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
                             </tr>
                         `;
-                    });
+                        totalItems = 1;
+                    }
 
                     const html = `
                         <div class="row">
@@ -468,6 +575,7 @@ include '../../../view/master/sidebar.php';
                                             <tr><th>Tanggal</th><td>${new Date(h.tgl_transaksi).toLocaleString('id-ID')}</td></tr>
                                             <tr><th>Member</th><td>${h.nama_member || '<em class="text-muted">Pelanggan Umum</em>'}</td></tr>
                                             <tr><th>Kasir</th><td>${h.nama_kasir || '-'}</td></tr>
+                                            <tr><th>Paket</th><td>${h.nama_paket || '-'}</td></tr>
                                             <tr><th>Metode Bayar</th><td>
                                                 ${h.metode_pembayaran === 'TUNAI' ? '<span class="badge-metode badge-tunai"><i class="fas fa-money-bill-wave mr-1"></i>Tunai</span>' :
                                                   h.metode_pembayaran === 'QRIS' ? '<span class="badge-metode badge-qris"><i class="fas fa-qrcode mr-1"></i>QRIS</span>' :
@@ -483,12 +591,10 @@ include '../../../view/master/sidebar.php';
                                     <div class="card-body">
                                         <h6 class="card-title"><i class="fas fa-calculator mr-2"></i>Ringkasan Pembayaran</h6>
                                         <table class="table table-sm table-borderless">
-                                            <tr><th width="60%">Sub Total</th><td class="text-right">Rp ${parseInt(h.sub_total).toLocaleString('id-ID')}</td></tr>
-                                            <tr><th>Diskon Global</th><td class="text-right">- Rp ${parseInt(h.potongan_diskon_global || 0).toLocaleString('id-ID')}</td></tr>
-                                            <tr class="border-top"><th>Grand Total</th><td class="text-right"><strong>Rp ${parseInt(h.grand_total).toLocaleString('id-ID')}</strong></td></tr>
-                                            <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_dibayar_tunai).toLocaleString('id-ID')}</td></tr>
-                                            ${h.jumlah_kembalian > 0 ? 
-                                                `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.jumlah_kembalian).toLocaleString('id-ID')}</td></tr>` : 
+                                            <tr><th width="60%">Total</th><td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td></tr>
+                                            <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_bayar).toLocaleString('id-ID')}</td></tr>
+                                            ${h.kembalian > 0 ? 
+                                                `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.kembalian).toLocaleString('id-ID')}</td></tr>` : 
                                                 ''}
                                         </table>
                                     </div>
@@ -517,15 +623,6 @@ include '../../../view/master/sidebar.php';
                                 </div>
                             </div>
                         </div>
-
-                        ${h.keterangan ? `
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <strong><i class="fas fa-sticky-note mr-2"></i>Keterangan:</strong> ${h.keterangan}
-                                </div>
-                            </div>
-                        </div>` : ''}
                     `;
 
                     $('#detailContent').html(html);

@@ -742,12 +742,12 @@ $result = $stmt->get_result();
                     <?php endif; ?>
 
                     <!-- Bukti Pembayaran -->
-                    <?php if ($transaction_detail['bukti_pembayaran']): ?>
+                    <?php if ($transaction_detail['bukti_transfer']): ?>
                         <div class="info-section">
                             <h4 class="section-title"><i class="fas fa-image"></i> Bukti Pembayaran</h4>
                             <div class="text-center">
                                 <?php
-                                $bukti_path = "../../../Uploads/bukti_pembayaran/" . $transaction_detail['bukti_pembayaran'];
+                                $bukti_path = "../../../Uploads/bukti_pembayaran/" . $transaction_detail['bukti_transfer'];
                                 if (file_exists($bukti_path)):
                                 ?>
                                     <a href="<?php echo $bukti_path; ?>" target="_blank">

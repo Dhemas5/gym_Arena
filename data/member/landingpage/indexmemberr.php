@@ -44,50 +44,97 @@ if ($res->num_rows > 0) {
 }
 $stmt->close();
 
-// Data jadwal sesuai gambar
-$jadwal_kelas = [
-    'Senin' => [
-        ['07:00', 'STUDIO 1', 'SEMAN BL', 'COACH FITRI'],
-        ['08:00', '-', 'BOXING', ''],
-        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN IRA'],
-        ['08:30', 'STUDIO 2', 'BODY SHAPE', 'COACH NIEKE']
-    ],
-    'Selasa' => [
-        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN NILA'],
-        ['08:15', 'STUDIO 2', 'CID ROCKER', 'SISKA'],
-        ['18:15', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
-        ['13:00', 'STUDIO 1', 'STROKU KATOI', 'SYNCHOVA']
-    ],
-    'Rabu' => [
-        ['08:00', '-', 'BOXING', ''],
-        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN IRA'],
-        ['18:00', 'STUDIO 1', 'BODY SHAPE', 'COACH NIEKE'],
-        ['18:30', 'STUDIO 1', 'KAPHA YOGA', 'COACH NANA']
-    ],
-    'Kamis' => [
-        ['08:00', '-', 'BOXING', ''],
-        ['08:30', 'STUDIO 1', 'BODY SHAPE', 'COACH NIEKE'],
-        ['18:00', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
-        ['16:00', 'STUDIO 2', 'AERO BL', 'COACH WIVVIK']
-    ],
-    'Jumat' => [
-        ['07:00', 'STUDIO 1', 'SEMAN BL', 'COACH FITRI'],
-        ['07:45', 'STUDIO 2', 'POUNDFIT', 'BERNI'],
-        ['18:00', 'STUDIO 1', 'KAPHA YOGA', 'COACH NANA'],
-        ['16:00', 'STUDIO 2', 'POUNDFIT', 'PPNILA']
-    ],
-    'Sabtu' => [
-        ['08:00', '-', 'BOXING', ''],
-        ['08:30', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
-        ['16:00', 'STUDIO 2', 'ZUMBA', 'ZIN SARI'],
-        ['16:15', 'STUDIO 1', 'STROKU KATOI', 'SYNCHOVA']
-    ],
-    'Minggu' => [
-        ['07:30', 'STUDIO 2', 'TRAMPOLINE', 'COACH NANA'],
-        ['08:00', 'STUDIO 1', 'ZUMBA', 'ZIN INA'],
-        ['15:30', 'STUDIO 1', 'AERO BL', 'COACH WIVVIK']
-    ]
-];
+// === AMBIL JADWAL DARI DATABASE ===
+// Ambil jadwal untuk 7 hari ke depan
+$tanggal_sekarang = date('Y-m-d');
+$tanggal_maksimal = date('Y-m-d', strtotime('+6 days'));
+
+$query_jadwal = "
+    SELECT 
+        jk.id_jadwal,
+        jk.tanggal,
+        jk.studio,
+        DATE_FORMAT(jk.jam_mulai, '%H:%i') as jam_mulai,
+        DATE_FORMAT(jk.jam_selesai, '%H:%i') as jam_selesai,
+        k.nama_kategori as nama_kelas,
+        i.nama_instruktur
+    FROM tbl_jadwal_kelas jk
+    LEFT JOIN tbl_kategori k ON jk.id_kategori = k.id_kategori
+    LEFT JOIN tbl_instruktur i ON jk.id_instruktur = i.id_instruktur
+    WHERE jk.tanggal BETWEEN ? AND ?
+    ORDER BY jk.tanggal, jk.jam_mulai
+";
+
+$stmt = $con->prepare($query_jadwal);
+$stmt->bind_param("ss", $tanggal_sekarang, $tanggal_maksimal);
+$stmt->execute();
+$result_jadwal = $stmt->get_result();
+$jadwal_dari_db = [];
+$current_time = date('H:i:s');
+
+while ($row = $result_jadwal->fetch_assoc()) {
+    // Filter: hanya tampilkan jadwal yang belum lewat waktu selesainya
+    $jadwal_time = $row['jam_selesai'] . ':00';
+    $kelas_date = $row['tanggal'];
+    
+    // Jika tanggal sama dengan hari ini, cek apakah sudah lewat waktu
+    if ($kelas_date == $tanggal_sekarang && $jadwal_time < $current_time) {
+        continue; // Lewati kelas yang sudah selesai hari ini
+    }
+    
+    $hari_indonesia = [
+        'Monday' => 'Senin',
+        'Tuesday' => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday' => 'Kamis',
+        'Friday' => 'Jumat',
+        'Saturday' => 'Sabtu',
+        'Sunday' => 'Minggu'
+    ];
+    
+    $english_day = date('l', strtotime($kelas_date));
+    $hari = $hari_indonesia[$english_day];
+    
+    if (!isset($jadwal_dari_db[$hari])) {
+        $jadwal_dari_db[$hari] = [];
+    }
+    
+    // Format nama instruktur
+    $nama_instruktur = '';
+    if (!empty($row['nama_instruktur'])) {
+        // Sesuaikan format dengan gambar
+        $nama_kelas = $row['nama_kelas'];
+        if (strpos($nama_kelas, 'ZUMBA') !== false) {
+            $nama_instruktur = 'ZIN ' . $row['nama_instruktur'];
+        } else if (strpos($nama_kelas, 'SEMAN BL') !== false || 
+                   strpos($nama_kelas, 'BODY SHAPE') !== false ||
+                   strpos($nama_kelas, 'KAPHA YOGA') !== false ||
+                   strpos($nama_kelas, 'AERO BL') !== false ||
+                   strpos($nama_kelas, 'TRAMPOLINE') !== false) {
+            $nama_instruktur = 'COACH ' . $row['nama_instruktur'];
+        } else {
+            $nama_instruktur = $row['nama_instruktur'];
+        }
+    }
+    
+    // Format studio sesuai gambar
+    $studio_display = $row['studio'];
+    if ($studio_display == 'STUDIO1') {
+        $studio_display = 'STUDIO 1';
+    } else if ($studio_display == 'STUDIO2') {
+        $studio_display = 'STUDIO 2';
+    }
+    
+    $jadwal_dari_db[$hari][] = [
+        'jam_mulai' => $row['jam_mulai'],
+        'jam_selesai' => $row['jam_selesai'],
+        'studio' => $studio_display,
+        'nama_kelas' => $row['nama_kelas'],
+        'nama_instruktur' => $nama_instruktur,
+        'tanggal' => $kelas_date
+    ];
+}
+$stmt->close();
 
 // Urutan hari dalam seminggu
 $hari_dalam_minggu = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -103,41 +150,22 @@ $jadwal_terurut = [];
 for ($i = 0; $i < 7; $i++) {
     $index = ($hari_ini_index + $i) % 7;
     $hari = $hari_dalam_minggu[$index];
-    $jadwal_terurut[$hari] = $jadwal_kelas[$hari];
+    
+    // Jika ada jadwal dari database untuk hari ini, gunakan
+    if (isset($jadwal_dari_db[$hari]) && !empty($jadwal_dari_db[$hari])) {
+        $jadwal_terurut[$hari] = $jadwal_dari_db[$hari];
+    } else {
+        // Jika tidak ada jadwal, buat array kosong
+        $jadwal_terurut[$hari] = [];
+    }
 }
 
-// Ambil paket hanya jika belum aktif
-$pakets = [];
-if (!$membership_aktif) {
-  $paket_result = $con->query("
-        SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
-        FROM tbl_paket 
-        ORDER BY durasi_hari ASC
-    ");
-
-  while ($p = $paket_result->fetch_assoc()) {
-    $durasi_text = match ((int)$p['durasi_hari']) {
-      1    => '1 Hari',
-      30   => '1 Bulan',
-      90   => '3 Bulan',
-      180  => '6 Bulan',
-      365  => '1 Tahun',
-      default => $p['durasi_hari'] . ' Hari'
-    };
-
-    $featured = in_array($p['durasi_hari'], [90, 180, 365]);
-
-    $pakets[] = [
-      'id'              => $p['id_paket'],
-      'nama'            => htmlspecialchars($p['nama_paket']),
-      'harga_umum'      => (int)$p['harga_umum'],
-      'harga_mahasiswa' => (int)$p['harga_mahasiswa'],
-      'durasi'          => $durasi_text,
-      'featured'        => $featured,
-      'deskripsi'       => htmlspecialchars($p['deskripsi'] ?? '')
-    ];
-  }
-}
+// Ambil semua paket untuk ditampilkan
+$paket_result = $con->query("
+    SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
+    FROM tbl_paket 
+    ORDER BY durasi_hari ASC
+");
 ?>
 
 <!DOCTYPE html>
@@ -262,7 +290,7 @@ if (!$membership_aktif) {
     .time-cell {
       font-weight: 600;
       color: #64b5f6;
-      width: 100px;
+      width: 150px;
     }
 
     .studio-cell {
@@ -280,16 +308,17 @@ if (!$membership_aktif) {
       font-size: 0.9rem;
     }
 
-    .class-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      background: rgba(66, 165, 245, 0.2);
-      color: #42a5f5;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-right: 8px;
-      margin-bottom: 5px;
+    .time-range {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 4px;
+    }
+
+    .no-class {
+      text-align: center;
+      padding: 30px;
+      color: rgba(255, 255, 255, 0.5);
+      font-style: italic;
     }
 
     .instagram-section {
@@ -414,6 +443,10 @@ if (!$membership_aktif) {
         padding: 10px 8px;
       }
 
+      .time-cell {
+        width: 120px;
+      }
+
       .price-row.with-button {
         padding: 8px;
       }
@@ -501,6 +534,7 @@ if (!$membership_aktif) {
         // Hitung tanggal untuk hari ini dan seterusnya
         $offset = array_search($hari, $hari_dalam_minggu) - $hari_ini_index;
         $tanggal_hari = date('d M', strtotime("+$offset days"));
+        $tanggal_full = date('Y-m-d', strtotime("+$offset days"));
         $is_today = $hari === $hari_ini;
         ?>
         
@@ -511,29 +545,54 @@ if (!$membership_aktif) {
               <?= $is_today ? 'HARI INI' : $tanggal_hari ?>
             </div>
           </div>
-          <table class="class-table">
-            <thead>
-              <tr>
-                <th>WAKTU</th>
-                <th>STUDIO</th>
-                <th>KELAS & INSTRUKTUR</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach($kelas as $kelas_item): ?>
+          
+          <?php if (empty($kelas)): ?>
+            <div class="no-class">
+              <i class="fas fa-calendar-times fa-2x mb-3"></i>
+              <p>Tidak ada kelas terjadwal untuk hari ini</p>
+            </div>
+          <?php else: ?>
+            <table class="class-table">
+              <thead>
                 <tr>
-                  <td class="time-cell"><?= $kelas_item[0] ?></td>
-                  <td class="studio-cell"><?= $kelas_item[1] ?></td>
-                  <td>
-                    <div class="class-cell"><?= $kelas_item[2] ?></div>
-                    <?php if(!empty($kelas_item[3])): ?>
-                      <div class="instructor-cell"><?= $kelas_item[3] ?></div>
-                    <?php endif; ?>
-                  </td>
+                  <th>WAKTU</th>
+                  <th>STUDIO</th>
+                  <th>KELAS & INSTRUKTUR</th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach($kelas as $kelas_item): ?>
+                  <?php 
+                  // Cek apakah kelas sudah lewat
+                  $kelas_sudah_lewat = false;
+                  if ($tanggal_full == date('Y-m-d')) {
+                      $current_time = date('H:i:s');
+                      $kelas_end_time = $kelas_item['jam_selesai'] . ':00';
+                      if ($kelas_end_time < $current_time) {
+                          $kelas_sudah_lewat = true;
+                      }
+                  }
+                  
+                  // Skip jika kelas sudah lewat
+                  if ($kelas_sudah_lewat) continue;
+                  ?>
+                  <tr>
+                    <td class="time-cell">
+                      <div><?= $kelas_item['jam_mulai'] ?> - <?= $kelas_item['jam_selesai'] ?></div>
+                      <div class="time-range"><?= $kelas_item['jam_mulai'] ?> - <?= $kelas_item['jam_selesai'] ?></div>
+                    </td>
+                    <td class="studio-cell"><?= $kelas_item['studio'] ?></td>
+                    <td>
+                      <div class="class-cell"><?= $kelas_item['nama_kelas'] ?></div>
+                      <?php if(!empty($kelas_item['nama_instruktur'])): ?>
+                        <div class="instructor-cell"><?= $kelas_item['nama_instruktur'] ?></div>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php endif; ?>
         </div>
       <?php endforeach; ?>
 
@@ -576,15 +635,7 @@ if (!$membership_aktif) {
 
     <h3 class="price-category-title">Paket Membership Gym</h3>
     <div class="gym-packages-grid">
-      <?php 
-      // Ambil semua paket (selalu, tidak peduli aktif atau tidak)
-      $paket_result = $con->query("
-          SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari, deskripsi 
-          FROM tbl_paket 
-          ORDER BY durasi_hari ASC
-      ");
-
-      while ($p = $paket_result->fetch_assoc()): 
+      <?php while ($p = $paket_result->fetch_assoc()): 
         $durasi_text = match ((int)$p['durasi_hari']) {
           1    => '1 Hari',
           30   => '1 Bulan',
@@ -663,6 +714,11 @@ if (!$membership_aktif) {
     window.addEventListener('scroll', () => {
       document.querySelector('.scroll-to-top').classList.toggle('visible', window.pageYOffset > 300);
     });
+    
+    // Auto-refresh jadwal setiap 5 menit
+    setInterval(() => {
+      location.reload();
+    }, 300000); // 300000 ms = 5 menit
   </script>
 </body>
 

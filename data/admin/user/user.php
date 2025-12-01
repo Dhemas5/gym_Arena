@@ -14,29 +14,29 @@ $queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
-.btn-group {
-    display: flex;
-    flex-wrap: nowrap;
-}
+    .btn-group {
+        display: flex;
+        flex-wrap: nowrap;
+    }
 
-.btn-hapus:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s;
-}
+    .btn-hapus:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
 
-.table-responsive {
-    border-radius: 8px;
-    overflow: hidden;
-}
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+    }
 
-.card-header {
-    border-bottom: 0;
-}
+    .card-header {
+        border-bottom: 0;
+    }
 
-.breadcrumb {
-    background: transparent;
-    margin-bottom: 0;
-}
+    .breadcrumb {
+        background: transparent;
+        margin-bottom: 0;
+    }
 </style>
 
 <!-- Content Header -->
@@ -67,7 +67,7 @@ $queryUser = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY id_user ASC");
                     </div>
                     <div class="card-body">
                         <div class="table-responsive rounded">
-                            <table id="tabelUser" class="table table-bordered table-striped table-hover">
+                            <table id="tabelPelatih" class="table table-bordered table-striped table-hover">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th style="width: 5%;">No</th>
@@ -190,136 +190,150 @@ if (mysqli_num_rows($queryUser) > 0) {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    // SweetAlert untuk konfirmasi hapus
-    $('.btn-hapus').on('click', function(e) {
-        e.preventDefault();
-        
-        const id = $(this).data('id');
-        const nama = $(this).data('nama');
-        
-        Swal.fire({
-            title: 'Hapus User?',
-            html: `Anda yakin ingin menghapus user <strong>"${nama}"</strong>?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            backdrop: true,
-            allowOutsideClick: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                hapusUser(id);
-            }
+    $(document).ready(function() {
+        // SweetAlert untuk konfirmasi hapus
+        $('.btn-hapus').on('click', function(e) {
+            e.preventDefault();
+
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+
+            Swal.fire({
+                title: 'Hapus User?',
+                html: `Anda yakin ingin menghapus user <strong>"${nama}"</strong>?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                backdrop: true,
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    hapusUser(id);
+                }
+            });
         });
-    });
-    
-    // Fungsi hapus user via AJAX
-    function hapusUser(id) {
-        $.ajax({
-            url: 'proses_user.php',
-            type: 'GET',
-            data: {
-                action: 'hapus',
-                id: id
-            },
-            dataType: 'json',
-            beforeSend: function() {
-                // Tampilkan loading
-                Swal.fire({
-                    title: 'Menghapus...',
-                    text: 'Sedang menghapus user',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function(response) {
-                Swal.close();
-                if (response.status === 'success') {
+
+        // Fungsi hapus user via AJAX
+        function hapusUser(id) {
+            $.ajax({
+                url: 'proses_user.php',
+                type: 'GET',
+                data: {
+                    action: 'hapus',
+                    id: id
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                    // Tampilkan loading
                     Swal.fire({
-                        title: 'Berhasil!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK',
-                        timer: 2000,
-                        timerProgressBar: true
-                    }).then((result) => {
-                        // Refresh halaman setelah berhasil hapus
-                        location.reload();
+                        title: 'Menghapus...',
+                        text: 'Sedang menghapus user',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                } else {
+                },
+                success: function(response) {
+                    Swal.close();
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            timerProgressBar: true
+                        }).then((result) => {
+                            // Refresh halaman setelah berhasil hapus
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    console.error('Error:', error);
                     Swal.fire({
                         title: 'Error!',
-                        text: response.message,
+                        text: 'Terjadi kesalahan saat menghapus user',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
                 }
-            },
-            error: function(xhr, status, error) {
-                Swal.close();
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat menghapus user',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    }
-    
-    // Handle form edit
-    $('.formEdit').on('submit', function(e) {
-        e.preventDefault();
-        const form = $(this);
-        const modalId = form.closest('.modal').attr('id');
-        const formData = new FormData(this);
-        formData.append('action', 'update');
-        
-        $.ajax({
-            url: 'proses_user.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            beforeSend: function() {
-                // Tampilkan loading
-                $('#' + modalId).modal('hide');
-                Swal.fire({
-                    title: 'Memperbarui...',
-                    text: 'Sedang mengupdate data user',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            },
-            success: function(response) {
-                Swal.close();
-                if (response.status === 'success') {
+            });
+        }
+
+        // Handle form edit
+        $('.formEdit').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const modalId = form.closest('.modal').attr('id');
+            const formData = new FormData(this);
+            formData.append('action', 'update');
+
+            $.ajax({
+                url: 'proses_user.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                beforeSend: function() {
+                    // Tampilkan loading
+                    $('#' + modalId).modal('hide');
                     Swal.fire({
-                        title: 'Berhasil!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK',
-                        timer: 2000,
-                        timerProgressBar: true
-                    }).then((result) => {
-                        location.reload();
+                        title: 'Memperbarui...',
+                        text: 'Sedang mengupdate data user',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                } else {
+                },
+                success: function(response) {
+                    Swal.close();
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            timerProgressBar: true
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            // Tampilkan kembali modal edit jika error
+                            $('#' + modalId).modal('show');
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    console.error('Error:', error);
                     Swal.fire({
-                        title: 'Error!',
-                        text: response.message,
+                        title: 'Error Sistem!',
+                        html: `Terjadi kesalahan saat mengupdate user.<br><small>${error}</small>`,
                         icon: 'error',
                         confirmButtonText: 'OK'
                     }).then((result) => {
@@ -327,21 +341,7 @@ $(document).ready(function() {
                         $('#' + modalId).modal('show');
                     });
                 }
-            },
-            error: function(xhr, status, error) {
-                Swal.close();
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error Sistem!',
-                    html: `Terjadi kesalahan saat mengupdate user.<br><small>${error}</small>`,
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    // Tampilkan kembali modal edit jika error
-                    $('#' + modalId).modal('show');
-                });
-            }
+            });
         });
     });
-});
 </script>

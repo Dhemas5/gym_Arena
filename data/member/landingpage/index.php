@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arena FIT - Gym and Class</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arena | Fit Club</title>
+    <link rel="icon" type="image/png" href="../../../assets/assets_admin/dist/img/logoadmin.png">
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
@@ -27,7 +28,6 @@
     include 'sections/classes.php';
     include 'sections/membership.php';
     include 'sections/trainers.php';
-    include 'sections/blog.php';
     include 'sections/contact.php';
     ?>
   </main>

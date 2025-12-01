@@ -8,165 +8,161 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../vendor/autoload.php';
 
-// Set timezone ke Asia/Jakarta
-date_default_timezone_set('Asia/Jakarta');
-
 $error = "";
 $success = "";
 
 // Proses registrasi
 if (isset($_POST['registerbtn'])) {
-    // Ambil dan sanitasi data
     $nama = trim(htmlspecialchars($_POST['nama']));
     $email = trim(htmlspecialchars($_POST['email']));
     $no_hp = trim(htmlspecialchars($_POST['no_hp']));
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
+    $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
+    $tipe_member = trim($_POST['tipe_member']);
+    
     // Validasi input
-    if (empty($nama) || empty($email) || empty($no_hp) || empty($password) || empty($confirm_password)) {
-        $error = "❌ Semua field harus diisi!";
+    if (empty($nama) || empty($email) || empty($no_hp) || empty($password) || empty($tipe_member)) {
+        $error = "Semua field wajib diisi!";
     } elseif ($password !== $confirm_password) {
-        $error = "❌ Password dan konfirmasi password tidak cocok!";
+        $error = "Password dan konfirmasi password tidak cocok!";
     } elseif (strlen($password) < 6) {
-        $error = "❌ Password minimal 6 karakter!";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "❌ Format email tidak valid!";
+        $error = "Password minimal 6 karakter!";
     } else {
         // Cek apakah email sudah terdaftar
-        $check_email = $con->prepare("SELECT id_member FROM tbl_member WHERE email = ?");
+        $check_email = $con->prepare("SELECT email FROM tbl_member WHERE email = ?");
         $check_email->bind_param("s", $email);
         $check_email->execute();
-        $check_email->store_result();
-
-        if ($check_email->num_rows > 0) {
-            $error = "❌ Email sudah terdaftar! Silakan gunakan email lain.";
+        $result = $check_email->get_result();
+        
+        if ($result->num_rows > 0) {
+            $error = "Email sudah terdaftar! Silakan gunakan email lain.";
         } else {
             // Cek apakah username sudah terdaftar
-            $check_username = $con->prepare("SELECT id_member FROM tbl_member WHERE nama = ?");
-            $check_username->bind_param("s", $nama);
-            $check_username->execute();
-            $check_username->store_result();
-
-            if ($check_username->num_rows > 0) {
-                $error = "❌ Username sudah terdaftar! Silakan gunakan username lain.";
+            $check_nama = $con->prepare("SELECT nama FROM tbl_member WHERE nama = ?");
+            $check_nama->bind_param("s", $nama);
+            $check_nama->execute();
+            $result_nama = $check_nama->get_result();
+            
+            if ($result_nama->num_rows > 0) {
+                $error = "Username sudah terdaftar! Silakan gunakan username lain.";
             } else {
-                // Generate kode verifikasi
-                $verification_code = sprintf("%06d", random_int(1, 999999));
-                $code_expiry = date("Y-m-d H:i:s", time() + 3600); // 1 jam dari sekarang
+                // Handle upload file KTM untuk mahasiswa
+                $bukti_ktm = null;
+                $is_mahasiswa = 0;
                 
-                // Hash password
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Generate ID member
-                $id_member = "MEM" . date('YmdHis') . random_int(100, 999);
-
-                // Cek struktur tabel dan sesuaikan query
-                // Pertama, cek kolom apa saja yang ada di tabel
-                $check_columns = $con->query("SHOW COLUMNS FROM tbl_member");
-                $columns = [];
-                while ($row = $check_columns->fetch_assoc()) {
-                    $columns[] = $row['Field'];
-                }
-
-                // Buat query dinamis berdasarkan kolom yang ada
-                if (in_array('created_at', $columns)) {
-                    // Jika ada created_at
-                    $insert = $con->prepare("INSERT INTO tbl_member (id_member, nama, email, no_hp, password, verification_code, code_expiry, is_verified, status_akun, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 'pending', NOW())");
-                } else {
-                    // Jika tidak ada created_at
-                    $insert = $con->prepare("INSERT INTO tbl_member (id_member, nama, email, no_hp, password, verification_code, code_expiry, is_verified, status_akun) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 'pending')");
-                }
-                
-                $insert->bind_param("sssssss", $id_member, $nama, $email, $no_hp, $hashed_password, $verification_code, $code_expiry);
-
-                if ($insert->execute()) {
-                    // Kirim email verifikasi
-                    $mail = new PHPMailer(true);
-                    try {
-                        $mail->isSMTP();
-                        $mail->Host       = 'smtp.gmail.com';
-                        $mail->SMTPAuth   = true;
-                        $mail->Username   = 'valhidayat01@gmail.com';
-                        $mail->Password   = 'ecbnikaaznxaujbk';
-                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port       = 587;
-                        $mail->CharSet    = 'UTF-8';
-
-                        $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
-                        $mail->addAddress($email);
-                        $mail->addReplyTo('valhidayat01@gmail.com', 'Arena FIT');
-
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Verifikasi Email - Arena FIT';
-                        $mail->Body    = "
-                            <!DOCTYPE html>
-                            <html>
-                            <head>
-                                <style>
-                                    body { font-family: Arial, sans-serif; color: #333; }
-                                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                                    .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-                                    .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
-                                    .code { font-size: 32px; font-weight: bold; color: #1976d2; text-align: center; margin: 20px 0; }
-                                    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-                                </style>
-                            </head>
-                            <body>
-                                <div class='container'>
-                                    <div class='header'>
-                                        <h1>Arena FIT</h1>
-                                        <p>Verifikasi Email Anda</p>
-                                    </div>
-                                    <div class='content'>
-                                        <p>Halo <strong>$nama</strong>,</p>
-                                        <p>Terima kasih telah mendaftar di Arena FIT. Berikut adalah kode verifikasi untuk mengaktifkan akun Anda:</p>
-                                        <div class='code'>$verification_code</div>
-                                        <p>Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB</strong></p>
-                                        <p>Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.</p>
-                                        <p>Jika Anda tidak merasa mendaftar, abaikan email ini.</p>
-                                    </div>
-                                    <div class='footer'>
-                                        <p>&copy; " . date('Y') . " Arena FIT. All rights reserved.</p>
-                                    </div>
-                                </div>
-                            </body>
-                            </html>
-                        ";
+                if ($tipe_member == 'mahasiswa') {
+                    $is_mahasiswa = 1;
+                    if (!isset($_FILES['bukti_ktm']) || $_FILES['bukti_ktm']['error'] == UPLOAD_ERR_NO_FILE) {
+                        $error = "Upload KTM/Kartu Pelajar wajib untuk Mahasiswa/Pelajar!";
+                    } else {
+                        $file = $_FILES['bukti_ktm'];
+                        $file_name = $file['name'];
+                        $file_tmp = $file['tmp_name'];
+                        $file_size = $file['size'];
+                        $file_error = $file['error'];
                         
-                        // Tambahkan plain text version
-                        $mail->AltBody = "Halo $nama,\n\nKode verifikasi Anda: $verification_code\n\nKode berlaku hingga: " . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB\n\nSilakan masukkan kode pada halaman verifikasi.";
+                        // Validasi file
+                        $allowed_ext = array('jpg', 'jpeg', 'png', 'pdf');
+                        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                        
+                        if ($file_error !== 0) {
+                            $error = "Terjadi kesalahan saat upload file!";
+                        } elseif (!in_array($file_ext, $allowed_ext)) {
+                            $error = "Format file tidak valid! Gunakan JPG, PNG, atau PDF.";
+                        } elseif ($file_size > 2097152) { // 2MB in bytes
+                            $error = "Ukuran file terlalu besar! Maksimal 2MB.";
+                        } else {
+                            // Create upload directory if not exists
+                            $upload_dir = "../../../uploads/ktm/";
+                            if (!file_exists($upload_dir)) {
+                                mkdir($upload_dir, 0777, true);
+                            }
+                            
+                            // Generate unique filename
+                            $new_filename = uniqid('ktm_', true) . '_' . time() . '.' . $file_ext;
+                            $upload_path = $upload_dir . $new_filename;
+                            
+                            if (move_uploaded_file($file_tmp, $upload_path)) {
+                                $bukti_ktm = $new_filename;
+                            } else {
+                                $error = "Gagal mengupload file! Periksa permission folder.";
+                            }
+                        }
+                    }
+                }
+                
+                // Jika tidak ada error, lanjutkan proses registrasi
+                if (empty($error)) {
+                    // Hash password
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                    
+                    // Generate verification code
+                    $verification_code = sprintf("%06d", mt_rand(1, 999999));
+                    $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour")); // Berlaku 1 jam
+                    
+                    // Insert ke database - SESUAIKAN DENGAN STRUCTURE DATABASE ANDA
+                    $sql = "INSERT INTO tbl_member (nama, email, password, no_hp, is_mahasiswa, ktm_file, verification_code, code_expiry, is_verified, status_akun, membership_status, tanggal_daftar) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'nonaktif', 'belum_aktif', NOW())";
+                    $stmt = $con->prepare($sql);
+                    $stmt->bind_param("ssssisss", $nama, $email, $hashed_password, $no_hp, $is_mahasiswa, $bukti_ktm, $verification_code, $code_expiry);
+                    
+                    if ($stmt->execute()) {
+                        // Kirim email verifikasi
+                        $mail = new PHPMailer(true);
+                        
+                        try {
+                            $mail->isSMTP();
+                            $mail->Host       = 'smtp.gmail.com';
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = 'valhidayat01@gmail.com';
+                            $mail->Password   = 'ecbnikaaznxaujbk';
+                            $mail->SMTPSecure = 'tls';
+                            $mail->Port       = 587;
 
-                        if ($mail->send()) {
+                            $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
+                            $mail->addAddress($email);
+
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Verifikasi Email - Arena FIT';
+                            $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
+                                              Terima kasih telah mendaftar di Arena FIT.<br>
+                                              Kode verifikasi Anda adalah: <h2 style='color: #1976d2;'>$verification_code</h2><br>
+                                              Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB</strong><br><br>
+                                              Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.<br><br>
+                                              Salam,<br>Tim Arena FIT";
+
+                            $mail->send();
+                            
                             // Set session untuk verifikasi
                             $_SESSION['verify_email'] = $email;
-                            $_SESSION['registration_step'] = 2;
+                            $_SESSION['registration_step'] = 'verification';
                             
                             // Redirect ke halaman verifikasi
                             header("Location: verify.php");
-                            exit();
-                        } else {
-                            $error = "❌ Gagal mengirim email verifikasi. Silakan coba lagi.";
-                            // Hapus data yang sudah tersimpan jika gagal kirim email
-                            $delete = $con->prepare("DELETE FROM tbl_member WHERE email = ?");
-                            $delete->bind_param("s", $email);
-                            $delete->execute();
+                            exit;
+                            
+                        } catch (Exception $e) {
+                            $error = "Registrasi berhasil tetapi gagal mengirim email verifikasi. Error: " . $mail->ErrorInfo;
                         }
-                    } catch (Exception $e) {
-                        $error = "❌ Terjadi kesalahan saat mengirim email. Silakan coba lagi.";
-                        // Hapus data yang sudah tersimpan jika gagal kirim email
-                        $delete = $con->prepare("DELETE FROM tbl_member WHERE email = ?");
-                        $delete->bind_param("s", $email);
-                        $delete->execute();
+                    } else {
+                        $error = "Gagal mendaftar! Silakan coba lagi. Error: " . $stmt->error;
+                        
+                        // Hapus file yang sudah diupload jika gagal insert
+                        if ($bukti_ktm && file_exists($upload_dir . $bukti_ktm)) {
+                            unlink($upload_dir . $bukti_ktm);
+                        }
                     }
-                } else {
-                    $error = "❌ Gagal melakukan registrasi! Silakan coba lagi. Error: " . $con->error;
+                    
+                    $stmt->close();
                 }
             }
+            $check_nama->close();
         }
+        $check_email->close();
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -206,18 +202,68 @@ if (isset($_POST['registerbtn'])) {
             <h2 class="section-title">Data Diri</h2>
 
             <div class="alert alert-info">
-                💡 Setelah mengisi data diri, kami akan mengirimkan kode verifikasi ke email Anda. Setelah verifikasi berhasil, Anda langsung dapat mengakses dashboard member.
+                💡 Setelah mengisi data diri, kami akan mengirimkan kode verifikasi ke email Anda. Setelah verifikasi berhasil, Anda langsung dapat login.
             </div>
 
             <?php if (!empty($error)) : ?>
-                <div class="alert alert-danger"><?= $error; ?></div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> <?= $error; ?>
+                </div>
             <?php endif; ?>
 
             <?php if (!empty($success)) : ?>
-                <div class="alert alert-success"><?= $success; ?></div>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <?= $success; ?>
+                </div>
             <?php endif; ?>
 
-            <form method="POST" id="registrationForm">
+            <form method="POST" id="registrationForm" enctype="multipart/form-data">
+                <!-- Tipe Member dengan Dropdown -->
+                <div class="form-group">
+                    <label class="form-label">Tipe Member *</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👥</span>
+                        <select name="tipe_member" id="tipe_member" class="form-control" required>
+                            <option value="">-- Pilih Tipe Member --</option>
+                            <option value="mahasiswa" <?= (isset($_POST['tipe_member']) && $_POST['tipe_member'] == 'mahasiswa') ? 'selected' : ''; ?>>
+                                🎓 Mahasiswa/Pelajar
+                            </option>
+                            <option value="umum" <?= (isset($_POST['tipe_member']) && $_POST['tipe_member'] == 'umum') ? 'selected' : ''; ?>>
+                                👤 Umum
+                            </option>
+                        </select>
+                    </div>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle"></i> Mahasiswa/Pelajar wajib upload KTM atau Kartu Pelajar
+                    </small>
+                </div>
+
+                <!-- Upload KTM/Kartu Pelajar (Hidden by default) -->
+                <div class="form-group" id="uploadKtmSection" style="display: none;">
+                    <label class="form-label">Upload KTM / Kartu Pelajar *</label>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" name="bukti_ktm" id="bukti_ktm" accept="image/*,.pdf" style="display: none;">
+                        <div class="upload-content" id="uploadContent">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p class="upload-text">Klik atau seret file ke sini</p>
+                            <p class="upload-subtext">Format: JPG, PNG, PDF (Max: 2MB)</p>
+                        </div>
+                        <div class="upload-preview" id="uploadPreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Preview" style="display: none;">
+                            <div id="previewPdf" style="display: none;">
+                                <i class="fas fa-file-pdf" style="font-size: 3rem; color: #d32f2f;"></i>
+                                <p id="pdfFileName" style="margin-top: 10px; font-weight: 500;"></p>
+                            </div>
+                            <button type="button" class="btn-remove-file" id="removeFile">
+                                <i class="fas fa-times"></i> Hapus File
+                            </button>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-exclamation-triangle"></i> Wajib untuk Mahasiswa/Pelajar. Pastikan foto/scan jelas dan terbaca.
+                    </small>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Username *</label>
                     <div class="input-wrapper">
@@ -296,7 +342,6 @@ if (isset($_POST['registerbtn'])) {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
 
-            // Toggle icon
             const icon = this.querySelector('i');
             if (type === 'text') {
                 icon.classList.remove('fa-eye');
@@ -311,7 +356,6 @@ if (isset($_POST['registerbtn'])) {
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             confirmPasswordInput.setAttribute('type', type);
 
-            // Toggle icon
             const icon = this.querySelector('i');
             if (type === 'text') {
                 icon.classList.remove('fa-eye');
@@ -327,21 +371,14 @@ if (isset($_POST['registerbtn'])) {
             const password = this.value;
             let strength = 0;
 
-            // Check password length
             if (password.length >= 6) strength += 25;
             if (password.length >= 8) strength += 25;
-
-            // Check for uppercase letters
             if (/[A-Z]/.test(password)) strength += 25;
-
-            // Check for numbers and special characters
             if (/[0-9]/.test(password)) strength += 15;
             if (/[^A-Za-z0-9]/.test(password)) strength += 10;
 
-            // Update strength bar
             passwordStrengthBar.style.width = strength + '%';
 
-            // Update color based on strength
             if (strength < 50) {
                 passwordStrengthBar.className = 'password-strength-bar strength-weak';
             } else if (strength < 80) {
@@ -368,15 +405,136 @@ if (isset($_POST['registerbtn'])) {
             }
         });
 
+        // Show/Hide KTM Upload Section
+        const tipeMemberSelect = document.getElementById('tipe_member');
+        const uploadKtmSection = document.getElementById('uploadKtmSection');
+        const buktiKtmInput = document.getElementById('bukti_ktm');
+
+        tipeMemberSelect.addEventListener('change', function() {
+            if (this.value === 'mahasiswa') {
+                uploadKtmSection.style.display = 'block';
+                buktiKtmInput.setAttribute('required', 'required');
+            } else {
+                uploadKtmSection.style.display = 'none';
+                buktiKtmInput.removeAttribute('required');
+                buktiKtmInput.value = '';
+                resetUploadArea();
+            }
+        });
+
+        // File Upload Handling
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadContent = document.getElementById('uploadContent');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const previewImage = document.getElementById('previewImage');
+        const previewPdf = document.getElementById('previewPdf');
+        const pdfFileName = document.getElementById('pdfFileName');
+        const removeFileBtn = document.getElementById('removeFile');
+
+        // Click to upload
+        uploadArea.addEventListener('click', function(e) {
+            if (!e.target.closest('.btn-remove-file')) {
+                buktiKtmInput.click();
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#007bff';
+            this.style.background = '#f0f8ff';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#ddd';
+            this.style.background = '#fafafa';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#ddd';
+            this.style.background = '#fafafa';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                buktiKtmInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // File input change
+        buktiKtmInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                handleFileSelect(this.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleFileSelect(file) {
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran file terlalu besar! Maksimal 2MB.');
+                buktiKtmInput.value = '';
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Format file tidak valid! Gunakan JPG, PNG, atau PDF.');
+                buktiKtmInput.value = '';
+                return;
+            }
+
+            // Show preview
+            uploadContent.style.display = 'none';
+            uploadPreview.style.display = 'flex';
+
+            if (file.type === 'application/pdf') {
+                previewImage.style.display = 'none';
+                previewPdf.style.display = 'flex';
+                pdfFileName.textContent = file.name;
+            } else {
+                previewPdf.style.display = 'none';
+                previewImage.style.display = 'block';
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove file
+        removeFileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            buktiKtmInput.value = '';
+            resetUploadArea();
+        });
+
+        function resetUploadArea() {
+            uploadContent.style.display = 'flex';
+            uploadPreview.style.display = 'none';
+            previewImage.src = '';
+        }
+
         // Form validation
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
+            const tipeMember = tipeMemberSelect.value;
 
-            if (password.length < 6) {
+            if (!tipeMember) {
                 e.preventDefault();
-                alert('Password minimal 6 karakter!');
-                passwordInput.focus();
+                alert('Silakan pilih tipe member terlebih dahulu!');
+                tipeMemberSelect.focus();
+                return;
+            }
+
+            if (tipeMember === 'mahasiswa' && !buktiKtmInput.files.length) {
+                e.preventDefault();
+                alert('Silakan upload KTM atau Kartu Pelajar untuk member Mahasiswa/Pelajar!');
                 return;
             }
 
@@ -384,6 +542,23 @@ if (isset($_POST['registerbtn'])) {
                 e.preventDefault();
                 alert('Password dan konfirmasi password tidak cocok!');
                 confirmPasswordInput.focus();
+                return;
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (tipeMemberSelect.value === 'mahasiswa') {
+                uploadKtmSection.style.display = 'block';
+                buktiKtmInput.setAttribute('required', 'required');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (tipeMemberSelect.value === 'mahasiswa') {
+                uploadKtmSection.style.display = 'block';
+                buktiKtmInput.setAttribute('required', 'required');
             }
         });
 
@@ -393,7 +568,117 @@ if (isset($_POST['registerbtn'])) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
     </script>
+    
+    <style>
+        /* Styling untuk upload area */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .upload-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .upload-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #previewPdf {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-remove-file {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-file:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .form-text {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.875rem;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        /* Style untuk select dropdown */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        select.form-control option {
+            padding: 10px;
+        }
+    </style>
 </body>
 
 </html>
+
 <?php ob_end_flush(); ?>

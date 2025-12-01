@@ -50,6 +50,7 @@ while ($row = mysqli_fetch_assoc($queryGrafik)) {
   $dataJumlah[] = $row['jumlah'];
 }
 
+<<<<<<< HEAD
 // Cek struktur tabel member untuk kolom yang tersedia
 $queryCheckColumns = mysqli_query($con, "SHOW COLUMNS FROM tbl_member");
 $availableColumns = [];
@@ -107,6 +108,15 @@ if (empty($statusLabels)) {
     $statusLabels = ['Aktif', 'Nonaktif'];
     $statusData = [$jumlahMember, 0];
     $statusColors = ['#28a745', '#dc3545'];
+=======
+// Data untuk grafik Donut (status membership)
+$queryStatus = mysqli_query($con, "SELECT membership_status, COUNT(*) AS total FROM tbl_member GROUP BY membership_status");
+$statusLabels = [];
+$statusData = [];
+while ($r = mysqli_fetch_assoc($queryStatus)) {
+    $statusLabels[] = $r['membership_status'];
+    $statusData[] = $r['total'];
+>>>>>>> origin/main
 }
 ?>
 
@@ -224,6 +234,7 @@ if (empty($statusLabels)) {
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Chart Tabs -->
     <div class="card mt-4">
       <div class="card-header">
@@ -237,20 +248,34 @@ if (empty($statusLabels)) {
             <li class="nav-item"><a class="nav-link" href="#donut-chart" data-toggle="tab">Status</a></li>
           </ul>
         </div>
+=======
+        <!-- Chart Section: Line dan Donut Berdampingan -->
+        <div class="row">
+  <!-- Grafik Line (lebih panjang) -->
+  <div class="col-md-8 mb-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <i class="fas fa-chart-line mr-2"></i> Statistik Pendaftaran Member Tahun <?= date('Y') ?>
+>>>>>>> origin/main
       </div>
-      <div class="card-body">
-        <div class="tab-content p-0">
-          <div class="chart tab-pane active" id="area-chart" style="position: relative; height: 300px;">
-            <canvas id="areaChart" height="300"></canvas>
-          </div>
-          <div class="chart tab-pane" id="donut-chart" style="position: relative; height: 300px;">
-            <canvas id="donutChart" height="300"></canvas>
-          </div>
-        </div>
+      <div class="card-body" style="height: 350px;">
+        <canvas id="areaChart"></canvas>
       </div>
     </div>
-
   </div>
+
+  <!-- Grafik Donut (lebih kecil, menyesuaikan) -->
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <i class="fas fa-chart-pie mr-2"></i> Status Member Tahun <?= date('Y') ?>
+      </div>
+      <div class="card-body" style="height: 350px;">
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
 <?php include '../../../view/master/footer.php'; ?>

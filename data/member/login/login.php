@@ -5,6 +5,18 @@ require "../../../setting/session.php";
 require "../../../setting/koneksi.php";
 blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
 
+// Tampilkan pesan sukses verifikasi
+$success_message = "";
+if (isset($_GET['verified']) && $_GET['verified'] == 1) {
+    $success_message = "✅ Email berhasil diverifikasi! Silakan login dengan akun Anda.";
+}
+
+// Tampilkan pesan sukses registrasi
+if (isset($_SESSION['verification_success'])) {
+    $success_message = "✅ Pendaftaran berhasil! Akun Anda telah aktif. Silakan login.";
+    unset($_SESSION['verification_success']);
+}
+
 $error = "";
 
 // Jika tombol login ditekan
@@ -50,7 +62,7 @@ if (isset($_POST['loginbtn'])) {
 
         // Cek verifikasi email member
         if ($member['is_verified'] == 0) {
-            $error = "Email Anda belum diverifikasi! Silakan cek email Anda.";
+            $error = "Email Anda belum diverifikasi! Silakan cek email Anda untuk kode verifikasi.";
         } elseif (password_verify($password, $member['password'])) {
             // Login member berhasil
             $_SESSION['login'] = true;
@@ -59,6 +71,7 @@ if (isset($_POST['loginbtn'])) {
             $_SESSION['nama'] = $member['nama'];
             $_SESSION['email'] = $member['email'];
             $_SESSION['no_hp'] = $member['no_hp'];
+            $_SESSION['tipe_member'] = $member['tipe_member']; // Tambahkan tipe member ke session
 
             header("Location: ../landingpage/indexmemberr.php");
             exit;
@@ -68,11 +81,7 @@ if (isset($_POST['loginbtn'])) {
     } else {
         $error = "⚠️ Username atau email tidak ditemukan!";
     }
-    
-    // Jika sampai di sini berarti login gagal untuk kedua tipe user
-    if (empty($error)) {
-        $error = "Username/email atau password salah!";
-    }
+    $query_member->close();
 }
 ?>
 
@@ -113,6 +122,16 @@ if (isset($_POST['loginbtn'])) {
             margin-bottom: 5px;
             font-size: 0.9em;
         }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #166534;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
     </style>
 </head>
 <body>
@@ -126,6 +145,12 @@ if (isset($_POST['loginbtn'])) {
             <h1>Login <span class="text-primary">Arena FIT</span></h1>
             <p>Masuk ke akun Anda</p>
         </div>
+
+        <?php if (!empty($success_message)) : ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <?= $success_message; ?>
+            </div>
+        <?php endif; ?>
 
         <?php if (!empty($error)) : ?>
             <div class="alert">

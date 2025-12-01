@@ -32,55 +32,37 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 if (isset($_POST['verifybtn'])) {
     $input_code = trim(htmlspecialchars($_POST['verification_code']));
     
-    // Validasi input kode
-    if (empty($input_code) || strlen($input_code) != 6 || !is_numeric($input_code)) {
-        $error = "❌ Kode verifikasi harus 6 digit angka!";
-    } else {
-        // Query verifikasi dengan prepared statement
-        $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
-        $query->bind_param("ss", $email, $input_code);
-        $query->execute();
-        $result = $query->get_result();
+    // Query verifikasi - SESUAIKAN DENGAN STRUCTURE DATABASE
+    $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
+    $query->bind_param("ss", $email, $input_code);
+    $query->execute();
+    $result = $query->get_result();
 
-        if ($result->num_rows === 1) {
-            $member = $result->fetch_assoc();
-            $expiry_time = strtotime($member['code_expiry']);
-            $current_time = time();
+    if ($result->num_rows === 1) {
+        $member = $result->fetch_assoc();
+        $expiry_time = strtotime($member['code_expiry']);
+        $current_time = time();
+        
+        // Manual check expiry time dengan timezone Jakarta
+        if ($expiry_time > $current_time) {
+            // Kode masih valid, lanjutkan verifikasi
+            $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
+            $update->bind_param("s", $email);
             
-            // Check expiry time
-            if ($expiry_time > $current_time) {
-                // Kode valid, lanjutkan verifikasi
-                $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
-                $update->bind_param("s", $email);
+            if ($update->execute()) {
+                // Hapus session verifikasi
+                unset($_SESSION['verify_email']);
+                unset($_SESSION['registration_step']);
                 
-                if ($update->execute()) {
-                    // HAPUS BAGIAN NOTIFIKASI MANUAL - Biarkan trigger yang menangani
-                    // atau buat notifikasi sederhana tanpa kolom judul
-                    try {
-                        $notifikasi_query = $con->prepare("INSERT INTO tbl_notifikasi (pesan, tipe, id_referensi, jenis_referensi, dibuat_pada) VALUES (?, 'member_baru', ?, 'member', NOW())");
-                        $pesan_notifikasi = "Member " . $member['nama'] . " (" . $email . ") telah berhasil verifikasi email dan aktif.";
-                        $notifikasi_query->bind_param("si", $pesan_notifikasi, $member['id_member']);
-                        $notifikasi_query->execute();
-                    } catch (Exception $e) {
-                        // Skip error notifikasi jika masih bermasalah
-                        error_log("Error notifikasi: " . $e->getMessage());
-                    }
-                    
-                    // Hapus session verifikasi
-                    unset($_SESSION['verify_email']);
-                    unset($_SESSION['registration_step']);
-                    
-                    // Set session success
-                    $_SESSION['verification_success'] = true;
-                    $_SESSION['verified_email'] = $email;
-                    
-                    header("Location: login.php");
-                    exit();
-                } else {
-                    $error = "❌ Gagal memperbarui status verifikasi! Silakan coba lagi.";
-                }
+                // Set session success
+                $_SESSION['verification_success'] = true;
+                $_SESSION['verified_email'] = $email;
+                
+                // Redirect ke halaman login dengan pesan sukses
+                header("Location: login.php?verified=1");
+                exit();
             } else {
-                $error = "❌ Kode verifikasi sudah kadaluarsa! Silakan minta kode baru.";
+                $error = "❌ Gagal memperbarui status verifikasi!";
             }
         } else {
             $error = "❌ Kode verifikasi salah! Periksa kembali kode Anda.";
@@ -91,8 +73,8 @@ if (isset($_POST['verifybtn'])) {
 // Kirim ulang kode verifikasi
 if (isset($_POST['resendbtn'])) {
     // Generate kode baru
-    $new_code = sprintf("%06d", random_int(1, 999999));
-    $new_expiry = date("Y-m-d H:i:s", time() + 3600); // 1 jam dari sekarang
+    $new_code = sprintf("%06d", mt_rand(1, 999999));
+    $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
     
     // Update kode di database
     $update = $con->prepare("UPDATE tbl_member SET verification_code = ?, code_expiry = ? WHERE email = ?");
@@ -589,42 +571,10 @@ if ($status_result->num_rows === 1) {
         codeInput.addEventListener('input', function(e) {
             // Hanya izinkan angka
             this.value = this.value.replace(/[^0-9]/g, '');
-            
-            // HAPUS AUTO SUBMIT - Ini penyebab refresh otomatis
-            // Hanya beri visual feedback ketika 6 digit terisi
-            if (this.value.length === 6) {
-                this.style.borderColor = '#4caf50';
-                this.style.boxShadow = '0 0 0 3px rgba(76, 175, 80, 0.1)';
-                
-                // Opsional: Focus ke tombol verify
-                document.querySelector('.btn-verify').focus();
-            } else {
-                this.style.borderColor = 'rgba(66, 165, 245, 0.2)';
-                this.style.boxShadow = 'none';
-            }
         });
 
-        // Prevent form submission jika kode tidak valid
-        document.getElementById('verifyForm').addEventListener('submit', function(e) {
-            const code = codeInput.value;
-            if (code.length !== 6 || !/^\d+$/.test(code)) {
-                e.preventDefault();
-                alert('Kode verifikasi harus 6 digit angka!');
-                codeInput.focus();
-            }
-        });
-
-        // Auto focus ke input kode dan select semua text
+        // Auto focus ke input kode
         codeInput.focus();
-        codeInput.select();
-
-        // Tambahkan event listener untuk keypress (Enter)
-        codeInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('verifyForm').submit();
-            }
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

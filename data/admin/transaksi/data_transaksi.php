@@ -15,7 +15,8 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     exit;
 }
 
-function exportToExcel($con, $tgl_awal, $tgl_akhir) {
+function exportToExcel($con, $tgl_awal, $tgl_akhir)
+{
     // Query data untuk export - DIPERBAIKI sesuai struktur database
     $stmt = $con->prepare("
         SELECT 
@@ -39,18 +40,18 @@ function exportToExcel($con, $tgl_awal, $tgl_akhir) {
     $stmt->execute();
     $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
-    
+
     // Hitung total
     $totalPendapatan = 0;
     foreach ($data as $row) {
         $totalPendapatan += $row['total'];
     }
-    
+
     // Header Excel
     header("Content-Type: application/vnd.ms-excel");
     header("Content-Disposition: attachment; filename=\"Data_Transaksi_Offline_{$tgl_awal}_sd_{$tgl_akhir}.xls\"");
     header("Cache-Control: max-age=0");
-    
+
     echo "<!DOCTYPE html>
     <html>
     <head>
@@ -65,13 +66,13 @@ function exportToExcel($con, $tgl_awal, $tgl_akhir) {
         </style>
     </head>
     <body>";
-    
+
     echo "<h2>DATA TRANSAKSI OFFLINE ARENA FIT</h2>";
     echo "<h3>Periode: " . date('d/m/Y', strtotime($tgl_awal)) . " - " . date('d/m/Y', strtotime($tgl_akhir)) . "</h3>";
     echo "<h4>Total Pendapatan: Rp " . number_format($totalPendapatan, 0, ',', '.') . "</h4>";
     echo "<h4>Jumlah Transaksi: " . count($data) . "</h4>";
     echo "<br>";
-    
+
     echo "<table border='1'>
         <tr>
             <th>No</th>
@@ -85,7 +86,7 @@ function exportToExcel($con, $tgl_awal, $tgl_akhir) {
             <th>Dibayar</th>
             <th>Kembalian</th>
         </tr>";
-    
+
     $no = 1;
     foreach ($data as $row) {
         echo "<tr>";
@@ -101,7 +102,7 @@ function exportToExcel($con, $tgl_awal, $tgl_akhir) {
         echo "<td>Rp " . number_format($row['kembalian'] ?? 0, 0, ',', '.') . "</td>";
         echo "</tr>";
     }
-    
+
     echo "</table>";
     echo "</body></html>";
     exit;
@@ -353,8 +354,8 @@ include '../../../view/master/sidebar.php';
                         </a>
                     </div>
                     <div class="col-md-2">
-                        <a href="?export=excel&tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>" 
-                           class="btn btn-warning btn-modern btn-block mt-2">
+                        <a href="?export=excel&tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>"
+                            class="btn btn-warning btn-modern btn-block mt-2">
                             <i class="fas fa-file-export mr-1"></i> Export Excel
                         </a>
                     </div>
@@ -381,57 +382,64 @@ include '../../../view/master/sidebar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (empty($data)): ?>
-                                <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">
-                                        <i class="fas fa-receipt fa-2x mb-3 d-block"></i>
-                                        Tidak ada transaksi pada periode yang dipilih.
-                                    </td>
-                                </tr>
-                            <?php else: ?>
-                                <?php $no = 1;
-                                foreach ($data as $row): ?>
-                                    <tr>
-                                        <td class="text-center"><?= $no++ ?></td>
-                                        <td><strong><?= htmlspecialchars($row['id_transaksi']) ?></strong></td>
-                                        <td><?= date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) ?></td>
-                                        <td>
-                                            <?php if ($row['nama_member']): ?>
-                                                <span class="text-primary"><?= htmlspecialchars($row['nama_member']) ?></span>
-                                            <?php else: ?>
-                                                <span class="text-muted"><em>Pelanggan Umum</em></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= htmlspecialchars($row['nama_kasir'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['nama_paket'] ?? '-') ?></td>
-                                        <td>
-                                            <?php
-                                            $metode = strtoupper($row['metode_pembayaran']);
-                                            if ($metode == 'TUNAI') {
-                                                echo '<span class="badge-metode badge-tunai"><i class="fas fa-money-bill-wave mr-1"></i>Tunai</span>';
-                                            } elseif ($metode == 'QRIS') {
-                                                echo '<span class="badge-metode badge-qris"><i class="fas fa-qrcode mr-1"></i>QRIS</span>';
-                                            } elseif ($metode == 'TRANSFER') {
-                                                echo '<span class="badge-metode badge-transfer"><i class="fas fa-exchange-alt mr-1"></i>Transfer</span>';
-                                            } else {
-                                                echo '<span class="badge-metode badge-debit"><i class="fas fa-credit-card mr-1"></i>Debit</span>';
-                                            }
-                                            ?>
-                                        </td>
-                                        <td class="text-right total-highlight">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
-                                        <td class="text-center">
-                                            <button class="btn btn-detail btn-detail-transaksi" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
-                                                <i class="fas fa-eye mr-1"></i> Detail
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                            <?php
+                            if (empty($data)):
+                                // Jangan render tabel sama sekali jika tidak ada data
+                            ?>
                         </tbody>
                     </table>
                 </div>
+                <div class="text-center py-5">
+                    <i class="fas fa-receipt fa-5x text-muted mb-3"></i>
+                    <h4 class="text-muted">Tidak ada transaksi</h4>
+                    <p class="text-muted">Tidak ada transaksi pada periode yang dipilih.</p>
+                </div>
+            <?php else: ?>
+                <?php
+                                $no = 1;
+                                foreach ($data as $row):
+                ?>
+                    <tr>
+                        <td class="text-center"><?= $no++ ?></td>
+                        <td><strong><?= htmlspecialchars($row['id_transaksi']) ?></strong></td>
+                        <td><?= date('d/m/Y H:i', strtotime($row['tgl_transaksi'])) ?></td>
+                        <td>
+                            <?php if ($row['nama_member']): ?>
+                                <span class="text-primary"><?= htmlspecialchars($row['nama_member']) ?></span>
+                            <?php else: ?>
+                                <span class="text-muted"><em>Pelanggan Umum</em></span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= htmlspecialchars($row['nama_kasir'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($row['nama_paket'] ?? '-') ?></td>
+                        <td>
+                            <?php
+                                    $metode = strtoupper($row['metode_pembayaran']);
+                                    if ($metode == 'TUNAI') {
+                                        echo '<span class="badge-metode badge-tunai"><i class="fas fa-money-bill-wave mr-1"></i>Tunai</span>';
+                                    } elseif ($metode == 'QRIS') {
+                                        echo '<span class="badge-metode badge-qris"><i class="fas fa-qrcode mr-1"></i>QRIS</span>';
+                                    } elseif ($metode == 'TRANSFER') {
+                                        echo '<span class="badge-metode badge-transfer"><i class="fas fa-exchange-alt mr-1"></i>Transfer</span>';
+                                    } else {
+                                        echo '<span class="badge-metode badge-debit"><i class="fas fa-credit-card mr-1"></i>Debit</span>';
+                                    }
+                            ?>
+                        </td>
+                        <td class="text-right total-highlight">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
+                        <td class="text-center">
+                            <button class="btn btn-detail btn-detail-transaksi" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
+                                <i class="fas fa-eye mr-1"></i> Detail
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            <?php endif; ?>
+            </table>
             </div>
         </div>
+    </div>
     </div>
 </section>
 
@@ -473,205 +481,195 @@ include '../../../view/master/sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
+    // Hanya inisialisasi jika tabel memiliki data
+    if ($('#tabelTransaksi tbody tr').length > 0 && !$('#tabelTransaksi tbody tr td[colspan]').length) {
+        // Cek apakah DataTable sudah diinisialisasi
+        if ($.fn.DataTable.isDataTable('#tabelTransaksi')) {
+            $('#tabelTransaksi').DataTable().destroy();
+        }
+        
         // Inisialisasi DataTable
-        var table = $('#tabelTransaksi').DataTable({
+        $('#tabelTransaksi').DataTable({
             "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json"
+                "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Tidak ada data yang tersedia",
+                "infoFiltered": "(difilter dari _MAX_ total data)",
+                "search": "Cari:",
+                "paginate": {
+                    "first": "Pertama",
+                    "last": "Terakhir",
+                    "next": "Selanjutnya",
+                    "previous": "Sebelumnya"
+                }
             },
             "pageLength": 10,
-            "lengthMenu": [
-                [5, 10, 25, 50, -1],
-                [5, 10, 25, 50, "Semua"]
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]],
+            "order": [[2, "desc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": [0, 8] }
             ],
-            "order": [
-                [2, "desc"]
-            ],
-            "dom": '<"row"<"col-md-6"B><"col-md-6"f>>rt<"row"<"col-md-6"l><"col-md-6"p>>',
-            "buttons": [{
-                    extend: 'excel',
-                    text: '<i class="fas fa-file-excel mr-1"></i> Excel',
-                    className: 'btn btn-success btn-modern',
-                    filename: 'Data_Transaksi_Offline_<?= $tgl_awal ?>_sd_<?= $tgl_akhir ?>',
-                    title: 'DATA TRANSAKSI OFFLINE ARENA FIT',
-                    messageTop: 'Periode: <?= date("d/m/Y", strtotime($tgl_awal)) ?> - <?= date("d/m/Y", strtotime($tgl_akhir)) ?>',
-                    customize: function(xlsx) {
-                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                        $('row c', sheet).attr('s', '55');
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    text: '<i class="fas fa-file-pdf mr-1"></i> PDF',
-                    className: 'btn btn-danger btn-modern'
-                },
-                {
-                    extend: 'print',
-                    text: '<i class="fas fa-print mr-1"></i> Print',
-                    className: 'btn btn-warning btn-modern'
-                }
-            ]
+            "destroy": true,
+            "autoWidth": false,
+            "responsive": true
         });
+    }
 
-        // Detail Transaksi
-        $(document).on('click', '.btn-detail-transaksi', function() {
-            const id = $(this).data('id');
-            $('#detailContent').html(`
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
-                    <p>Memuat detail transaksi...</p>
-                </div>
-            `);
-            $('#modalDetail').modal('show');
+    // Detail Transaksi - KODE TETAP SAMA
+    $(document).on('click', '.btn-detail-transaksi', function() {
+        const id = $(this).data('id');
+        $('#detailContent').html(`
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                <p>Memuat detail transaksi...</p>
+            </div>
+        `);
+        $('#modalDetail').modal('show');
 
-            $.ajax({
-                url: 'detail_transaksi.php',
-                method: 'GET',
-                data: {
-                    id: id
-                },
-                dataType: 'json',
-                success: function(res) {
-                    if (!res.success) {
-                        $('#detailContent').html(`
-                            <div class="alert alert-danger text-center">
-                                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                                <h5>Error</h5>
-                                <p>${res.error || 'Terjadi kesalahan saat memuat data'}</p>
-                            </div>
-                        `);
-                        return;
-                    }
-
-                    const h = res.header;
-                    const details = res.details;
-
-                    let detailItems = '';
-                    let totalItems = 0;
-
-                    // Perbaikan: Karena database Anda hanya menyimpan 1 paket per transaksi offline
-                    // Kita buat detail dari data header
-                    if (h.nama_paket) {
-                        detailItems = `
-                            <tr>
-                                <td>${h.nama_paket}</td>
-                                <td class="text-center">1</td>
-                                <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
-                                <td class="text-right">Rp 0</td>
-                                <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
-                            </tr>
-                        `;
-                        totalItems = 1;
-                    }
-
-                    const html = `
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h6 class="card-title"><i class="fas fa-info-circle mr-2"></i>Informasi Transaksi</h6>
-                                        <table class="table table-sm table-borderless">
-                                            <tr><th width="40%">ID Transaksi</th><td><strong>${h.id_transaksi}</strong></td></tr>
-                                            <tr><th>Tanggal</th><td>${new Date(h.tgl_transaksi).toLocaleString('id-ID')}</td></tr>
-                                            <tr><th>Member</th><td>${h.nama_member || '<em class="text-muted">Pelanggan Umum</em>'}</td></tr>
-                                            <tr><th>Kasir</th><td>${h.nama_kasir || '-'}</td></tr>
-                                            <tr><th>Paket</th><td>${h.nama_paket || '-'}</td></tr>
-                                            <tr><th>Metode Bayar</th><td>
-                                                ${h.metode_pembayaran === 'TUNAI' ? '<span class="badge-metode badge-tunai"><i class="fas fa-money-bill-wave mr-1"></i>Tunai</span>' :
-                                                  h.metode_pembayaran === 'QRIS' ? '<span class="badge-metode badge-qris"><i class="fas fa-qrcode mr-1"></i>QRIS</span>' :
-                                                  h.metode_pembayaran === 'TRANSFER' ? '<span class="badge-metode badge-transfer"><i class="fas fa-exchange-alt mr-1"></i>Transfer</span>' :
-                                                  '<span class="badge-metode badge-debit"><i class="fas fa-credit-card mr-1"></i>Debit</span>'}
-                                            </td></tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h6 class="card-title"><i class="fas fa-calculator mr-2"></i>Ringkasan Pembayaran</h6>
-                                        <table class="table table-sm table-borderless">
-                                            <tr><th width="60%">Total</th><td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td></tr>
-                                            <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_bayar).toLocaleString('id-ID')}</td></tr>
-                                            ${h.kembalian > 0 ? 
-                                                `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.kembalian).toLocaleString('id-ID')}</td></tr>` : 
-                                                ''}
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+        $.ajax({
+            url: 'detail_transaksi.php',
+            method: 'GET',
+            data: { id: id },
+            dataType: 'json',
+            success: function(res) {
+                if (!res.success) {
+                    $('#detailContent').html(`
+                        <div class="alert alert-danger text-center">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                            <h5>Error</h5>
+                            <p>${res.error || 'Terjadi kesalahan saat memuat data'}</p>
                         </div>
+                    `);
+                    return;
+                }
 
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <h6><i class="fas fa-list mr-2"></i>Detail Items (${totalItems} item)</h6>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th>Paket</th>
-                                                <th width="10%" class="text-center">Qty</th>
-                                                <th width="20%" class="text-right">Harga Satuan</th>
-                                                <th width="20%" class="text-right">Diskon Item</th>
-                                                <th width="20%" class="text-right">Sub Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${detailItems}
-                                        </tbody>
+                const h = res.header;
+                let detailItems = '';
+                let totalItems = 0;
+
+                if (h.nama_paket) {
+                    detailItems = `
+                        <tr>
+                            <td>${h.nama_paket}</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
+                            <td class="text-right">Rp 0</td>
+                            <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
+                        </tr>
+                    `;
+                    totalItems = 1;
+                }
+
+                const html = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-info-circle mr-2"></i>Informasi Transaksi</h6>
+                                    <table class="table table-sm table-borderless">
+                                        <tr><th width="40%">ID Transaksi</th><td><strong>${h.id_transaksi}</strong></td></tr>
+                                        <tr><th>Tanggal</th><td>${new Date(h.tgl_transaksi).toLocaleString('id-ID')}</td></tr>
+                                        <tr><th>Member</th><td>${h.nama_member || '<em class="text-muted">Pelanggan Umum</em>'}</td></tr>
+                                        <tr><th>Kasir</th><td>${h.nama_kasir || '-'}</td></tr>
+                                        <tr><th>Paket</th><td>${h.nama_paket || '-'}</td></tr>
+                                        <tr><th>Metode Bayar</th><td>
+                                            ${h.metode_pembayaran === 'TUNAI' ? '<span class="badge-metode badge-tunai"><i class="fas fa-money-bill-wave mr-1"></i>Tunai</span>' :
+                                              h.metode_pembayaran === 'QRIS' ? '<span class="badge-metode badge-qris"><i class="fas fa-qrcode mr-1"></i>QRIS</span>' :
+                                              h.metode_pembayaran === 'TRANSFER' ? '<span class="badge-metode badge-transfer"><i class="fas fa-exchange-alt mr-1"></i>Transfer</span>' :
+                                              '<span class="badge-metode badge-debit"><i class="fas fa-credit-card mr-1"></i>Debit</span>'}
+                                        </td></tr>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                    `;
-
-                    $('#detailContent').html(html);
-                },
-                error: function(xhr, status, error) {
-                    $('#detailContent').html(`
-                        <div class="alert alert-danger text-center">
-                            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                            <h5>Kesalahan Jaringan</h5>
-                            <p>Tidak dapat terhubung ke server. Silakan coba lagi.</p>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-calculator mr-2"></i>Ringkasan Pembayaran</h6>
+                                    <table class="table table-sm table-borderless">
+                                        <tr><th width="60%">Total</th><td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td></tr>
+                                        <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_bayar).toLocaleString('id-ID')}</td></tr>
+                                        ${h.kembalian > 0 ? 
+                                            `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.kembalian).toLocaleString('id-ID')}</td></tr>` : 
+                                            ''}
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    `);
-                }
-            });
-        });
-
-        // Cetak Detail
-        $('#btnPrintDetail').click(function() {
-            const content = $('#detailContent').html();
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Detail Transaksi</title>
-                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .table th { background-color: #f8f9fa; }
-                        @media print { 
-                            .btn { display: none; }
-                            .no-print { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="text-center mb-4">
-                            <h3 class="mb-1">Detail Transaksi</h3>
-                            <p class="text-muted">${new Date().toLocaleString('id-ID')}</p>
-                        </div>
-                        ${content}
                     </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h6><i class="fas fa-list mr-2"></i>Detail Items (${totalItems} item)</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Paket</th>
+                                            <th width="10%" class="text-center">Qty</th>
+                                            <th width="20%" class="text-right">Harga Satuan</th>
+                                            <th width="20%" class="text-right">Diskon Item</th>
+                                            <th width="20%" class="text-right">Sub Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${detailItems}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                $('#detailContent').html(html);
+            },
+            error: function(xhr, status, error) {
+                $('#detailContent').html(`
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h5>Kesalahan Jaringan</h5>
+                        <p>Tidak dapat terhubung ke server. Silakan coba lagi.</p>
+                    </div>
+                `);
+            }
         });
     });
+
+    // Cetak Detail
+    $('#btnPrintDetail').click(function() {
+        const content = $('#detailContent').html();
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Detail Transaksi</title>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .table th { background-color: #f8f9fa; }
+                    @media print { 
+                        .btn { display: none; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="text-center mb-4">
+                        <h3 class="mb-1">Detail Transaksi</h3>
+                        <p class="text-muted">${new Date().toLocaleString('id-ID')}</p>
+                    </div>
+                    ${content}
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    });
+});
 </script>

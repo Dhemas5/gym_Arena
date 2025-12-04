@@ -114,20 +114,21 @@ class Layout {
   }
 
   fixLoginRegisterHeight() {
-    const $body = $('body')
-    const $selector = $(`${SELECTOR_LOGIN_BOX}, ${SELECTOR_REGISTER_BOX}`)
+  const $body = $('body')
+  // Perbaikan: Gabungkan selector dengan cara yang lebih aman
+  const $selector = $(SELECTOR_LOGIN_BOX).add($(SELECTOR_REGISTER_BOX))
 
-    if ($selector.length === 0) {
-      $body.css('height', 'auto')
-      $('html').css('height', 'auto')
-    } else {
-      const boxHeight = $selector.height()
+  if ($selector.length === 0) {
+    $body.css('height', 'auto')
+    $('html').css('height', 'auto')
+  } else {
+    const boxHeight = $selector.height()
 
-      if ($body.css(this._config.panelAutoHeightMode) !== boxHeight) {
-        $body.css(this._config.panelAutoHeightMode, boxHeight)
-      }
+    if ($body.css(this._config.panelAutoHeightMode) !== boxHeight) {
+      $body.css(this._config.panelAutoHeightMode, boxHeight)
     }
   }
+}
 
   // Private
 

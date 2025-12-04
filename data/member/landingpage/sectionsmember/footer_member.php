@@ -652,24 +652,25 @@ $stmt->close();
             <!-- Informasi Gym -->
             <div class="col-lg-3 col-md-6 mb-4">
                 <h5 class="mb-3">
-                    <i class="fas fa-map-marker-alt me-2"></i>Kontak Kami
+                    <i class="fas fa-map-marker-alt me-2"></i>Informasi Kami
                 </h5>
                 <ul class="list-unstyled">
                     <li class="mb-2">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                        Jl. Gym Arena No. 123, Jakarta
+                       Jl. KH Shiddiq No.19-21 TalangSari, Jember
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-phone me-2"></i>
-                        (021) 1234-5678
+                       +62 821-4308-0510
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-envelope me-2"></i>
-                        info@gymarena.com
+                        arenafitclubjbr22@gmail.com
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-clock me-2"></i>
-                        Senin - Minggu: 05:00 - 22:00
+                        Senin - Sabtu: 07:00 - 22:00 WIB
+                        Minggu : 07.00-18.00 WIB
                     </li>
                 </ul>
             </div>
@@ -677,20 +678,15 @@ $stmt->close();
             <!-- Social Media & Support -->
             <div class="col-lg-3 col-md-6 mb-4">
                 <h5 class="mb-3">
-                    <i class="fas fa-share-alt me-2"></i>Follow Kami
+                    <i class="fas fa-share-alt me-2"></i>Kontak Kami
                 </h5>
                 <div class="social-links mb-4">
-                    <a href="#" class="btn-social">
-                        <i class="fab fa-facebook-f me-1"></i> Facebook
+                    <a href="https://www.instagram.com/arenafitclubjember?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="btn-social">
+                        <i class="fab fa-instagram me-1"></i> @arenafitclubjember
                     </a>
+                    
                     <a href="#" class="btn-social">
-                        <i class="fab fa-instagram me-1"></i> Instagram
-                    </a>
-                    <a href="#" class="btn-social">
-                        <i class="fab fa-twitter me-1"></i> Twitter
-                    </a>
-                    <a href="#" class="btn-social">
-                        <i class="fab fa-youtube me-1"></i> YouTube
+                        <i class="fas fa-envelope contact-icon email-icon"></i> arenafitclubjbr22@gmail.com
                     </a>
                 </div>
             </div>

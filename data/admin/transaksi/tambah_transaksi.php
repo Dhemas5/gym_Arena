@@ -4,14 +4,14 @@ require "../../../setting/session.php";
 checkSession("admin");
 require "../../../setting/koneksi.php";
 
-// Ambil semua paket + harga_umum dan harga_mahasiswa
+// PERBAIKAN: Hapus kondisi WHERE status karena tidak ada di database
 $pakets = $con->query("
     SELECT id_paket, nama_paket, harga_umum, harga_mahasiswa, durasi_hari 
     FROM tbl_paket 
     ORDER BY nama_paket
 ")->fetch_all(MYSQLI_ASSOC);
 
-// Ambil member aktif yang membershipnya belum aktif atau sudah expired
+// PERBAIKAN: Query member - sesuaikan dengan struktur database
 $members = $con->query("
     SELECT m.id_member, m.nama, m.is_mahasiswa, m.email, m.no_hp
     FROM tbl_member m
@@ -221,6 +221,40 @@ include '../../../view/master/sidebar.php';
         margin-bottom: 15px;
         color: #dee2e6;
     }
+
+    .nota-container {
+        display: none;
+        font-family: 'Courier New', monospace;
+        max-width: 300px;
+        margin: 0 auto;
+        padding: 15px;
+        border: 1px dashed #ccc;
+        background: white;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .nota-container,
+        .nota-container * {
+            visibility: visible;
+        }
+
+        .nota-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none;
+            box-shadow: none;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
 </style>
 
 <section class="content-header">
@@ -320,6 +354,7 @@ include '../../../view/master/sidebar.php';
                                         data-price-mahasiswa="<?= $p['harga_mahasiswa'] ?>">
                                         <div class="package-card"
                                             data-id="<?= $p['id_paket'] ?>"
+                                            data-nama="<?= htmlspecialchars($p['nama_paket']) ?>"
                                             data-harga-umum="<?= $p['harga_umum'] ?>"
                                             data-harga-mahasiswa="<?= $p['harga_mahasiswa'] ?>"
                                             data-durasi="<?= $p['durasi_hari'] ?>">
@@ -369,7 +404,7 @@ include '../../../view/master/sidebar.php';
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Rp</span>
                                         </div>
-                                        <input type="number" id="diskon" class="form-control" value="0" min="0">
+                                        <input type="number" id="diskon" name="diskon" class="form-control" value="0" min="0" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -415,13 +450,13 @@ include '../../../view/master/sidebar.php';
             <div class="col-lg-4">
                 <div class="card transaction-card">
                     <div class="card-header bg-dark text-white text-center">
-                        <h4><i class="fas fa-qrcode"></i> QRIS DANA</h4>
+                        <h4><i class="fas fa-qrcode"></i> QR TRANSFER BCA</h4>
                     </div>
                     <div class="card-body">
-                        <div class="qris-container">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=085719630447" class="img-fluid rounded">
-                            <h5 class="mt-3">085719630447</h5>
-                            <p class="text-muted">Scan kode QR untuk pembayaran via DANA</p>
+                        <div class="qris-container text-center">
+                            <img id="qrBcaImage" class="img-fluid rounded" style="width: 250px;">
+                            <h5 class="mt-3" id="rekBcaText"></h5>
+                            <p class="text-muted">Scan untuk transfer via m-BCA</p>
                         </div>
                     </div>
                 </div>
@@ -459,6 +494,7 @@ include '../../../view/master/sidebar.php';
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -522,10 +558,110 @@ include '../../../view/master/sidebar.php';
     </div>
 </div>
 
+<!-- Nota Transaksi (Hidden) -->
+<div id="notaContainer" class="nota-container">
+    <div class="text-center mb-3">
+        <h4 class="mb-1">GYM FITNESS CENTER</h4>
+        <p class="mb-1">Jl. Contoh No. 123, Jakarta</p>
+        <p class="mb-1">Telp: (021) 123-4567</p>
+        <hr>
+    </div>
+
+    <div class="mb-2">
+        <div class="d-flex justify-content-between">
+            <span>No. Transaksi:</span>
+            <span id="notaNoTransaksi">-</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Tanggal:</span>
+            <span id="notaTanggal">-</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Kasir:</span>
+            <span id="notaKasir">-</span>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="mb-2">
+        <div class="d-flex justify-content-between">
+            <span>Member:</span>
+            <span id="notaMember">Pelanggan Umum</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Paket:</span>
+            <span id="notaPaket">-</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Durasi:</span>
+            <span id="notaDurasi">-</span>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="mb-2">
+        <div class="d-flex justify-content-between">
+            <span>Harga:</span>
+            <span id="notaHarga">Rp 0</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Diskon:</span>
+            <span id="notaDiskon">Rp 0</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Total:</span>
+            <span id="notaTotal">Rp 0</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Dibayar:</span>
+            <span id="notaDibayar">Rp 0</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Kembalian:</span>
+            <span id="notaKembalian">Rp 0</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Metode:</span>
+            <span id="notaMetode">-</span>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="text-center mt-3">
+        <p class="mb-1">Terima kasih atas kunjungan Anda</p>
+        <p class="mb-1">*** Semoga Sehat Selalu ***</p>
+    </div>
+
+    <div class="text-center mt-3 no-print">
+        <button id="cetakNota" class="btn btn-primary btn-sm">
+            <i class="fas fa-print"></i> Cetak Nota
+        </button>
+        <button id="tutupNota" class="btn btn-secondary btn-sm">
+            <i class="fas fa-times"></i> Tutup
+        </button>
+    </div>
+</div>
+
 <?php include '../../../view/master/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Pastikan diskon selalu memiliki nilai
+    $('#diskon').on('blur', function() {
+        if (!$(this).val() || $(this).val() === '') {
+            $(this).val(0);
+        }
+    });
+
+    // Inisialisasi saat halaman load
+    $(document).ready(function() {
+        if (!$('#diskon').val()) {
+            $('#diskon').val(0);
+        }
+    });
     $(document).ready(function() {
         const formatRupiah = (num) => 'Rp ' + parseInt(num || 0).toLocaleString('id-ID');
 
@@ -534,6 +670,9 @@ include '../../../view/master/sidebar.php';
         let isMahasiswa = false;
         let selectedMember = null;
         let selectedPackage = null;
+
+        // Inisialisasi nilai diskon ke 0
+        $('#diskon').val(0);
 
         // Fungsi untuk update ringkasan transaksi
         function updateSummary() {
@@ -640,7 +779,7 @@ include '../../../view/master/sidebar.php';
 
             selectedPackage = {
                 id: $(this).data('id'),
-                nama: $(this).find('h5').text(),
+                nama: $(this).data('nama'),
                 hargaUmum: parseFloat($(this).data('harga-umum')) || 0,
                 hargaMhs: parseFloat($(this).data('harga-mahasiswa')) || 0,
                 durasi: parseInt($(this).data('durasi')) || 30
@@ -676,6 +815,38 @@ include '../../../view/master/sidebar.php';
             updateSummary();
         }
 
+        // Fungsi untuk menampilkan nota
+        // Fungsi untuk menampilkan nota
+        function tampilkanNota(data) {
+            // Isi data nota
+            $('#notaNoTransaksi').text(data.id_transaksi);
+            $('#notaTanggal').text(data.tanggal_transaksi);
+            $('#notaKasir').text(data.nama_kasir);
+            $('#notaMember').text(data.nama_member);
+            $('#notaPaket').text(data.nama_paket);
+            $('#notaDurasi').text(data.durasi_hari + ' hari');
+            $('#notaHarga').text(formatRupiah(data.harga_paket));
+            $('#notaDiskon').text(formatRupiah(data.diskon));
+            $('#notaTotal').text(formatRupiah(data.grand_total));
+            $('#notaDibayar').text(formatRupiah(data.jumlah_dibayar));
+            $('#notaKembalian').text(formatRupiah(data.kembalian));
+            $('#notaMetode').text(data.metode_pembayaran);
+
+            // Tampilkan modal nota
+            $('#notaContainer').show();
+        }
+
+        // Event untuk cetak nota
+        $('#cetakNota').click(function() {
+            window.print();
+        });
+
+        // Event untuk tutup nota
+        $('#tutupNota').click(function() {
+            $('#notaContainer').hide();
+            location.reload(); // Reset form setelah transaksi selesai
+        });
+
         $('#formTransaksi').submit(function(e) {
             e.preventDefault();
 
@@ -707,15 +878,15 @@ include '../../../view/master/sidebar.php';
             Swal.fire({
                 title: 'Konfirmasi Transaksi',
                 html: `
-                    <div class="text-left">
-                        <p><strong>Member:</strong> ${selectedMember ? selectedMember.nama : 'Pelanggan Umum'}</p>
-                        <p><strong>Paket:</strong> ${selectedPackage.nama}</p>
-                        <p><strong>Total Bayar:</strong> ${formatRupiah(total)}</p>
-                        <p><strong>Dibayar:</strong> ${formatRupiah(dibayar)}</p>
-                        <p><strong>Kembalian:</strong> ${formatRupiah(dibayar - total)}</p>
-                        <p><strong>Metode:</strong> ${$('#metode').find('option:selected').text()}</p>
-                    </div>
-                `,
+            <div class="text-left">
+                <p><strong>Member:</strong> ${selectedMember ? selectedMember.nama : 'Pelanggan Umum'}</p>
+                <p><strong>Paket:</strong> ${selectedPackage.nama}</p>
+                <p><strong>Total Bayar:</strong> ${formatRupiah(total)}</p>
+                <p><strong>Dibayar:</strong> ${formatRupiah(dibayar)}</p>
+                <p><strong>Kembalian:</strong> ${formatRupiah(dibayar - total)}</p>
+                <p><strong>Metode:</strong> ${$('#metode').find('option:selected').text()}</p>
+            </div>
+        `,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#06d6a0',
@@ -724,33 +895,52 @@ include '../../../view/master/sidebar.php';
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Proses transaksi
-                    $.post('proses_transaksi.php', {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Memproses Transaksi...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // PERBAIKAN: Pastikan semua data terkirim dengan benar
+                    const dataToSend = {
                         id_user_kasir: <?= $_SESSION['id_user'] ?? 1 ?>,
                         id_member: selectedMember ? selectedMember.id : null,
                         id_paket: selectedPackage.id,
                         harga_paket: hargaPaket,
-                        diskon: diskon,
+                        diskon: diskon, // PASTIKAN diskon dikirim
                         metode_pembayaran: $('#metode').val(),
                         jumlah_dibayar: dibayar,
                         durasi_hari: durasiHari
-                    }, function(res) {
+                    };
+
+                    console.log('Data yang dikirim:', dataToSend); // Untuk debugging
+
+                    // Proses transaksi
+                    $.post('proses_transaksi.php', dataToSend, function(res) {
                         if (res.success) {
+                            Swal.close();
+
+                            // Tampilkan nota
+                            tampilkanNota(res);
+
+                            // Tampilkan notifikasi sukses
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Transaksi Berhasil!',
                                 html: `
-                                    <div class="text-left">
-                                        <p><strong>No. Transaksi:</strong> ${res.id_transaksi}</p>
-                                        <p><strong>Total Bayar:</strong> ${formatRupiah(res.grand_total)}</p>
-                                        <p><strong>Kembalian:</strong> ${formatRupiah(res.kembalian)}</p>
-                                        ${res.member_aktif ? '<p class="text-success"><i class="fas fa-check-circle"></i> Membership telah diaktifkan!</p>' : ''}
-                                    </div>
-                                `,
+                            <div class="text-left">
+                                <p><strong>No. Transaksi:</strong> ${res.id_transaksi}</p>
+                                <p><strong>Total Bayar:</strong> ${formatRupiah(res.grand_total)}</p>
+                                <p><strong>Kembalian:</strong> ${formatRupiah(res.kembalian)}</p>
+                                ${res.member_aktif ? '<p class="text-success"><i class="fas fa-check-circle"></i> Membership telah diaktifkan!</p>' : ''}
+                            </div>
+                        `,
                                 confirmButtonColor: '#06d6a0',
-                                timer: 6000
-                            }).then(() => {
-                                location.reload();
+                                showConfirmButton: false,
+                                timer: 3000
                             });
                         } else {
                             Swal.fire({
@@ -760,11 +950,11 @@ include '../../../view/master/sidebar.php';
                                 confirmButtonColor: '#4361ee'
                             });
                         }
-                    }, 'json').fail(function() {
+                    }, 'json').fail(function(xhr, status, error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Kesalahan Jaringan',
-                            text: 'Tidak dapat terhubung ke server',
+                            text: 'Tidak dapat terhubung ke server: ' + error,
                             confirmButtonColor: '#4361ee'
                         });
                     });
@@ -772,7 +962,18 @@ include '../../../view/master/sidebar.php';
             });
         });
 
+        let rekBCA = "1234567890";
+        let namaBCA = "GYM FITNESS CENTER";
+
+        let urlBCA = `bca://transfer?no_rek=${rekBCA}&nama=${encodeURIComponent(namaBCA)}`;
+
+        document.getElementById("qrBcaImage").src =
+            "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(urlBCA);
+
+        document.getElementById("rekBcaText").innerText = rekBCA;
+
         // Inisialisasi
         updateSummary();
+
     });
 </script>

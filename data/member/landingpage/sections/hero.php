@@ -6,7 +6,7 @@
       <br>
       <span class="text-white">Stay</span> <span class="text-danger">Healthy</span>
     </h1>
-    <p>with Arena FIT</p>
+    <p>with Arena FIT </p>
     <a href="#membership" class="btn btn-danger btn-lg">Join Now</a>
   </div>
 </section>

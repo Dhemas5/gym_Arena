@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
     // Simpan ke tbl_transaksi_online
     $stmt = $con->prepare("
         INSERT INTO tbl_transaksi_online 
-        (id_transaksi, tgl_transaksi, id_member, id_paket, total, bukti_pembayaran, catatan, status) 
+        (id_transaksi, tgl_transaksi, id_member, id_paket, total, bukti_transfer, catatan, status) 
         VALUES (?, NOW(), ?, ?, ?, ?, ?, 'pending')
     ");
     $stmt->bind_param("siisss", $id_transaksi, $id_member, $paket['id_paket'], $paket['harga'], $new_filename, $catatan);

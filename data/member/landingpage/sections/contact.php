@@ -12,31 +12,31 @@
 
       <?php
       $contact_info = [
-        [
+      [
           'icon' => 'location',
           'title' => 'Alamat',
-          'content' => 'Jl. Kaliwates 5, Jember, Jawa Timur',
+          'content' => 'Jl. KH Shiddiq No.19-21 TalangSari, Jember',
           'type' => 'location',
-          'link' => 'https://maps.app.goo.gl/Sa4KrD6Pa67DRoLn9'
+          'link' => 'https://www.google.com/maps/place/arena+fit+club+jember/data=!4m2!3m1!1s0x2dd6956c17efe3cd:0x238723fc52e5054e?sa=X&ved=1t:242&ictx=111'
         ],
         [
           'icon' => 'phone',
           'title' => 'Telepon',
-          'content' => '+62 812-3456-7890',
+          'content' => '+62 821-4308-0510',
           'type' => 'phone',
-          'link' => 'https://wa.me/message/7TCOAF5OPHLYO1'
+          'link' => 'wa.me/message/7TCOAF5OPHLYO1'
         ],
         [
           'icon' => 'email',
           'title' => 'Email',
-          'content' => 'info@arenafit.com',
+          'content' => 'arenafitclubjbr22@gmail.com',
           'type' => 'email',
-          'link' => 'mailto:info@arenafit.com'
+          'link' => 'arenafitclubjbr22@gmail.com'
         ],
         [
           'icon' => 'time',
           'title' => 'Jam Buka',
-          'content' => 'Senin - Minggu<br>05:00 - 22:00',
+          'content' => 'Senin - Sabtu<br>07:00 - 22:00<br>Minggu<br>07:00 - 18:00',
           'type' => 'text',
           'link' => ''
         ]
@@ -114,18 +114,16 @@
         @arenafitclubjember
       </a>
     </div>
-
-    <!-- Map -->
-    <div class="contact-map">
-      <iframe 
-        src="https://maps.app.goo.gl/Sa4KrD6Pa67DRoLn9" 
-        width="100%" 
-        height="400" 
-        style="border:0; border-radius: 15px;" 
-        allowfullscreen="" 
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </div>
-  </div>
-</section>
+<!-- Map -->
+<div class="contact-map">
+  <iframe 
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3951.456239372435!2d113.6907272!3d-8.1781471!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd6956c17efe3cd%3A0x238723fc52e5054e!2sARENA%20FIT%20CLUB!5e0!3m2!1sen!2sid!4v1733320512203!5m2!1sen!2sid"
+    width="100%" 
+    height="400" 
+    style="border:0; border-radius: 15px;" 
+    allowfullscreen="" 
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    title="Peta Lokasi Arena FIT Club Jember">
+  </iframe>
+</div>

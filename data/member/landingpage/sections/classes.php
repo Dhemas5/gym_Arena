@@ -28,20 +28,6 @@
           if (mysqli_num_rows($queryKategori) == 0) {
             echo '<div class="col-12 text-center"><p class="text-muted">Tidak ada kelas populer saat ini</p></div>';
           } else {
-            // Gambar AI untuk setiap kelas
-            $class_images = [
-              'SEMAN BL' => 'https://images.unsplash.com/photo-1549060279-7e168fce7090?w=800&auto=format&fit=crop&q=60',
-              'BOXING' => 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=800&auto=format&fit=crop&q=60',
-              'ZUMBA' => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=60',
-              'BODY SHAPE' => 'https://images.unsplash.com/photo-1536922246289-88c42f957773?w=800&auto=format&fit=crop&q=60',
-              'CID ROCKER' => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60',
-              'STROKU KATOI SYNCHOVA' => 'https://images.unsplash.com/photo-1598974357801-cbca100e5d10?w=800&auto=format&fit=crop&q=60',
-              'KAPHA YOGA' => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=60',
-              'AERO BL' => 'https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=800&auto=format&fit=crop&q=60',
-              'POUNDFIT' => 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&auto=format&fit=crop&q=60',
-              'TRAMPOLINE' => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60'
-            ];
-            
             while ($kategori = mysqli_fetch_array($queryKategori)) {
               // Tentukan gambar default jika foto tidak ada
               $gambar = !empty($kategori['foto'])
@@ -69,6 +55,7 @@
                   <div class="class-body">
                     <p class="class-desc">' . (!empty($kategori['deskripsi']) ? htmlspecialchars($kategori['deskripsi']) : 'Deskripsi kelas akan segera tersedia') . '</p>
                     <p class="class-schedule"><strong>Level:</strong> ' . $jadwal . '</p>
+                    <button class="btn-booking">Booking Kelas</button>
                   </div>
                 </div>
               </div>';
@@ -88,20 +75,6 @@
           if (mysqli_num_rows($queryKategoriAll) == 0) {
             echo '<div class="col-12 text-center"><p class="text-muted">Tidak ada data kategori</p></div>';
           } else {
-            // Gambar AI untuk setiap kelas
-            $class_images_all = [
-              'SEMAN BL' => 'https://images.unsplash.com/photo-1549060279-7e168fce7090?w=800&auto=format&fit=crop&q=60',
-              'BOXING' => 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=800&auto=format&fit=crop&q=60',
-              'ZUMBA' => 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=60',
-              'BODY SHAPE' => 'https://images.unsplash.com/photo-1536922246289-88c42f957773?w=800&auto=format&fit=crop&q=60',
-              'CID ROCKER' => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60',
-              'STROKU KATOI SYNCHOVA' => 'https://images.unsplash.com/photo-1598974357801-cbca100e5d10?w=800&auto=format&fit=crop&q=60',
-              'KAPHA YOGA' => 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=60',
-              'AERO BL' => 'https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=800&auto=format&fit=crop&q=60',
-              'POUNDFIT' => 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&auto=format&fit=crop&q=60',
-              'TRAMPOLINE' => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60'
-            ];
-            
             while ($kategori = mysqli_fetch_array($queryKategoriAll)) {
               // Tentukan gambar default jika foto tidak ada
               $gambar = !empty($kategori['foto'])
@@ -134,6 +107,7 @@
                   <div class="class-body">
                     <p class="class-desc">' . (!empty($kategori['deskripsi']) ? htmlspecialchars($kategori['deskripsi']) : 'Deskripsi kelas akan segera tersedia') . '</p>
                     <p class="class-schedule"><strong>Level:</strong> ' . $jadwal . '</p>
+                    <button class="btn-booking">Booking Kelas</button>
                   </div>
                 </div>
               </div>';

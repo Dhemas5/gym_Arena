@@ -9,8 +9,23 @@ date_default_timezone_set('Asia/Jakarta');
 $tgl_awal = $_GET['tgl_awal'] ?? date('Y-m-d');
 $tgl_akhir = $_GET['tgl_akhir'] ?? date('Y-m-d');
 
+// Validasi: tanggal akhir tidak boleh lebih besar dari hari ini
+$today = date('Y-m-d');
+if ($tgl_akhir > $today) {
+    $tgl_akhir = $today;
+}
+
+// PERBAIKAN: Query harus sesuai dengan field yang ada di database
 $stmt = $con->prepare("
-    SELECT th.*, m.nama AS nama_member, u.username AS nama_kasir 
+    SELECT 
+        th.id_transaksi,
+        th.tgl_transaksi,
+        th.total,
+        th.metode_pembayaran,
+        th.jumlah_bayar,
+        th.kembalian,
+        m.nama AS nama_member, 
+        u.username AS nama_kasir 
     FROM tbl_transaksi_offline th
     LEFT JOIN tbl_member m ON th.id_member = m.id_member
     LEFT JOIN tbl_user u ON th.id_kasir = u.id_user
@@ -29,16 +44,18 @@ include '../../../view/master/sidebar.php';
 <style>
     body {
         font-family: 'Poppins', sans-serif;
-        background: #f4f6f9;
+        background: #0f1117;
+        color: #e5e7eb;
     }
 
     .card-glass {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(25, 27, 45, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 16px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         overflow: hidden;
+        color: #e5e7eb;
     }
 
     .btn-modern {
@@ -47,6 +64,13 @@ include '../../../view/master/sidebar.php';
         padding: 10px 20px;
         transition: all 0.3s;
         border: none;
+        background: #1f2937;
+        color: #f3f4f6;
+    }
+
+    .btn-modern:hover {
+        background: #374151;
+        transform: translateY(-2px);
     }
 
     .badge-metode {
@@ -54,30 +78,27 @@ include '../../../view/master/sidebar.php';
         padding: 6px 12px;
         border-radius: 8px;
         font-weight: 600;
+        color: white;
     }
 
     .badge-tunai {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
     }
 
     .badge-qris {
-        background: linear-gradient(135deg, #ff5722, #ff6b35);
-        color: white;
+        background: linear-gradient(135deg, #f97316, #ea580c);
     }
 
     .badge-transfer {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
     }
 
     .badge-debit {
-        background: linear-gradient(135deg, #6f42c1, #8e44ad);
-        color: white;
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
     }
 
     .table th {
-        background: linear-gradient(135deg, #4361ee, #3a56d4);
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
         color: white;
         border: none;
         font-weight: 600;
@@ -87,38 +108,63 @@ include '../../../view/master/sidebar.php';
     .table td {
         padding: 12px 15px;
         vertical-align: middle;
+        background: #111827;
+        color: #e5e7eb;
+    }
+
+    .table tr:nth-child(even) td {
+        background: #1a1f2d;
     }
 
     .btn-detail {
-        background: linear-gradient(135deg, #17a2b8, #138496);
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
         color: white;
         border: none;
         border-radius: 8px;
         padding: 6px 12px;
         font-size: 12px;
-        transition: all 0.3s;
+        transition: 0.3s;
+        margin: 2px;
     }
 
     .btn-detail:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    }
+
+    .btn-cetak {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border: none;
+        transition: 0.3s;
+        margin: 2px;
+    }
+
+    .btn-cetak:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
     .filter-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1e3a8a, #312e81);
         color: white;
         border-radius: 15px;
         padding: 20px;
         margin-bottom: 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
     .stat-card {
-        background: white;
+        background: #1f2937;
         border-radius: 12px;
         padding: 20px;
         text-align: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         transition: transform 0.3s;
+        color: #f3f4f6;
     }
 
     .stat-card:hover {
@@ -128,29 +174,30 @@ include '../../../view/master/sidebar.php';
     .stat-number {
         font-size: 2rem;
         font-weight: 700;
-        color: #4361ee;
+        color: #60a5fa;
     }
 
     .stat-label {
-        color: #6c757d;
+        color: #9ca3af;
         font-size: 0.9rem;
     }
 
     .modal-content {
+        background: #1f2937;
         border-radius: 15px;
         border: none;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        color: #f3f4f6;
     }
 
     .modal-header {
-        background: linear-gradient(135deg, #4361ee, #3a56d4);
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
         color: white;
         border-radius: 15px 15px 0 0;
-        border: none;
     }
 
     .total-highlight {
-        background: linear-gradient(135deg, #06d6a0, #05a87e);
+        background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border-radius: 8px;
         padding: 8px 12px;
@@ -160,13 +207,26 @@ include '../../../view/master/sidebar.php';
     .dataTables_wrapper .dataTables_paginate .paginate_button {
         border-radius: 8px !important;
         margin: 0 3px;
+        background: #1f2937 !important;
+        color: #e5e7eb !important;
+        border: none !important;
     }
 
     .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: linear-gradient(135deg, #4361ee, #3a56d4) !important;
-        border: none !important;
+        background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+        color: white !important;
+    }
+
+    /* Date input validation */
+    input[type="date"]:invalid {
+        border-color: #ff4444;
+    }
+
+    input[type="date"]:valid {
+        border-color: #22c55e;
     }
 </style>
+
 
 <section class="content-header">
     <div class="container-fluid">
@@ -200,7 +260,7 @@ include '../../../view/master/sidebar.php';
                     <?php
                     $totalPendapatan = 0;
                     foreach ($data as $row) {
-                        $totalPendapatan += $row['grand_total'];
+                        $totalPendapatan += $row['total'];
                     }
                     ?>
                     <div class="stat-number">Rp <?= number_format($totalPendapatan, 0, ',', '.') ?></div>
@@ -232,15 +292,15 @@ include '../../../view/master/sidebar.php';
 
         <!-- Filter Card -->
         <div class="filter-card">
-            <form method="get" class="mb-0">
+            <form method="get" class="mb-0" id="filterForm">
                 <div class="row align-items-end">
                     <div class="col-md-3">
                         <label class="text-white"><i class="fas fa-calendar-alt"></i> Dari Tanggal</label>
-                        <input type="date" name="tgl_awal" value="<?= $tgl_awal ?>" class="form-control" style="border-radius: 10px;">
+                        <input type="date" name="tgl_awal" value="<?= $tgl_awal ?>" class="form-control" id="tglAwal" max="<?= date('Y-m-d') ?>" style="border-radius: 10px;" required>
                     </div>
                     <div class="col-md-3">
                         <label class="text-white"><i class="fas fa-calendar-check"></i> Sampai Tanggal</label>
-                        <input type="date" name="tgl_akhir" value="<?= $tgl_akhir ?>" class="form-control" style="border-radius: 10px;">
+                        <input type="date" name="tgl_akhir" value="<?= $tgl_akhir ?>" class="form-control" id="tglAkhir" max="<?= date('Y-m-d') ?>" style="border-radius: 10px;" required>
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-light btn-modern btn-block mt-2">
@@ -258,6 +318,7 @@ include '../../../view/master/sidebar.php';
                         </button>
                     </div>
                 </div>
+                <small class="text-warning mt-2 d-block"><i class="fas fa-info-circle"></i> Tanggal tidak boleh lebih dari hari ini</small>
             </form>
         </div>
 
@@ -315,10 +376,16 @@ include '../../../view/master/sidebar.php';
                                             }
                                             ?>
                                         </td>
-                                        <td class="text-right total-highlight">Rp <?= number_format($row['grand_total'], 0, ',', '.') ?></td>
+                                        <td class="text-right total-highlight">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
                                         <td class="text-center">
                                             <button class="btn btn-detail btn-detail-transaksi" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
                                                 <i class="fas fa-eye mr-1"></i> Detail
+                                            </button>
+                                            <button class="btn btn-cetak btn-cetak-nota" data-id="<?= htmlspecialchars($row['id_transaksi']) ?>">
+                                                <i class="fas fa-print mr-1"></i> Nota
+                                            </button>
+                                            <button class="btn btn-warning btn-cetak" onclick="downloadNota('<?= htmlspecialchars($row['id_transaksi']) ?>')" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                                <i class="fas fa-download mr-1"></i> PDF
                                             </button>
                                         </td>
                                     </tr>
@@ -348,8 +415,11 @@ include '../../../view/master/sidebar.php';
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" id="btnPrintDetail">
-                    <i class="fas fa-print mr-1"></i> Cetak
+                <button type="button" class="btn btn-primary" id="btnPrintNota">
+                    <i class="fas fa-print mr-1"></i> Cetak Nota
+                </button>
+                <button type="button" class="btn btn-success" id="btnDownloadNota">
+                    <i class="fas fa-download mr-1"></i> Download PDF
                 </button>
             </div>
         </div>
@@ -368,9 +438,33 @@ include '../../../view/master/sidebar.php';
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {
+        // Set max date untuk input tanggal
+        const today = new Date().toISOString().split('T')[0];
+        $('#tglAwal').attr('max', today);
+        $('#tglAkhir').attr('max', today);
+
+        // Validasi tanggal
+        $('#tglAwal, #tglAkhir').on('change', function() {
+            const tglAwal = $('#tglAwal').val();
+            const tglAkhir = $('#tglAkhir').val();
+
+            if (tglAwal && tglAkhir) {
+                if (tglAwal > tglAkhir) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'Tanggal awal tidak boleh lebih besar dari tanggal akhir!',
+                        confirmButtonColor: '#4361ee'
+                    });
+                    $('#tglAkhir').val(tglAwal);
+                }
+            }
+        });
+
         // Inisialisasi DataTable
         var table = $('#tabelTransaksi').DataTable({
             "language": {
@@ -388,17 +482,32 @@ include '../../../view/master/sidebar.php';
             "buttons": [{
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel mr-1"></i> Excel',
-                    className: 'btn btn-success btn-modern'
+                    className: 'btn btn-success btn-modern',
+                    filename: 'Data_Transaksi_<?= date('Y-m-d') ?>'
                 },
                 {
                     extend: 'pdf',
                     text: '<i class="fas fa-file-pdf mr-1"></i> PDF',
-                    className: 'btn btn-danger btn-modern'
+                    className: 'btn btn-danger btn-modern',
+                    filename: 'Data_Transaksi_<?= date('Y-m-d') ?>',
+                    title: 'Data Transaksi Offline',
+                    message: 'Periode: <?= date('d/m/Y', strtotime($tgl_awal)) ?> - <?= date('d/m/Y', strtotime($tgl_akhir)) ?>',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    },
+                    customize: function(doc) {
+                        doc.content[1].table.widths = ['5%', '15%', '15%', '15%', '15%', '10%', '15%'];
+                    }
                 },
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print mr-1"></i> Print',
-                    className: 'btn btn-warning btn-modern'
+                    className: 'btn btn-warning btn-modern',
+                    title: 'Data Transaksi Offline',
+                    message: 'Periode: <?= date('d/m/Y', strtotime($tgl_awal)) ?> - <?= date('d/m/Y', strtotime($tgl_akhir)) ?>',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
                 }
             ]
         });
@@ -409,8 +518,9 @@ include '../../../view/master/sidebar.php';
         });
 
         // Detail Transaksi
+        let currentTransactionId = null;
         $(document).on('click', '.btn-detail-transaksi', function() {
-            const id = $(this).data('id');
+            currentTransactionId = $(this).data('id');
             $('#detailContent').html(`
                 <div class="text-center text-muted py-4">
                     <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
@@ -423,7 +533,7 @@ include '../../../view/master/sidebar.php';
                 url: 'detail_transaksi.php',
                 method: 'GET',
                 data: {
-                    id: id
+                    id: currentTransactionId
                 },
                 dataType: 'json',
                 success: function(res) {
@@ -460,10 +570,10 @@ include '../../../view/master/sidebar.php';
                     const html = `
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="card bg-light">
+                                <div class="card bg-dark border-light">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="fas fa-info-circle mr-2"></i>Informasi Transaksi</h6>
-                                        <table class="table table-sm table-borderless">
+                                        <h6 class="card-title text-info"><i class="fas fa-info-circle mr-2"></i>Informasi Transaksi</h6>
+                                        <table class="table table-sm table-borderless text-light">
                                             <tr><th width="40%">ID Transaksi</th><td><strong>${h.id_transaksi}</strong></td></tr>
                                             <tr><th>Tanggal</th><td>${new Date(h.tgl_transaksi).toLocaleString('id-ID')}</td></tr>
                                             <tr><th>Member</th><td>${h.nama_member || '<em class="text-muted">Pelanggan Umum</em>'}</td></tr>
@@ -479,16 +589,14 @@ include '../../../view/master/sidebar.php';
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card bg-light">
+                                <div class="card bg-dark border-light">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="fas fa-calculator mr-2"></i>Ringkasan Pembayaran</h6>
-                                        <table class="table table-sm table-borderless">
-                                            <tr><th width="60%">Sub Total</th><td class="text-right">Rp ${parseInt(h.sub_total).toLocaleString('id-ID')}</td></tr>
-                                            <tr><th>Diskon Global</th><td class="text-right">- Rp ${parseInt(h.potongan_diskon_global || 0).toLocaleString('id-ID')}</td></tr>
-                                            <tr class="border-top"><th>Grand Total</th><td class="text-right"><strong>Rp ${parseInt(h.grand_total).toLocaleString('id-ID')}</strong></td></tr>
-                                            <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_dibayar_tunai).toLocaleString('id-ID')}</td></tr>
-                                            ${h.jumlah_kembalian > 0 ? 
-                                                `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.jumlah_kembalian).toLocaleString('id-ID')}</td></tr>` : 
+                                        <h6 class="card-title text-info"><i class="fas fa-calculator mr-2"></i>Ringkasan Pembayaran</h6>
+                                        <table class="table table-sm table-borderless text-light">
+                                            <tr><th width="60%">Total</th><td class="text-right"><strong>Rp ${parseInt(h.total).toLocaleString('id-ID')}</strong></td></tr>
+                                            <tr><th>Dibayar</th><td class="text-right">Rp ${parseInt(h.jumlah_bayar).toLocaleString('id-ID')}</td></tr>
+                                            ${h.kembalian > 0 ? 
+                                                `<tr><th>Kembalian</th><td class="text-right text-success">+ Rp ${parseInt(h.kembalian).toLocaleString('id-ID')}</td></tr>` : 
                                                 ''}
                                         </table>
                                     </div>
@@ -498,10 +606,10 @@ include '../../../view/master/sidebar.php';
 
                         <div class="row mt-4">
                             <div class="col-12">
-                                <h6><i class="fas fa-list mr-2"></i>Detail Items (${totalItems} item)</h6>
+                                <h6 class="text-info"><i class="fas fa-list mr-2"></i>Detail Items (${totalItems} item)</h6>
                                 <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead class="bg-light">
+                                    <table class="table table-sm table-bordered table-dark">
+                                        <thead class="bg-secondary">
                                             <tr>
                                                 <th>Paket</th>
                                                 <th width="10%" class="text-center">Qty</th>
@@ -517,15 +625,6 @@ include '../../../view/master/sidebar.php';
                                 </div>
                             </div>
                         </div>
-
-                        ${h.keterangan ? `
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <strong><i class="fas fa-sticky-note mr-2"></i>Keterangan:</strong> ${h.keterangan}
-                                </div>
-                            </div>
-                        </div>` : ''}
                     `;
 
                     $('#detailContent').html(html);
@@ -542,39 +641,366 @@ include '../../../view/master/sidebar.php';
             });
         });
 
-        // Cetak Detail
-        $('#btnPrintDetail').click(function() {
-            const content = $('#detailContent').html();
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Detail Transaksi</title>
-                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .table th { background-color: #f8f9fa; }
-                        @media print { 
-                            .btn { display: none; }
-                            .no-print { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="text-center mb-4">
-                            <h3 class="mb-1">Detail Transaksi</h3>
-                            <p class="text-muted">${new Date().toLocaleString('id-ID')}</p>
-                        </div>
-                        ${content}
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+        // Cetak Nota dari Modal
+        $('#btnPrintNota').click(function() {
+            if (currentTransactionId) {
+                printNota(currentTransactionId);
+            }
+        });
+
+        // Download PDF dari Modal
+        $('#btnDownloadNota').click(function() {
+            if (currentTransactionId) {
+                downloadNota(currentTransactionId);
+            }
+        });
+
+        // Cetak Nota langsung dari tabel
+        $(document).on('click', '.btn-cetak-nota', function() {
+            const idTransaksi = $(this).data('id');
+            printNota(idTransaksi);
         });
     });
+
+    // Fungsi untuk cetak nota
+    function printNota(idTransaksi) {
+        Swal.fire({
+            title: 'Menyiapkan Nota...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: 'get_data_nota.php',
+            method: 'GET',
+            data: {
+                id: idTransaksi
+            },
+            dataType: 'json',
+            success: function(res) {
+                Swal.close();
+                if (res.success) {
+                    const data = res.data;
+                    const printWindow = window.open('', '_blank', 'width=350,height=500');
+
+                    const html = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Nota Transaksi #${data.id_transaksi}</title>
+                            <style>
+                                @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap');
+                                * {
+                                    margin: 0;
+                                    padding: 0;
+                                    box-sizing: border-box;
+                                    font-family: 'Source Code Pro', monospace;
+                                }
+                                body {
+                                    width: 300px;
+                                    margin: 0 auto;
+                                    padding: 15px;
+                                    background: white;
+                                    font-size: 14px;
+                                    line-height: 1.4;
+                                }
+                                .header {
+                                    text-align: center;
+                                    border-bottom: 2px dashed #000;
+                                    padding-bottom: 10px;
+                                    margin-bottom: 15px;
+                                }
+                                .header h2 {
+                                    font-size: 18px;
+                                    margin-bottom: 5px;
+                                    text-transform: uppercase;
+                                    font-weight: bold;
+                                }
+                                .header p {
+                                    font-size: 12px;
+                                    color: #666;
+                                }
+                                .info-section {
+                                    margin-bottom: 15px;
+                                }
+                                .info-row {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    margin-bottom: 5px;
+                                }
+                                .info-label {
+                                    font-weight: bold;
+                                    color: #333;
+                                }
+                                .info-value {
+                                    text-align: right;
+                                    color: #333;
+                                }
+                                .divider {
+                                    border: none;
+                                    border-top: 1px dashed #000;
+                                    margin: 10px 0;
+                                }
+                                .total-section {
+                                    background: #f8f9fa;
+                                    padding: 10px;
+                                    border-radius: 5px;
+                                    margin: 15px 0;
+                                    border: 1px dashed #ccc;
+                                }
+                                .total-row {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    margin-bottom: 5px;
+                                    font-weight: 500;
+                                }
+                                .grand-total {
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    color: #e74c3c;
+                                    border-top: 1px solid #000;
+                                    padding-top: 5px;
+                                    margin-top: 5px;
+                                }
+                                .footer {
+                                    text-align: center;
+                                    margin-top: 20px;
+                                    padding-top: 10px;
+                                    border-top: 2px dashed #000;
+                                    color: #666;
+                                    font-size: 12px;
+                                }
+                                @media print {
+                                    body { 
+                                        width: 300px !important;
+                                        padding: 10px !important;
+                                        font-size: 13px !important;
+                                    }
+                                    .no-print { display: none !important; }
+                                    .header h2 { font-size: 16px !important; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="header">
+                                <h2>GYM FITNESS CENTER</h2>
+                                <p>Jl. Contoh No. 123, Jakarta</p>
+                                <p>Telp: (021) 123-4567</p>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-row">
+                                    <span class="info-label">No. Transaksi:</span>
+                                    <span class="info-value">${data.id_transaksi}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tanggal:</span>
+                                    <span class="info-value">${data.tgl_transaksi}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Kasir:</span>
+                                    <span class="info-value">${data.nama_kasir}</span>
+                                </div>
+                            </div>
+                            
+                            <hr class="divider">
+                            
+                            <div class="info-section">
+                                <div class="info-row">
+                                    <span class="info-label">Member:</span>
+                                    <span class="info-value">${data.nama_member}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Metode:</span>
+                                    <span class="info-value">${data.metode_pembayaran}</span>
+                                </div>
+                            </div>
+                            
+                            <hr class="divider">
+                            
+                            <div class="total-section">
+                                <div class="total-row">
+                                    <span>Total:</span>
+                                    <span>Rp ${parseInt(data.total).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Dibayar:</span>
+                                    <span>Rp ${parseInt(data.jumlah_bayar).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Kembalian:</span>
+                                    <span>Rp ${parseInt(data.kembalian).toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="footer">
+                                <p>Terima kasih atas kunjungan Anda</p>
+                                <p>*** Semoga Sehat Selalu ***</p>
+                            </div>
+                            
+                            <script>
+                                setTimeout(() => {
+                                    window.print();
+                                }, 500);
+                                
+                                window.onafterprint = function() {
+                                    setTimeout(() => {
+                                        window.close();
+                                    }, 1000);
+                                };
+                            <\/script>
+                        </body>
+                        </html>
+                    `;
+
+                    printWindow.document.write(html);
+                    printWindow.document.close();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.error || 'Tidak dapat mengambil data transaksi',
+                        confirmButtonColor: '#4361ee'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Tidak dapat terhubung ke server',
+                    confirmButtonColor: '#4361ee'
+                });
+            }
+        });
+    }
+
+    // Fungsi untuk download nota sebagai PDF
+    function downloadNota(idTransaksi) {
+        Swal.fire({
+            title: 'Membuat PDF...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: 'get_data_nota.php',
+            method: 'GET',
+            data: {
+                id: idTransaksi
+            },
+            dataType: 'json',
+            success: function(res) {
+                Swal.close();
+                if (res.success) {
+                    const data = res.data;
+
+                    // Buat konten HTML untuk PDF
+                    const content = `
+                        <div style="font-family: Arial, sans-serif; max-width: 300px; margin: 0 auto; padding: 20px;">
+                            <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px;">
+                                <h2 style="font-size: 18px; margin-bottom: 5px; font-weight: bold;">GYM FITNESS CENTER</h2>
+                                <p style="font-size: 12px; color: #666; margin: 2px 0;">Jl. Contoh No. 123, Jakarta</p>
+                                <p style="font-size: 12px; color: #666; margin: 2px 0;">Telp: (021) 123-4567</p>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: bold;">No. Transaksi:</span>
+                                    <span>${data.id_transaksi}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: bold;">Tanggal:</span>
+                                    <span>${data.tgl_transaksi}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: bold;">Kasir:</span>
+                                    <span>${data.nama_kasir}</span>
+                                </div>
+                            </div>
+                            
+                            <hr style="border: none; border-top: 1px dashed #000; margin: 10px 0;">
+                            
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: bold;">Member:</span>
+                                    <span>${data.nama_member}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: bold;">Metode:</span>
+                                    <span>${data.metode_pembayaran}</span>
+                                </div>
+                            </div>
+                            
+                            <hr style="border: none; border-top: 1px dashed #000; margin: 10px 0;">
+                            
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 15px 0; border: 1px dashed #ccc;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500;">
+                                    <span>Total:</span>
+                                    <span>Rp ${parseInt(data.total).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500;">
+                                    <span>Dibayar:</span>
+                                    <span>Rp ${parseInt(data.jumlah_bayar).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500;">
+                                    <span>Kembalian:</span>
+                                    <span>Rp ${parseInt(data.kembalian).toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 20px; padding-top: 10px; border-top: 2px dashed #000; color: #666; font-size: 12px;">
+                                <p style="margin: 5px 0;">Terima kasih atas kunjungan Anda</p>
+                                <p style="margin: 5px 0;">*** Semoga Sehat Selalu ***</p>
+                            </div>
+                        </div>
+                    `;
+
+                    // Konfigurasi html2pdf
+                    const element = document.createElement('div');
+                    element.innerHTML = content;
+
+                    const opt = {
+                        margin: 10,
+                        filename: `Nota_${data.id_transaksi}.pdf`,
+                        image: {
+                            type: 'jpeg',
+                            quality: 0.98
+                        },
+                        html2canvas: {
+                            scale: 2
+                        },
+                        jsPDF: {
+                            unit: 'mm',
+                            format: 'a5',
+                            orientation: 'portrait'
+                        }
+                    };
+
+                    // Generate dan download PDF
+                    html2pdf().set(opt).from(element).save();
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.error || 'Tidak dapat mengambil data transaksi',
+                        confirmButtonColor: '#4361ee'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Tidak dapat terhubung ke server',
+                    confirmButtonColor: '#4361ee'
+                });
+            }
+        });
+    }
 </script>

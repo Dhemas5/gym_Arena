@@ -46,9 +46,10 @@ if (isset($_POST['simpan'])) {
      WHERE id_instruktur = '$instruktur' 
      AND tanggal = '$tanggal' 
      AND (
-          (jam_mulai <= '$mulai_datetime' AND jam_selesai > '$mulai_datetime') OR
-          (jam_mulai < '$selesai_datetime' AND jam_selesai >= '$selesai_datetime') OR
-          ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
+          ('$mulai_datetime' BETWEEN jam_mulai AND jam_selesai) OR
+          ('$selesai_datetime' BETWEEN jam_mulai AND jam_selesai) OR
+          (jam_mulai BETWEEN '$mulai_datetime' AND '$selesai_datetime') OR
+          (jam_selesai BETWEEN '$mulai_datetime' AND '$selesai_datetime')
      )"
   );
 
@@ -60,8 +61,8 @@ if (isset($_POST['simpan'])) {
     exit;
   }
 
-  $insert = mysqli_query($con, "INSERT INTO tbl_jadwal_kelas (id_kategori,id_instruktur,tanggal,jam_mulai,jam_selesai) 
-        VALUES('$kategori','$instruktur','$tanggal','$mulai_datetime','$selesai_datetime')");
+  $insert = mysqli_query($con, "INSERT INTO tbl_jadwal_kelas (id_kategori, id_instruktur, tanggal, jam_mulai, jam_selesai) 
+        VALUES('$kategori', '$instruktur', '$tanggal', '$mulai_datetime', '$selesai_datetime')");
 
   if ($insert) {
     echo "<script>
@@ -103,9 +104,10 @@ if (isset($_POST['update'])) {
      AND tanggal = '$tanggal' 
      AND id_jadwal != '$id'
      AND (
-          (jam_mulai <= '$mulai_datetime' AND jam_selesai > '$mulai_datetime') OR
-          (jam_mulai < '$selesai_datetime' AND jam_selesai >= '$selesai_datetime') OR
-          ('$mulai_datetime' <= jam_mulai AND '$selesai_datetime' > jam_mulai)
+          ('$mulai_datetime' BETWEEN jam_mulai AND jam_selesai) OR
+          ('$selesai_datetime' BETWEEN jam_mulai AND jam_selesai) OR
+          (jam_mulai BETWEEN '$mulai_datetime' AND '$selesai_datetime') OR
+          (jam_selesai BETWEEN '$mulai_datetime' AND '$selesai_datetime')
      )"
   );
 
@@ -150,8 +152,8 @@ if (isset($_GET['hapus'])) {
 $query = mysqli_query($con, "
     SELECT j.*, k.nama_kategori, i.nama_instruktur 
     FROM tbl_jadwal_kelas j
-    JOIN tbl_kategori k ON j.id_kategori=k.id_kategori
-    JOIN tbl_instruktur i ON j.id_instruktur=i.id_instruktur
+    LEFT JOIN tbl_kategori k ON j.id_kategori = k.id_kategori
+    LEFT JOIN tbl_instruktur i ON j.id_instruktur = i.id_instruktur
     ORDER BY j.tanggal ASC, j.jam_mulai ASC
 ");
 $jumlah = mysqli_num_rows($query);
@@ -215,15 +217,20 @@ $jumlah = mysqli_num_rows($query);
                   // Untuk form edit, ambil hanya waktu saja dari datetime
                   $jam_mulai_edit = date('H:i', strtotime($row['jam_mulai']));
                   $jam_selesai_edit = date('H:i', strtotime($row['jam_selesai']));
+                  
+                  // Handle instruktur yang tidak ada
+                  $nama_instruktur = !empty($row['nama_instruktur']) ? htmlspecialchars($row['nama_instruktur']) : 'Instruktur tidak ditemukan (ID: ' . $row['id_instruktur'] . ')';
+                  $nama_kategori = !empty($row['nama_kategori']) ? htmlspecialchars($row['nama_kategori']) : 'Kategori tidak ditemukan (ID: ' . $row['id_kategori'] . ')';
                 ?>
                   <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= htmlspecialchars($row['nama_kategori']); ?></td>
-                    <td><?= htmlspecialchars($row['nama_instruktur']); ?></td>
+                    <td><?= $nama_kategori; ?></td>
+                    <td><?= $nama_instruktur; ?></td>
                     <td><?= $tanggal_display; ?></td>
                     <td><?= $jam_mulai_display . ' - ' . $jam_selesai_display; ?></td>
                     <td class="text-center align-middle">
                       <div class="btn-group" role="group" style="gap:8px;">
+                        <!-- Tombol Edit SELALU ditampilkan -->
                         <button class="btn btn-warning btn-sm px-3 py-2 btnEdit"
                           data-toggle="modal"
                           data-target="#modalEdit"
@@ -270,7 +277,7 @@ $jumlah = mysqli_num_rows($query);
             <select name="id_kategori" class="form-control" required>
               <option value="">-- Pilih Kategori --</option>
               <?php
-              $kat = mysqli_query($con, "SELECT * FROM tbl_kategori");
+              $kat = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_kategori");
               while ($k = mysqli_fetch_assoc($kat)) {
                 echo "<option value='{$k['id_kategori']}'>{$k['nama_kategori']}</option>";
               }
@@ -282,9 +289,9 @@ $jumlah = mysqli_num_rows($query);
             <select name="id_instruktur" class="form-control" required>
               <option value="">-- Pilih Instruktur --</option>
               <?php
-              $ins = mysqli_query($con, "SELECT * FROM tbl_instruktur");
+              $ins = mysqli_query($con, "SELECT * FROM tbl_instruktur ORDER BY nama_instruktur");
               while ($i = mysqli_fetch_assoc($ins)) {
-                echo "<option value='{$i['id_instruktur']}'>{$i['nama_instruktur']}</option>";
+                echo "<option value='{$i['id_instruktur']}'>{$i['nama_instruktur']} - {$i['spesialisasi']}</option>";
               }
               ?>
             </select>
@@ -331,8 +338,9 @@ $jumlah = mysqli_num_rows($query);
           <div class="form-group">
             <label>Kategori</label>
             <select name="id_kategori" id="edit_kategori" class="form-control" required>
+              <option value="">-- Pilih Kategori --</option>
               <?php
-              $kat = mysqli_query($con, "SELECT * FROM tbl_kategori");
+              $kat = mysqli_query($con, "SELECT * FROM tbl_kategori ORDER BY nama_kategori");
               while ($k = mysqli_fetch_assoc($kat)) {
                 echo "<option value='{$k['id_kategori']}'>{$k['nama_kategori']}</option>";
               }
@@ -342,10 +350,11 @@ $jumlah = mysqli_num_rows($query);
           <div class="form-group">
             <label>Instruktur</label>
             <select name="id_instruktur" id="edit_instruktur" class="form-control" required>
+              <option value="">-- Pilih Instruktur --</option>
               <?php
-              $ins = mysqli_query($con, "SELECT * FROM tbl_instruktur");
+              $ins = mysqli_query($con, "SELECT * FROM tbl_instruktur ORDER BY nama_instruktur");
               while ($i = mysqli_fetch_assoc($ins)) {
-                echo "<option value='{$i['id_instruktur']}'>{$i['nama_instruktur']}</option>";
+                echo "<option value='{$i['id_instruktur']}'>{$i['nama_instruktur']} - {$i['spesialisasi']}</option>";
               }
               ?>
             </select>
@@ -390,8 +399,6 @@ $jumlah = mysqli_num_rows($query);
       });
     });
   });
-  
 </script>
 
-<?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/footer.php'; ?>

@@ -12,7 +12,7 @@
 
       <?php
       // Koneksi ke database
-      require "../../../setting/koneksi.php";
+      require "setting/koneksi.php";
       
       // Query untuk mengambil data paket dari database
       $query = "SELECT p.*, k.nama_kategori FROM tbl_paket p 

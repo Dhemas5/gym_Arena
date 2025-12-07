@@ -180,29 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
             margin-bottom: 25px;
         }
 
-        /* QRIS Section Styles */
-        .qris-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .qris-image {
-            max-width: 300px;
-            margin: 0 auto;
-            border: 3px solid #42a5f5;
-            border-radius: 10px;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .qris-image:hover {
-            transform: scale(1.02);
-        }
-
+        /* QRIS Section Styles - DIHILANGKAN */
+        
         .rekening-section {
             background: rgba(66, 165, 245, 0.1);
             border: 1px solid rgba(66, 165, 245, 0.3);
@@ -501,23 +480,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
                 <i class="fas fa-info-circle"></i>
                 <strong>Petunjuk Pembayaran:</strong>
                 <ol style="margin: 10px 0 0 0; padding-left: 20px;">
-                    <li>Scan QR Code atau transfer ke rekening yang tersedia</li>
+                    <li>Transfer ke rekening yang tersedia</li>
                     <li>Upload bukti pembayaran Anda</li>
                     <li>Tunggu verifikasi dari admin (maksimal 1x24 jam)</li>
                 </ol>
             </div>
 
-            <!-- QRIS Section -->
-            <div class="qris-section">
-                <h5><i class="fas fa-qrcode"></i> Scan QR Code untuk Pembayaran</h5>
-                <img src="../../../assets/qris_arenafit.png" alt="QR Code Arena FIT" class="qris-image" onclick="openFullscreenQRIS(this)">
-                <p style="color: #666; margin-top: 15px; font-size: 0.9rem;">
-                    Scan QR Code menggunakan aplikasi mobile banking atau e-wallet Anda
-                </p>
-            </div>
+            <!-- Bagian QRIS DIHILANGKAN -->
 
             <div class="rekening-section">
-                <h5><i class="fas fa-university"></i> Atau Transfer ke Rekening Berikut</h5>
+                <h5><i class="fas fa-university"></i> Transfer ke Rekening Berikut</h5>
                 <div class="rekening-item">
                     <div class="rekening-label">Bank BCA</div>
                     <div class="rekening-value">
@@ -648,15 +620,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi_pembayaran
 
             modal.style.display = "block";
             modalImg.src = preview.src;
-            document.body.style.overflow = 'hidden';
-        }
-
-        function openFullscreenQRIS(img) {
-            const modal = document.getElementById("fullscreenModal");
-            const modalImg = document.getElementById("fullscreenImage");
-
-            modal.style.display = "block";
-            modalImg.src = img.src;
             document.body.style.overflow = 'hidden';
         }
 

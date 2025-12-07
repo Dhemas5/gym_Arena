@@ -20,7 +20,7 @@
         <div class="row g-4">
           <?php
           // Koneksi database
-          require "../../../setting/koneksi.php";
+          require "setting/koneksi.php";
           
           // Query untuk mengambil data kategori populer
           $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori WHERE kelas_populer = 1 ORDER BY id_kategori ASC");
@@ -43,11 +43,10 @@
             ];
             
             while ($kategori = mysqli_fetch_array($queryKategori)) {
-              $nama_kelas = $kategori['nama_kategori'];
-              
-              // Ambil gambar berdasarkan nama kelas, default jika tidak ada
-              $gambar = isset($class_images[$nama_kelas]) ? $class_images[$nama_kelas] : 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=60';
-              
+              // Tentukan gambar default jika foto tidak ada
+              $gambar = !empty($kategori['foto'])
+                ? 'data/img/' . $kategori['foto']
+                : 'data/img/default.jpg';
               // Tentukan jadwal berdasarkan nama kategori atau gunakan default
               $jadwal = "Semua Level"; // Default schedule
               if (strpos(strtolower($kategori['nama_kategori']), 'pemula') !== false) {
@@ -104,11 +103,11 @@
             ];
             
             while ($kategori = mysqli_fetch_array($queryKategoriAll)) {
-              $nama_kelas = $kategori['nama_kategori'];
-              
-              // Ambil gambar berdasarkan nama kelas
-              $gambar = isset($class_images_all[$nama_kelas]) ? $class_images_all[$nama_kelas] : 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=60';
-              
+              // Tentukan gambar default jika foto tidak ada
+              $gambar = !empty($kategori['foto'])
+                ? 'data/img/' . $kategori['foto']
+                : 'data/img/default.jpg';
+
               // Tentukan jadwal berdasarkan nama kategori atau gunakan default
               $jadwal = "Semua Level"; // Default schedule
               if (strpos(strtolower($kategori['nama_kategori']), 'pemula') !== false) {

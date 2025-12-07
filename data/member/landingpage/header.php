@@ -240,7 +240,7 @@
         <div class="container">
             <a class="navbar-brand" href="#home">
                 <div class="logo-container">
-                    <img src="../../../assets/assets_admin/dist/img/logoadmin.png" alt="Arena FIT Logo" class="logo-img">
+                    <img src="assets/assets_admin/dist/img/logoadmin.png" alt="Arena FIT Logo" class="logo-img">
                 </div>
                 <div class="brand-text-container">
                     <span class="brand-text">Arena FIT</span>
@@ -261,7 +261,7 @@
                     <li class="nav-item"><a class="nav-link" href="#trainers">Instruktur</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Kontak</a></li>
                 </ul>
-                <a href="../login/login.php" class="btn btn-danger ms-3">Daftar Member</a>
+                <a href="data/member/login/login.php" class="btn btn-danger ms-3">Daftar Member</a>
             </div>
         </div>
     </nav>

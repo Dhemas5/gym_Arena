@@ -9,35 +9,35 @@ ini_set('display_errors', 1);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Arena | Fit Club</title>
-    <link rel="icon" type="image/png" href="../../../assets/assets_admin/dist/img/logoadmin.png">
+    <link rel="icon" type="image/png" href="assets/assets_admin/dist/img/logoadmin.png">
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="data/member/landingpage/assets/css/style.css">
   
 </head>
 <body>
 
-  <?php include 'header.php'; ?>
+  <?php include 'data/member/landingpage/header.php'; ?>
 
   <main>
     <?php
     // Include semua section
-    include 'sections/hero.php';
-    include 'sections/features.php';
-    include 'sections/about.php';
-    include 'sections/gallery.php';
-    include 'sections/testimonial.php';
-    include 'sections/classes.php';
-    include 'sections/membership.php';
-    include 'sections/trainers.php';
-    include 'sections/contact.php';
+    include 'data/member/landingpage/sections/hero.php';
+    include 'data/member/landingpage/sections/features.php';
+    include 'data/member/landingpage/sections/about.php';
+    include 'data/member/landingpage/sections/gallery.php';
+    include 'data/member/landingpage/sections/testimonial.php';
+    include 'data/member/landingpage/sections/classes.php';
+    include 'data/member/landingpage/sections/membership.php';
+    include 'data/member/landingpage/sections/trainers.php';
+    include 'data/member/landingpage/sections/contact.php';
     ?>
   </main>
 
-  <?php include 'footer.php'; ?>
+  <?php include 'data/member/landingpage/footer.php'; ?>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

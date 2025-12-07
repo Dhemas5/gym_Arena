@@ -48,7 +48,30 @@ require "../../../setting/koneksi.php";
                             <?php
                             // Ambil semua data sekaligus ke array agar bisa dipakai ulang di modal
                             $members = [];
-                            $query = $con->query("SELECT * FROM vw_member_dashboard ORDER BY id_member ASC");
+                            $query = $con->query("SELECT 
+        m.id_member,
+        m.nama,
+        m.email,
+        m.no_hp,
+        m.alamat,
+        m.foto,
+        m.tanggal_daftar,
+        m.status_akun,
+        m.membership_status,
+        ms.tgl_berakhir,
+        p.nama_paket
+    FROM tbl_member m
+    LEFT JOIN tbl_membership ms 
+        ON m.id_member = ms.id_member
+        AND ms.tgl_berakhir = (
+            SELECT MAX(tgl_berakhir) 
+            FROM tbl_membership 
+            WHERE id_member = m.id_member
+        )
+    LEFT JOIN tbl_paket p 
+        ON ms.id_paket = p.id_paket
+    ORDER BY m.id_member DESC
+");
                             if ($query && $query->num_rows > 0) {
                                 while ($row = $query->fetch_assoc()) {
                                     $members[] = $row;

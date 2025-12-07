@@ -1,5 +1,6 @@
 <?php
-// detail_transaksi.php
+// get_data_nota.php
+require "../../../setting/session.php";
 require "../../../setting/koneksi.php";
 
 header('Content-Type: application/json');
@@ -11,10 +12,10 @@ if (!isset($_GET['id'])) {
 
 $id_transaksi = $_GET['id'];
 
-// Ambil data header transaksi
-$sql_header = "SELECT 
+// Query yang benar: ambil data transaksi offline
+$sql = "SELECT 
     th.id_transaksi,
-    th.tgl_transaksi,
+    DATE_FORMAT(th.tgl_transaksi, '%d/%m/%Y %H:%i') as tgl_transaksi,
     th.total,
     th.metode_pembayaran,
     th.jumlah_bayar,
@@ -26,39 +27,17 @@ LEFT JOIN tbl_member m ON th.id_member = m.id_member
 LEFT JOIN tbl_user u ON th.id_kasir = u.id_user
 WHERE th.id_transaksi = ?";
 
-$stmt = $con->prepare($sql_header);
+$stmt = $con->prepare($sql);
 $stmt->bind_param("s", $id_transaksi);
 $stmt->execute();
-$result_header = $stmt->get_result();
-$header = $result_header->fetch_assoc();
-$stmt->close();
+$result = $stmt->get_result();
 
-if (!$header) {
+if ($result->num_rows > 0) {
+    $data = $result->fetch_assoc();
+    echo json_encode(['success' => true, 'data' => $data]);
+} else {
     echo json_encode(['success' => false, 'error' => 'Transaksi tidak ditemukan']);
-    exit;
 }
 
-// Ambil detail transaksi
-$sql_detail = "SELECT 
-    td.nama_paket,
-    td.harga_satuan,
-    td.qty,
-    td.potongan_diskon_item,
-    td.sub_total
-FROM tbl_transaksi_offline_detail td
-WHERE td.id_transaksi = ?";
-
-$stmt = $con->prepare($sql_detail);
-$stmt->bind_param("s", $id_transaksi);
-$stmt->execute();
-$result_detail = $stmt->get_result();
-$details = $result_detail->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-echo json_encode([
-    'success' => true,
-    'header' => $header,
-    'details' => $details
-]);
-
 $con->close();

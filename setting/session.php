@@ -6,8 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 /**
  * Fungsi untuk cek login sesuai tipe user
- * - $type: 'admin' atau 'member'
- * - Jika belum login → diarahkan ke halaman login masing-masing
+ * - $type: 'admin', 'instruktur', atau 'member'
+ * - Jika belum login → diarahkan ke halaman login
  */
 if (!function_exists('checkSession')) {
     function checkSession($type)
@@ -16,19 +16,20 @@ if (!function_exists('checkSession')) {
         if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
             session_unset();
             session_destroy();
-
-            if ($type === 'admin') {
-                header("Location: ../../../data/admin/login/login.php");
-            } elseif ($type === 'member') {
-                header("Location: ../../../data/member/login/login.php");
-            } else {
-                header("Location: ../../../index.php");
-            }
+            header("Location: ../../../data/member/login/login.php");
             exit;
         }
 
         // Cek apakah login sesuai tipe
-        if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== $type) {
+        if (!isset($_SESSION['user_type'])) {
+            session_unset();
+            session_destroy();
+            header("Location: ../../../data/member/login/login.php");
+            exit;
+        }
+
+        // Jika user_type tidak sesuai dengan yang diharapkan
+        if ($_SESSION['user_type'] !== $type) {
             redirectByType($_SESSION['user_type']);
             exit;
         }
@@ -44,7 +45,9 @@ if (!function_exists('redirectByType')) {
         if ($type === 'admin') {
             header("Location: ../../../data/admin/dashboard/index.php");
         } elseif ($type === 'member') {
-            header("Location: ../../../data/member/landingpage/indexmember.html");
+            header("Location: ../../../data/member/landingpage/indexmemberr.php");
+        } elseif ($type === 'instruktur') {
+            header("Location: ../../../data/instruktur/dashboard/index.php");
         } else {
             session_unset();
             session_destroy();
@@ -64,5 +67,40 @@ if (!function_exists('blockLoginPageIfLoggedIn')) {
             redirectByType($_SESSION['user_type']);
             exit;
         }
+    }
+}
+
+/**
+ * Fungsi untuk mendapatkan nama user berdasarkan tipe
+ */
+if (!function_exists('getUserDisplayName')) {
+    function getUserDisplayName()
+    {
+        if (isset($_SESSION['user_type'])) {
+            switch ($_SESSION['user_type']) {
+                case 'admin':
+                    return $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? 'Admin';
+                case 'member':
+                    return $_SESSION['nama'] ?? 'Member';
+                case 'instruktur':
+                    return $_SESSION['nama_instruktur'] ?? 'Instruktur';
+                default:
+                    return 'User';
+            }
+        }
+        return 'User';
+    }
+}
+
+/**
+ * Fungsi untuk logout
+ */
+if (!function_exists('logout')) {
+    function logout()
+    {
+        session_unset();
+        session_destroy();
+        header("Location: ../data/member/login/login.php");
+        exit;
     }
 }

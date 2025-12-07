@@ -104,7 +104,7 @@ if (!isset($title)) {
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <span class="dropdown-item dropdown-header">User Menu</span>
                         <div class="dropdown-divider"></div>
-                        <a href="../login/logout.php" class="dropdown-item text-danger">
+                        <a href="../../logout.php" class="dropdown-item text-danger">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </a>
                     </div>

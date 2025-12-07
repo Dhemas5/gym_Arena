@@ -390,6 +390,8 @@ $jumlah = mysqli_num_rows($query);
       });
     });
   });
+  
 </script>
 
+<?php include '../../../view/master/header.php'; ?>
 <?php include '../../../view/master/footer.php'; ?>

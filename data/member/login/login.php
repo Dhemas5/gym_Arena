@@ -1,8 +1,9 @@
 <?php
 ob_start();
 session_start();
-require "../../../setting/session.php";
-require "../../../setting/koneksi.php";
+require __DIR__ . '/../../../setting/koneksi.php';
+require __DIR__ . '/../../../setting/session.php';
+
 blockLoginPageIfLoggedIn(); // Kalau sudah login, tidak boleh buka login.php
 
 // Tampilkan pesan sukses verifikasi
@@ -136,7 +137,7 @@ if (isset($_POST['loginbtn'])) {
 </head>
 <body>
     <div class="login-container">
-        <a href="../../../data/member/landingpage" class="btn-back-home">
+        <a href="../../../index.php" class="btn-back-home">
             <i class="fas fa-arrow-left"></i> Kembali ke Beranda
         </a>
 

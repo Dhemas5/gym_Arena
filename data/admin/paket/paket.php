@@ -10,6 +10,80 @@ include '../../../view/master/header.php';
 include '../../../view/master/sidebar.php';
 ?>
 
+<style>
+
+    /* Baris tombol & search */
+.datatable-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Rapikan tombol export */
+.datatable-actions .dt-buttons {
+    margin-bottom: 0 !important;
+}
+
+/* Rapikan input search */
+.datatable-actions .dataTables_filter {
+    margin-bottom: 0 !important;
+}
+
+/* Custom styling untuk DataTables - HANYA WARNA */
+.dataTables_wrapper .dataTables_length select {
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    padding: 5px 30px 5px 10px !important;
+    color: #495057 !important;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    padding: 5px 10px !important;
+    color: #495057 !important;
+    margin-left: 5px !important;
+}
+
+/* Tombol Tambah Paket - biru solid */
+.btn-primary {
+    background-color: #007bff !important;
+    border: 2px solid #007bff !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+    color: white !important;
+}
+
+/* Layout DataTables: Buttons di kiri, Search di kanan */
+.dataTables_wrapper .dataTables_filter {
+    float: right !important;
+}
+
+.dataTables_wrapper .dt-buttons {
+    float: left !important;
+    margin-bottom: 10px !important;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left !important;
+    margin-bottom: 10px !important;
+}
+
+/* Clear float */
+.dataTables_wrapper::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+</style>
+
 <section class="content-header">
     <div class="container-fluid">
         <h1>Menu Paket</h1>
@@ -19,12 +93,14 @@ include '../../../view/master/sidebar.php';
 <section class="content">
     <div class="container-fluid">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <div class="card-header bg-primary text-white">
                 <h3 class="card-title">Daftar Paket</h3>
             </div>
             <div class="card-body">
-                <button class="btn btn-outline-primary mb-3" data-toggle="modal" data-target="#modalTambah"><i class="fas fa-plus"></i> Tambah Paket</button>
-                <table class="table table-bordered table-hover" id="tabelPelatih">
+                <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+                    <i class="fas fa-plus"></i> Tambah Paket
+                </button>
+                <table class="table table-bordered table-hover" id="tabelPaket">
                     <thead class="bg-primary text-white">
                         <tr>
                             <th>No</th>
@@ -199,6 +275,18 @@ include '../../../view/master/sidebar.php';
 
 <?php include '../../../view/master/footer.php'; ?>
 
+<!-- DataTables Buttons CSS & JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function hitungDurasi() {
         document.getElementById('durasi_hari').value = document.getElementById('tipe_paket').value;
@@ -208,7 +296,37 @@ include '../../../view/master/sidebar.php';
         document.getElementById('durasi_hari_edit').value = val;
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
+    $('#tabelPaket').DataTable({
+        language: {
+            lengthMenu: "Tampilkan _MENU_ data per halaman",
+            zeroRecords: "Data tidak ditemukan",
+            info: "Menampilkan _PAGE_ dari _PAGES_ halaman",
+            infoEmpty: "Tidak ada data",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            search: "Cari:",
+            paginate: {
+                first: "Pertama",
+                last: "Terakhir",
+                next: "›",
+                previous: "‹"
+            }
+        },
+
+        pageLength: 10,
+        order: [[0, "asc"]],
+
+        dom:
+            "<'row mb-3'<'col-md-6 d-flex align-items-center'l><'col-md-6'f>>" +
+            "<'row mb-3'<'col-md-12'B>>" +
+            "rt" +
+            "<'row'<'col-md-5'i><'col-md-7'p>>",
+
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    });
+
         // Edit
         $(document).on('click', '.edit-btn', function() {
             $('#edit_id').val($(this).data('id'));
@@ -271,6 +389,8 @@ include '../../../view/master/sidebar.php';
                 text: `"${nama}" akan dihapus permanen!`,
                 icon: 'warning',
                 showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal'
             }).then(result => {
@@ -280,10 +400,13 @@ include '../../../view/master/sidebar.php';
                         id: id
                     }, res => {
                         res = JSON.parse(res);
-                        Swal.fire(res.status === 'success' ? 'Terhapus!' : 'Gagal!', res.message, res.status === 'success' ? 'success' : 'error')
-                            .then(() => {
-                                if (res.status === 'success') location.reload();
-                            });
+                        Swal.fire(
+                            res.status === 'success' ? 'Terhapus!' : 'Gagal!', 
+                            res.message, 
+                            res.status === 'success' ? 'success' : 'error'
+                        ).then(() => {
+                            if (res.status === 'success') location.reload();
+                        });
                     });
                 }
             });

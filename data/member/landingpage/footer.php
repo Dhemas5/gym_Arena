@@ -10,7 +10,7 @@
         <p>&copy; 2025 Arena FIT - Gym and Class. All rights reserved.</p>
       </div>
       <div class="col-md-6 text-end">
-        <p>Jl. Kaliwates 5, Jember, Jawa Timur</p>
+        <p>Jl. KH Shiddiq No.19-21 TalangSari, Jember'</p>
       </div>
     </div>
   </div>

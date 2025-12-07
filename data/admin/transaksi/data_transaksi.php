@@ -29,6 +29,7 @@ $stmt = $con->prepare("
     FROM tbl_transaksi_offline th
     LEFT JOIN tbl_member m ON th.id_member = m.id_member
     LEFT JOIN tbl_user u ON th.id_kasir = u.id_user
+    LEFT JOIN tbl_paket p ON th.id_paket = p.id_paket
     WHERE DATE(th.tgl_transaksi) BETWEEN ? AND ?
     ORDER BY th.tgl_transaksi DESC
 ");
@@ -261,6 +262,7 @@ include '../../../view/master/sidebar.php';
                     $totalPendapatan = 0;
                     foreach ($data as $row) {
                         $totalPendapatan += $row['total'];
+                        $totalPendapatan += $row['total'];
                     }
                     ?>
                     <div class="stat-number">Rp <?= number_format($totalPendapatan, 0, ',', '.') ?></div>
@@ -313,9 +315,10 @@ include '../../../view/master/sidebar.php';
                         </a>
                     </div>
                     <div class="col-md-2">
-                        <button type="button" class="btn btn-warning btn-modern btn-block mt-2" id="btnExport">
-                            <i class="fas fa-file-export mr-1"></i> Export
-                        </button>
+                        <a href="?export=excel&tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>"
+                            class="btn btn-warning btn-modern btn-block mt-2">
+                            <i class="fas fa-file-export mr-1"></i> Export Excel
+                        </a>
                     </div>
                 </div>
                 <small class="text-warning mt-2 d-block"><i class="fas fa-info-circle"></i> Tanggal tidak boleh lebih dari hari ini</small>
@@ -334,6 +337,7 @@ include '../../../view/master/sidebar.php';
                                 <th>Tanggal</th>
                                 <th>Member</th>
                                 <th>Kasir</th>
+                                <th>Paket</th>
                                 <th>Metode</th>
                                 <th>Total</th>
                                 <th>Aksi</th>
@@ -466,9 +470,20 @@ include '../../../view/master/sidebar.php';
         });
 
         // Inisialisasi DataTable
-        var table = $('#tabelTransaksi').DataTable({
+        $('#tabelTransaksi').DataTable({
             "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json"
+                "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Tidak ada data yang tersedia",
+                "infoFiltered": "(difilter dari _MAX_ total data)",
+                "search": "Cari:",
+                "paginate": {
+                    "first": "Pertama",
+                    "last": "Terakhir",
+                    "next": "Selanjutnya",
+                    "previous": "Sebelumnya"
+                }
             },
             "pageLength": 10,
             "lengthMenu": [
@@ -549,23 +564,21 @@ include '../../../view/master/sidebar.php';
                     }
 
                     const h = res.header;
-                    const details = res.details;
-
                     let detailItems = '';
                     let totalItems = 0;
 
-                    details.forEach(detail => {
-                        totalItems += detail.qty;
-                        detailItems += `
-                            <tr>
-                                <td>${detail.nama_paket}</td>
-                                <td class="text-center">${detail.qty}</td>
-                                <td class="text-right">Rp ${parseInt(detail.harga_satuan).toLocaleString('id-ID')}</td>
-                                <td class="text-right">Rp ${parseInt(detail.potongan_diskon_item || 0).toLocaleString('id-ID')}</td>
-                                <td class="text-right">Rp ${parseInt(detail.sub_total).toLocaleString('id-ID')}</td>
-                            </tr>
-                        `;
-                    });
+                    if (h.nama_paket) {
+                        detailItems = `
+                        <tr>
+                            <td>${h.nama_paket}</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
+                            <td class="text-right">Rp 0</td>
+                            <td class="text-right">Rp ${parseInt(h.total).toLocaleString('id-ID')}</td>
+                        </tr>
+                    `;
+                        totalItems = 1;
+                    }
 
                     const html = `
                         <div class="row">
@@ -631,12 +644,12 @@ include '../../../view/master/sidebar.php';
                 },
                 error: function(xhr, status, error) {
                     $('#detailContent').html(`
-                        <div class="alert alert-danger text-center">
-                            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                            <h5>Kesalahan Jaringan</h5>
-                            <p>Tidak dapat terhubung ke server. Silakan coba lagi.</p>
-                        </div>
-                    `);
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h5>Kesalahan Jaringan</h5>
+                        <p>Tidak dapat terhubung ke server. Silakan coba lagi.</p>
+                    </div>
+                `);
                 }
             });
         });

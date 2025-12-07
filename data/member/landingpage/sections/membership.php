@@ -12,7 +12,7 @@
 
       <?php
       // Koneksi ke database
-      require "../../../setting/koneksi.php";
+      require "setting/koneksi.php";
       
       // Query untuk mengambil data paket dari database
       $query = "SELECT p.*, k.nama_kategori FROM tbl_paket p 
@@ -52,6 +52,9 @@
           $popular = ($row['durasi_hari'] == 90);
           $popular_class = $popular ? 'popular' : '';
           $popular_btn = $popular ? 'popular-btn' : '';
+          
+          // Cek apakah paket 1 hari
+          $is_one_day = ($row['durasi_hari'] == 1);
           
           // Features dari database atau default
           $features = [];
@@ -116,11 +119,24 @@
             echo '<li><span class="check-icon">✓</span> ' . htmlspecialchars($feature) . '</li>';
           }
           
-          echo '
+          // Modifikasi tombol untuk paket 1 hari
+          if ($is_one_day) {
+            echo '
+              </ul>
+              <a href="javascript:void(0);" class="btn-pricing ' . $popular_btn . '" 
+                 style="cursor: default; background-color: #0A2137; color: #1976d2; border: 2px solid #1976d2;"
+                 onclick="return false;">
+                Daftar langsung di kasir
+              </a>
+            </div>
+          </div>';
+          }else {
+            echo '
               </ul>
               <a href="../login/register.php?durasi=' . $row['durasi_hari'] . '" class="btn-pricing ' . $popular_btn . '">Daftar Sekarang</a>
             </div>
           </div>';
+          }
         }
       } else {
         // Fallback jika tidak ada data dari database
@@ -138,6 +154,7 @@
     <!-- Footer Note -->
     <div class="text-center mt-5">
       <p class="pricing-note">Semua paket termasuk akses ke fasilitas shower, WiFi gratis, dan parkir</p>
+      <p class="pricing-note text-danger mt-2">* Paket 1 hari langsung daftar di kasir tempat gym</p>
     </div>
   </div>
 </section>

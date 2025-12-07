@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Query untuk mengambil data instruktur dari tabel tbl_instruktur
-$sql = "SELECT * FROM tbl_instruktur";
+$sql = "SELECT * FROM tbl_instruktur ORDER BY id_instruktur DESC";
 $result = $conn->query($sql);
 
 $trainers = [];
@@ -24,24 +24,14 @@ if ($result && $result->num_rows > 0) {
         $foto = '';
         
         if (!empty($row['foto'])) {
-            // Jika foto adalah path file
-            if (file_exists($row['foto'])) {
-                $foto = $row['foto'];
-            } 
-            // Jika foto adalah URL
-            elseif (filter_var($row['foto'], FILTER_VALIDATE_URL)) {
-                $foto = $row['foto'];
+            // Cek apakah foto adalah nama file dan file ada di folder
+            $foto_path = '../../../data/admin/img/' . $row['foto'];
+            if (file_exists($foto_path)) {
+                $foto = $foto_path;
             }
-            // Jika foto adalah binary data (BLOB)
-            elseif (strlen($row['foto']) > 100) { // Asumsi binary data
-                $foto = 'data:image/jpeg;base64,' . base64_encode($row['foto']);
-            }
-            // Jika foto adalah nama file saja
-            else {
-                $foto_path = '../../../data/admin/img/' . $row['foto'];
-                if (file_exists($foto_path)) {
-                    $foto = $foto_path;
-                }
+            // Jika tidak ditemukan di folder, coba gunakan path langsung
+            elseif (file_exists($row['foto'])) {
+                $foto = $row['foto'];
             }
         }
         
@@ -53,11 +43,9 @@ if ($result && $result->num_rows > 0) {
         // Ambil deskripsi dari kolom catatan
         $deskripsi = '';
         
-        // Prioritas: 1. catatan, 2. deskripsi, 3. default
+        // Gunakan catatan sebagai deskripsi
         if (!empty($row['catatan'])) {
             $deskripsi = $row['catatan'];
-        } elseif (!empty($row['deskripsi'])) {
-            $deskripsi = $row['deskripsi'];
         } else {
             $deskripsi = 'Instruktur profesional dengan pengalaman luas di bidang fitness dan kesehatan.';
         }
@@ -67,16 +55,31 @@ if ($result && $result->num_rows > 0) {
             $deskripsi = substr($deskripsi, 0, 147) . '...';
         }
         
+        // Parsing spesialisasi (jika ada koma, jadikan array)
+        $specialties = [];
+        if (!empty($row['spesialisasi'])) {
+            $specialties = array_map('trim', explode(',', $row['spesialisasi']));
+        } else {
+            $specialties = ['Fitness'];
+        }
+        
+        // Ambil data instagram
+        $instagram = !empty($row['instagram']) ? $row['instagram'] : '';
+        
+        // Tentukan jadwal mengajar (default atau dari database lain)
+        // NOTE: Anda mungkin perlu menyesuaikan ini dengan tabel jadwal
+        $jadwal = 'Belum diatur';
+        
         $trainers[] = [
             'id' => $row['id_instruktur'],
             'image' => $foto,
             'name' => $row['nama_instruktur'] ?? 'Instruktur',
-            'specialties' => !empty($row['spesialisasi']) ? explode(',', $row['spesialisasi']) : ['Fitness'],
-            'schedule' => $row['jadwal_mengajar'] ?? 'Belum diatur',
+            'specialties' => $specialties,
+            'schedule' => $jadwal,
             'desc' => $deskripsi,
-            'certifications' => !empty($row['sertifikasi']) ? explode(',', $row['sertifikasi']) : ['Certified Trainer'],
-            'pengalaman' => $row['pengalaman'] ?? null,
-            'rating' => $row['rating'] ?? null
+            'certifications' => !empty($row['spesialisasi']) ? [$row['spesialisasi']] : ['Certified Trainer'],
+            'instagram' => $instagram,
+            'catatan' => $row['catatan'] ?? ''
         ];
     }
 } else {
@@ -88,10 +91,9 @@ if ($result && $result->num_rows > 0) {
             'name' => 'Coach Fitri',
             'specialties' => ['Senam BL', 'Yoga'],
             'schedule' => 'Senin, Jumat',
-            'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional. Spesialisasi dalam Vinyasa dan Hatha Yoga dengan pendekatan holistik untuk kesehatan mental dan fisik.',
+            'desc' => '8 tahun pengalaman sebagai instruktur yoga bersertifikat internasional.',
             'certifications' => ['RYT-500', 'Pilates certified'],
-            'pengalaman' => '8 tahun',
-            'rating' => '4.9'
+            'instagram' => 'coach_fitri'
         ],
         [
             'id' => 2,
@@ -99,10 +101,9 @@ if ($result && $result->num_rows > 0) {
             'name' => 'Coach Mieke',
             'specialties' => ['Body Shape', 'Strength Training'],
             'schedule' => 'Rabu, Kamis',
-            'desc' => '10 tahun di bidang strength & conditioning. Mantan atlet angkat besi nasional dengan spesialisasi dalam program transformasi tubuh dan peningkatan performa atletik.',
+            'desc' => '10 tahun di bidang strength & conditioning.',
             'certifications' => ['NSCA-CPT', 'CrossFit Level 2'],
-            'pengalaman' => '10 tahun',
-            'rating' => '4.8'
+            'instagram' => 'coach_mieke'
         ]
     ];
 }
@@ -131,27 +132,21 @@ $conn->close();
                 <img src="' . htmlspecialchars($trainer['image']) . '" alt="' . htmlspecialchars($trainer['name']) . '" onerror="this.src=\'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop\'">
                 <div class="image-overlay"></div>';
           
-          // Tampilkan rating jika ada
-          if (!empty($trainer['rating'])) {
-            echo '<div class="trainer-rating">
-                    <span class="rating-star">⭐</span>
-                    <span class="rating-value">' . htmlspecialchars($trainer['rating']) . '</span>
+          // Tampilkan instagram badge jika ada
+          if (!empty($trainer['instagram'])) {
+            echo '<div class="trainer-instagram">
+                    <a href="https://instagram.com/' . htmlspecialchars($trainer['instagram']) . '" target="_blank" class="instagram-link">
+                      <span class="ig-icon">📱</span>
+                      <span class="ig-username">@' . htmlspecialchars($trainer['instagram']) . '</span>
+                    </a>
                   </div>';
           }
           
           echo '
               </div>
               <div class="trainer-info">
-                <h3 class="trainer-name">' . htmlspecialchars($trainer['name']) . '</h3>';
-          
-          // Tampilkan pengalaman jika ada
-          if (!empty($trainer['pengalaman'])) {
-            echo '<div class="trainer-experience">
-                    <span class="experience-badge">📅 ' . htmlspecialchars($trainer['pengalaman']) . ' Pengalaman</span>
-                  </div>';
-          }
-          
-          echo '
+                <h3 class="trainer-name">' . htmlspecialchars($trainer['name']) . '</h3>
+                
                 <div class="trainer-badges">';
           
           foreach ($trainer['specialties'] as $specialty) {
@@ -160,18 +155,31 @@ $conn->close();
           
           echo '
                 </div>
-                <p class="trainer-title">Jadwal Mengajar</p>
-                <p class="trainer-schedule">' . htmlspecialchars($trainer['schedule']) . '</p>
+                <p class="trainer-title">Spesialisasi</p>
+                <p class="trainer-specialty">' . htmlspecialchars($trainer['specialties'][0] ?? 'Fitness Trainer') . '</p>
+                
                 <p class="trainer-desc">' . htmlspecialchars($trainer['desc']) . '</p>
+                
                 <div class="trainer-certs">
-                  <p class="cert-title">Sertifikasi:</p>';
+                  <p class="cert-title">Keahlian:</p>';
           
           foreach ($trainer['certifications'] as $cert) {
             echo '<span class="cert-badge">' . trim(htmlspecialchars($cert)) . '</span>';
           }
           
           echo '
-                </div>
+                </div>';
+          
+          // Tampilkan instagram link di footer card jika ada
+          if (!empty($trainer['instagram'])) {
+            echo '<div class="trainer-footer">
+                    <a href="https://instagram.com/' . htmlspecialchars($trainer['instagram']) . '" target="_blank" class="ig-profile-link">
+                      <i class="fab fa-instagram"></i> Follow @' . htmlspecialchars($trainer['instagram']) . '
+                    </a>
+                  </div>';
+          }
+          
+          echo '
               </div>
             </div>
           </div>';
@@ -202,7 +210,6 @@ $conn->close();
     </div>
   </div>
 </section>
-</section>
 
 <style>
 /* ===================================
@@ -216,9 +223,9 @@ $conn->close();
 /* Carousel Container */
 .trainers-carousel-container {
   position: relative;
-  overflow: hidden; /* Kembalikan ke hidden */
+  overflow: hidden;
   padding: 0 20px;
-  margin-bottom: 50px; /* Beri margin bottom untuk indicators */
+  margin-bottom: 50px;
 }
 
 .trainers-carousel {
@@ -228,7 +235,7 @@ $conn->close();
 }
 
 .trainer-slide {
-  flex: 0 0 calc(25% - 22.5px); /* 4 cards per view with gap */
+  flex: 0 0 calc(25% - 22.5px);
   min-width: 0;
 }
 
@@ -240,6 +247,8 @@ $conn->close();
   overflow: hidden;
   transition: all 0.3s;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .trainer-card:hover {
@@ -265,8 +274,40 @@ $conn->close();
   transform: scale(1.1);
 }
 
+.trainer-instagram {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  padding: 8px 12px;
+  border-radius: 20px;
+  z-index: 2;
+}
+
+.instagram-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.instagram-link:hover {
+  color: #e1306c;
+}
+
+.ig-icon {
+  font-size: 0.9rem;
+}
+
 .trainer-info {
   padding: 25px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .trainer-name {
@@ -297,10 +338,10 @@ $conn->close();
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 5px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
-.trainer-schedule {
+.trainer-specialty {
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
@@ -312,11 +353,13 @@ $conn->close();
   font-size: 0.9rem;
   line-height: 1.6;
   margin-bottom: 15px;
+  flex-grow: 1;
 }
 
 .trainer-certs {
   padding-top: 15px;
   border-top: 1px solid rgba(66, 165, 245, 0.2);
+  margin-bottom: 15px;
 }
 
 .cert-title {
@@ -337,6 +380,32 @@ $conn->close();
   margin-right: 8px;
   margin-bottom: 5px;
   border: 1px solid rgba(66, 165, 245, 0.3);
+}
+
+.trainer-footer {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid rgba(66, 165, 245, 0.2);
+}
+
+.ig-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #e1306c;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.ig-profile-link:hover {
+  color: #c13584;
+  text-decoration: underline;
+}
+
+.ig-profile-link i {
+  font-size: 1rem;
 }
 
 /* Carousel Navigation */
@@ -382,7 +451,7 @@ $conn->close();
   justify-content: center;
   gap: 10px;
   margin-top: 30px;
-  position: relative; /* Ubah dari absolute ke relative */
+  position: relative;
   width: 100%;
   bottom: auto;
   left: auto;
@@ -411,13 +480,13 @@ $conn->close();
 /* Responsive Design */
 @media (max-width: 1200px) {
   .trainer-slide {
-    flex: 0 0 calc(33.333% - 20px); /* 3 cards per view on medium screens */
+    flex: 0 0 calc(33.333% - 20px);
   }
 }
 
 @media (max-width: 992px) {
   .trainer-slide {
-    flex: 0 0 calc(50% - 15px); /* 2 cards per view on tablets */
+    flex: 0 0 calc(50% - 15px);
   }
 }
 
@@ -427,12 +496,18 @@ $conn->close();
   }
   
   .trainer-slide {
-    flex: 0 0 100%; /* 1 card per view on mobile */
+    flex: 0 0 100%;
   }
   
   .carousel-nav {
     width: 40px;
     height: 40px;
+  }
+  
+  .trainer-instagram {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
   }
 }
 
@@ -449,6 +524,10 @@ $conn->close();
   .carousel-nav svg {
     width: 18px;
     height: 18px;
+  }
+  
+  .trainer-image {
+    height: 280px;
   }
 }
 </style>
@@ -472,7 +551,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function updateCarousel() {
-    const slideWidth = slides[0].offsetWidth + 30; // width + gap
+    if (slides.length === 0) return;
+    
+    const slideWidth = slides[0].offsetWidth + 30;
     carousel.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
     
     // Update indicators
@@ -482,20 +563,20 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function nextSlide() {
-    const maxIndex = slides.length - slidesPerView;
+    const maxIndex = Math.max(0, slides.length - slidesPerView);
     currentIndex = currentIndex < maxIndex ? currentIndex + 1 : 0;
     updateCarousel();
   }
   
   function prevSlide() {
-    const maxIndex = slides.length - slidesPerView;
+    const maxIndex = Math.max(0, slides.length - slidesPerView);
     currentIndex = currentIndex > 0 ? currentIndex - 1 : maxIndex;
     updateCarousel();
   }
   
   // Event listeners
-  prevBtn.addEventListener('click', prevSlide);
-  nextBtn.addEventListener('click', nextSlide);
+  if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+  if (nextBtn) nextBtn.addEventListener('click', nextSlide);
   
   indicators.forEach(indicator => {
     indicator.addEventListener('click', function() {
@@ -508,7 +589,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('resize', function() {
     const newSlidesPerView = getSlidesPerView();
     if (newSlidesPerView !== slidesPerView) {
-      // Reset to first slide on view change
       currentIndex = 0;
       updateCarousel();
     }
@@ -516,5 +596,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize carousel
   updateCarousel();
+  
+  // Auto slide jika ada lebih dari 4 instruktur
+  if (slides.length > 4) {
+    setInterval(nextSlide, 5000);
+  }
 });
 </script>

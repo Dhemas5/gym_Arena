@@ -21,10 +21,32 @@ $email = $_SESSION['verify_email'];
 $error = "";
 $success = "";
 
-// Validasi email session
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    session_destroy();
-    header("Location: register.php");
+// Validasi email session dan cek apakah user ada di database
+$check_user = $con->prepare("SELECT id_member, nama, verification_code, code_expiry, is_verified FROM tbl_member WHERE email = ?");
+$check_user->bind_param("s", $email);
+$check_user->execute();
+$check_result = $check_user->get_result();
+
+if ($check_result->num_rows === 0) {
+    // Jika user tidak ada di database, redirect ke registrasi
+    unset($_SESSION['verify_email']);
+    unset($_SESSION['registration_step']);
+    unset($_SESSION['verify_member_id']);
+    header("Location: register.php?error=user_not_found");
+    exit();
+}
+
+$user_data = $check_result->fetch_assoc();
+$member_id = $user_data['id_member'];
+$user_name = $user_data['nama'];
+$is_verified = $user_data['is_verified'];
+
+// Jika sudah terverifikasi, redirect ke login
+if ($is_verified == 1) {
+    unset($_SESSION['verify_email']);
+    unset($_SESSION['registration_step']);
+    unset($_SESSION['verify_member_id']);
+    header("Location: login.php?verified=1");
     exit();
 }
 
@@ -32,7 +54,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 if (isset($_POST['verifybtn'])) {
     $input_code = trim(htmlspecialchars($_POST['verification_code']));
     
-    // Query verifikasi - SESUAIKAN DENGAN STRUCTURE DATABASE
+    // Query verifikasi
     $query = $con->prepare("SELECT * FROM tbl_member WHERE email = ? AND verification_code = ? AND is_verified = 0");
     $query->bind_param("ss", $email, $input_code);
     $query->execute();
@@ -43,7 +65,7 @@ if (isset($_POST['verifybtn'])) {
         $expiry_time = strtotime($member['code_expiry']);
         $current_time = time();
         
-        // Manual check expiry time dengan timezone Jakarta
+        // Check jika kode masih valid
         if ($expiry_time > $current_time) {
             // Kode masih valid, lanjutkan verifikasi
             $update = $con->prepare("UPDATE tbl_member SET is_verified = 1, verification_code = NULL, code_expiry = NULL, verified_at = NOW(), status_akun = 'aktif' WHERE email = ?");
@@ -53,10 +75,12 @@ if (isset($_POST['verifybtn'])) {
                 // Hapus session verifikasi
                 unset($_SESSION['verify_email']);
                 unset($_SESSION['registration_step']);
+                unset($_SESSION['verify_member_id']);
                 
                 // Set session success
                 $_SESSION['verification_success'] = true;
                 $_SESSION['verified_email'] = $email;
+                $_SESSION['verified_member_id'] = $member_id;
                 
                 // Redirect ke halaman login dengan pesan sukses
                 header("Location: login.php?verified=1");
@@ -65,9 +89,12 @@ if (isset($_POST['verifybtn'])) {
                 $error = "❌ Gagal memperbarui status verifikasi!";
             }
         } else {
-            $error = "❌ Kode verifikasi salah! Periksa kembali kode Anda.";
+            $error = "❌ Kode verifikasi sudah kadaluarsa! Silakan minta kode baru.";
         }
+    } else {
+        $error = "❌ Kode verifikasi salah! Periksa kembali kode Anda.";
     }
+    $query->close();
 }
 
 // Kirim ulang kode verifikasi
@@ -76,91 +103,78 @@ if (isset($_POST['resendbtn'])) {
     $new_code = sprintf("%06d", mt_rand(1, 999999));
     $new_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
     
-    // Update kode di database
-    $update = $con->prepare("UPDATE tbl_member SET verification_code = ?, code_expiry = ? WHERE email = ?");
+    // Update kode di database - HANYA jika user belum terverifikasi
+    $update = $con->prepare("UPDATE tbl_member SET verification_code = ?, code_expiry = ? WHERE email = ? AND is_verified = 0");
     $update->bind_param("sss", $new_code, $new_expiry, $email);
     
-    if ($update->execute()) {
-        // Ambil data user
-        $user_query = $con->prepare("SELECT nama FROM tbl_member WHERE email = ?");
-        $user_query->bind_param("s", $email);
-        $user_query->execute();
-        $user_result = $user_query->get_result();
-        
-        if ($user_result->num_rows === 1) {
-            $user = $user_result->fetch_assoc();
-            $nama = $user['nama'];
-            
-            // Kirim email
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'valhidayat01@gmail.com';
-                $mail->Password   = 'ecbnikaaznxaujbk';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
-                $mail->CharSet    = 'UTF-8';
+    if ($update->execute() && $update->affected_rows > 0) {
+        // Kirim email
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'valhidayat01@gmail.com';
+            $mail->Password   = 'ecbnikaaznxaujbk';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->CharSet    = 'UTF-8';
 
-                $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
-                $mail->addAddress($email);
-                $mail->addReplyTo('valhidayat01@gmail.com', 'Arena FIT');
+            $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
+            $mail->addAddress($email);
+            $mail->addReplyTo('valhidayat01@gmail.com', 'Arena FIT');
 
-                $mail->isHTML(true);
-                $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
-                $mail->Body    = "
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <style>
-                            body { font-family: Arial, sans-serif; color: #333; }
-                            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                            .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-                            .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
-                            .code { font-size: 32px; font-weight: bold; color: #1976d2; text-align: center; margin: 20px 0; }
-                            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class='container'>
-                            <div class='header'>
-                                <h1>Arena FIT</h1>
-                                <p>Verifikasi Email Anda</p>
-                            </div>
-                            <div class='content'>
-                                <p>Halo <strong>$nama</strong>,</p>
-                                <p>Berikut adalah kode verifikasi baru untuk akun Arena FIT Anda:</p>
-                                <div class='code'>$new_code</div>
-                                <p>Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB</strong></p>
-                                <p>Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.</p>
-                                <p>Jika Anda tidak merasa mendaftar, abaikan email ini.</p>
-                            </div>
-                            <div class='footer'>
-                                <p>&copy; " . date('Y') . " Arena FIT. All rights reserved.</p>
-                            </div>
+            $mail->isHTML(true);
+            $mail->Subject = 'Kode Verifikasi Baru - Arena FIT';
+            $mail->Body    = "
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
+                        .code { font-size: 32px; font-weight: bold; color: #1976d2; text-align: center; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h1>Arena FIT</h1>
+                            <p>Verifikasi Email Anda</p>
                         </div>
-                    </body>
-                    </html>
-                ";
-                
-                // Tambahkan plain text version
-                $mail->AltBody = "Halo $nama,\n\nKode verifikasi baru Anda: $new_code\n\nKode berlaku hingga: " . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB\n\nSilakan masukkan kode pada halaman verifikasi.";
+                        <div class='content'>
+                            <p>Halo <strong>$user_name</strong>,</p>
+                            <p>Berikut adalah kode verifikasi baru untuk akun Arena FIT Anda:</p>
+                            <div class='code'>$new_code</div>
+                            <p>Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB</strong></p>
+                            <p>Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.</p>
+                            <p>Jika Anda tidak merasa mendaftar, abaikan email ini.</p>
+                        </div>
+                        <div class='footer'>
+                            <p>&copy; " . date('Y') . " Arena FIT. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            ";
+            
+            // Tambahkan plain text version
+            $mail->AltBody = "Halo $user_name,\n\nKode verifikasi baru Anda: $new_code\n\nKode berlaku hingga: " . date('d M Y H:i:s', strtotime($new_expiry)) . " WIB\n\nSilakan masukkan kode pada halaman verifikasi.";
 
-                if ($mail->send()) {
-                    $success = "✅ Kode verifikasi baru telah dikirim ke email Anda! Berlaku hingga " . date('H:i', strtotime($new_expiry)) . " WIB";
-                } else {
-                    $error = "❌ Gagal mengirim email. Silakan coba lagi.";
-                }
-            } catch (Exception $e) {
-                error_log("Mailer Error: " . $mail->ErrorInfo);
-                $error = "❌ Terjadi kesalahan saat mengirim email. Silakan coba lagi nanti.";
+            if ($mail->send()) {
+                $success = "✅ Kode verifikasi baru telah dikirim ke email Anda! Berlaku hingga " . date('H:i', strtotime($new_expiry)) . " WIB";
+            } else {
+                $error = "❌ Gagal mengirim email. Silakan coba lagi.";
             }
-        } else {
-            $error = "❌ Data user tidak ditemukan!";
+        } catch (Exception $e) {
+            error_log("Mailer Error: " . $mail->ErrorInfo);
+            $error = "❌ Terjadi kesalahan saat mengirim email. Silakan coba lagi nanti.";
         }
     } else {
-        $error = "❌ Gagal memperbarui kode verifikasi! Silakan coba lagi.";
+        $error = "❌ Akun sudah terverifikasi atau tidak ditemukan!";
     }
 }
 
@@ -506,9 +520,18 @@ if ($status_result->num_rows === 1) {
             <p>Masukkan kode 6 digit yang dikirim ke email Anda</p>
         </div>
 
+        <?php if (isset($_GET['error']) && $_GET['error'] == 'user_not_found'): ?>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Data registrasi tidak lengkap. Silakan registrasi ulang.
+                <a href="register.php" class="alert-link">Klik di sini untuk registrasi ulang</a>
+            </div>
+        <?php endif; ?>
+
         <div class="email-info">
             <p>Kode verifikasi dikirim ke:</p>
             <strong><?= htmlspecialchars($email); ?></strong>
+            <p>Nama: <strong><?= htmlspecialchars($user_name); ?></strong></p>
             <?php if ($current_code_expiry): ?>
                 <div class="expiry-info">
                     <p>⏰ Kode berlaku hingga: <?= date('H:i', strtotime($current_code_expiry)) ?> WIB</p>

@@ -1044,7 +1044,7 @@ while ($p = $paket_result->fetch_assoc()) {
     <div class="container">
       <div class="schedule-header">
         <h2 class="schedule-title">JADWAL KELAS ARENA FIT</h2>
-        <p class="schedule-subtitle">Ikuti kelas favorit Anda dengan instruktur profesional. Jadwal terbaru update setiap bulan.</p>
+        <p class="schedule-subtitle">Ikuti kelas favorit Anda. Jadwal terbaru update setiap bulan.</p>
       </div>
 
       <div class="current-week">
@@ -1086,7 +1086,7 @@ foreach($jadwal_terurut as $hari => $kelas):
               <tr>
                 <th>WAKTU</th>
                 <th>STUDIO</th>
-                <th>KELAS & INSTRUKTUR</th>
+                <th>KELAS</th>
               </tr>
             </thead>
            <tbody>
@@ -1137,9 +1137,9 @@ if (!$any_class_available): ?>
 
       <!-- Instagram Section -->
       <div class="instagram-section">
-        <div class="instagram-handle">@arenafticlub2022</div>
+        <div class="instagram-handle">@arenafticlubjember</div>
         <p class="instagram-cta">Follow Instagram kami untuk update jadwal terbaru dan informasi promo!</p>
-        <a href="https://instagram.com/arenafticlub2022" target="_blank" class="btn-instagram">
+        <a href="https://www.instagram.com/arenafitclubjember?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="btn-instagram">
           <i class="fab fa-instagram"></i>
           Follow Instagram
         </a>
@@ -1150,27 +1150,21 @@ if (!$any_class_available): ?>
     </div>
   </section>
 
- <!-- PRICE LIST SECTION -->
+<!-- PRICE LIST SECTION -->
 <section class="pricelist-section">
   <div class="container">
 
     <?php if ($membership_aktif): ?>
-      <div class="text-center py-5 my-5">
-        <i class="fas fa-check-circle fa-6x text-success mb-4"></i>
-        <h2 class="text-success fw-bold">Membership Anda Sudah Aktif!</h2>
-        <h4 class="mt-3">Paket: <strong class="text-primary"><?= $paket_aktif ?></strong></h4>
-        <p class="lead">Berlaku hingga: <strong class="text-warning"><?= $berakhir ?></strong></p>
-        <a href="transaksi.php" class="btn btn-lg btn-primary mt-4">
-          <i class="fas fa-history"></i> Lihat Riwayat Transaksi
-        </a>
+      <!-- Tampilkan info membership aktif sebagai info saja, bukan hambatan -->
+      <div class="alert alert-success" style="background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; color: white;">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Membership Anda Aktif!</strong> Paket <strong><?= $paket_aktif ?></strong> berlaku hingga <strong><?= $berakhir ?></strong>. 
+        Anda masih dapat membeli paket baru yang akan aktif setelah paket saat ini berakhir.
       </div>
     <?php endif; ?>
 
     <!-- Selalu tampilkan semua paket -->
-    <div class="pricelist-header <?= $membership_aktif ? 'mt-5' : '' ?>">
-      <h2 class="pricelist-title">GYM <span class="highlight">PRICE LIST</span></h2>
-      <p class="pricelist-subtitle">Pilih Paket Membership Sesuai Kebutuhan Anda</p>
-    </div>
+    <div class="pricelist-header">
 
     <?php if ($is_mahasiswa && !$membership_aktif): ?>
       <div class="student-info">

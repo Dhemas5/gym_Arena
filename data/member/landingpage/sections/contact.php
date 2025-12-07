@@ -27,12 +27,13 @@
           'link' => 'https://web.whatsapp.com/send?phone=+62 821-4308-0510&text=Halo,%20saya%20ingin%20bertanya'
         ],
         [
-            'icon' => 'email',
-            'title' => 'Email',
-            'content' => 'arenafitclubjbr22@gmail.com',
-            'type' => 'email',
-            'link' => 'mailto:arenafitclubjbr22@gmail.com'
+          'icon' => 'email',
+          'title' => 'Email',
+          'content' => 'arenafitclubjbr22@gmail.com',
+          'type' => 'email',
+          'link' => 'https://mail.google.com/mail/?view=cm&fs=1&to=arenafitclubjbr22@gmail.com'
         ],
+
         [
           'icon' => 'time',
           'title' => 'Jam Buka',

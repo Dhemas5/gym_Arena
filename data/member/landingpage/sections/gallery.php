@@ -13,27 +13,27 @@
       <?php
       $gallery_items = [
         [
-          'image' => 'assets/images/gallery/gambar1.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar1.jpg',
           'title' => 'Modern Gym Facility'
         ],
         [
-          'image' => 'assets/images/gallery/gambar2.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar2.jpg',
           'title' => 'Modern Gym Facility'
         ],
         [
-          'image' => 'assets/images/gallery/gambar3.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar3.jpg',
           'title' => 'Modern Gym Facility'
         ],
         [
-          'image' => 'assets/images/gallery/gambar4.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar4.jpg',
           'title' => 'Modern Gym Facility'
         ],
         [
-          'image' => 'assets/images/gallery/gambar5.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar5.jpg',
           'title' => 'Modern Gym Facility'
         ],
         [
-          'image' => 'assets/images/gallery/gambar6.jpg',
+          'image' => 'data/member/landingpage/assets/images/gallery/gambar6.jpg',
           'title' => 'Modern Gym Facility'
         ],
       ];

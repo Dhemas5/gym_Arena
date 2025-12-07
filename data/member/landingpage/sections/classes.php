@@ -20,7 +20,7 @@
         <div class="row g-4">
           <?php
           // Koneksi database
-          require "../../../setting/koneksi.php";
+          require "setting/koneksi.php";
           
           // Query untuk mengambil data kategori populer
           $queryKategori = mysqli_query($con, "SELECT * FROM tbl_kategori WHERE kelas_populer = 1 ORDER BY id_kategori ASC");
@@ -30,8 +30,9 @@
           } else {
             while ($kategori = mysqli_fetch_array($queryKategori)) {
               // Tentukan gambar default jika foto tidak ada
-              $gambar = !empty($kategori['foto']) ? '../../../data/admin/img/' . $kategori['foto'] : '../../../data/admin/img/default.jpg';
-              
+              $gambar = !empty($kategori['foto'])
+                ? 'data/img/' . $kategori['foto']
+                : 'data/img/default.jpg';
               // Tentukan jadwal berdasarkan nama kategori atau gunakan default
               $jadwal = "Semua Level"; // Default schedule
               if (strpos(strtolower($kategori['nama_kategori']), 'pemula') !== false) {
@@ -76,8 +77,10 @@
           } else {
             while ($kategori = mysqli_fetch_array($queryKategoriAll)) {
               // Tentukan gambar default jika foto tidak ada
-              $gambar = !empty($kategori['foto']) ? '../../../data/admin/img/' . $kategori['foto'] : '../../../data/admin/img/default.jpg';
-              
+              $gambar = !empty($kategori['foto'])
+                ? 'data/img/' . $kategori['foto']
+                : 'data/img/default.jpg';
+
               // Tentukan jadwal berdasarkan nama kategori atau gunakan default
               $jadwal = "Semua Level"; // Default schedule
               if (strpos(strtolower($kategori['nama_kategori']), 'pemula') !== false) {

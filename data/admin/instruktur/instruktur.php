@@ -18,7 +18,7 @@ function generateID($con)
     } else {
         $num = 1;
     }
-    return str_pad($num, 3, "0", STR_PAD_LEFT);
+    return $num; // Kembalikan angka saja, tidak perlu str_pad
 }
 
 // ====== Tambah Data ======
@@ -26,12 +26,11 @@ if (isset($_POST['simpan'])) {
     $id = generateID($con);
     $nama = htmlspecialchars($_POST['nama_instruktur']);
     $spesialisasi = htmlspecialchars($_POST['spesialisasi']);
-    $no_hp = htmlspecialchars($_POST['no_hp']);
-    $email = htmlspecialchars($_POST['email']);
+    $instagram = htmlspecialchars($_POST['instagram']);
     $catatan = htmlspecialchars($_POST['catatan'] ?? '');
 
     // Upload Foto
-    $foto = null;
+    $foto = '';
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
         $target_dir = "../../../data/admin/img/";
         if (!is_dir($target_dir)) {
@@ -42,38 +41,32 @@ if (isset($_POST['simpan'])) {
         $nama_file = "foto_" . $id . "_" . time() . "." . $ext;
         $target_file = $target_dir . $nama_file;
 
-        if (move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
-            $foto = $nama_file;
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        if (in_array(strtolower($ext), $allowed)) {
+            if (move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
+                $foto = $nama_file;
+            } else {
+                echo "<script>alert('Gagal upload foto, periksa izin folder!');</script>";
+            }
         } else {
-            echo "<script>alert('Gagal upload foto, periksa izin folder!');</script>";
+            echo "<script>alert('Format file tidak didukung! Gunakan JPG, PNG, atau GIF.');</script>";
         }
     }
 
-    // Cek duplikat email
-    $cek = mysqli_prepare($con, "SELECT * FROM tbl_instruktur WHERE email = ?");
-    mysqli_stmt_bind_param($cek, "s", $email);
-    mysqli_stmt_execute($cek);
-    $result = mysqli_stmt_get_result($cek);
+    $insert = mysqli_prepare($con, "INSERT INTO tbl_instruktur 
+        (id_instruktur, nama_instruktur, spesialisasi, instagram, foto, catatan)
+        VALUES (?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($insert, "isssss", $id, $nama, $spesialisasi, $instagram, $foto, $catatan);
 
-    if (mysqli_num_rows($result) > 0) {
-        echo "<script>alert('Email instruktur sudah terdaftar!');</script>";
+    if (mysqli_stmt_execute($insert)) {
+        echo "<script>
+            alert('Instruktur berhasil ditambahkan!');
+            window.location='instruktur.php';
+        </script>";
     } else {
-        $insert = mysqli_prepare($con, "INSERT INTO tbl_instruktur 
-            (id_instruktur, nama_instruktur, spesialisasi, no_hp, email, foto, catatan)
-            VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert, "sssssss", $id, $nama, $spesialisasi, $no_hp, $email, $foto, $catatan);
-
-        if (mysqli_stmt_execute($insert)) {
-            echo "<script>
-                alert('Instruktur berhasil ditambahkan!');
-                window.location='instruktur.php';
-            </script>";
-        } else {
-            echo "<script>alert('Gagal menambahkan instruktur!');</script>";
-        }
-        mysqli_stmt_close($insert);
+        echo "<script>alert('Gagal menambahkan instruktur!');</script>";
     }
-    mysqli_stmt_close($cek);
+    mysqli_stmt_close($insert);
 }
 
 // ====== Update Data ======
@@ -81,8 +74,7 @@ if (isset($_POST['update'])) {
     $id = $_POST['id_instruktur'];
     $nama = htmlspecialchars($_POST['nama_instruktur']);
     $spesialisasi = htmlspecialchars($_POST['spesialisasi']);
-    $no_hp = htmlspecialchars($_POST['no_hp']);
-    $email = htmlspecialchars($_POST['email']);
+    $instagram = htmlspecialchars($_POST['instagram']);
     $catatan = htmlspecialchars($_POST['catatan'] ?? '');
 
     // Ambil data lama
@@ -112,9 +104,9 @@ if (isset($_POST['update'])) {
     }
 
     $update = mysqli_prepare($con, "UPDATE tbl_instruktur SET 
-        nama_instruktur=?, spesialisasi=?, no_hp=?, email=?, foto=?, catatan=? 
+        nama_instruktur=?, spesialisasi=?, instagram=?, foto=?, catatan=? 
         WHERE id_instruktur=?");
-    mysqli_stmt_bind_param($update, "sssssss", $nama, $spesialisasi, $no_hp, $email, $foto, $catatan, $id);
+    mysqli_stmt_bind_param($update, "sssssi", $nama, $spesialisasi, $instagram, $foto, $catatan, $id);
 
     if (mysqli_stmt_execute($update)) {
         echo "<script>
@@ -141,7 +133,7 @@ if (isset($_GET['hapus'])) {
     }
 
     $delete = mysqli_prepare($con, "DELETE FROM tbl_instruktur WHERE id_instruktur=?");
-    mysqli_stmt_bind_param($delete, "s", $id);
+    mysqli_stmt_bind_param($delete, "i", $id);
 
     if (mysqli_stmt_execute($delete)) {
         echo "<script>
@@ -194,8 +186,7 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                                 <th>No</th>
                                 <th>Nama</th>
                                 <th>Spesialisasi</th>
-                                <th>No. HP</th>
-                                <th>Email</th>
+                                <th>Instagram</th>
                                 <th>Foto</th>
                                 <th>Catatan</th>
                                 <th>Aksi</th>
@@ -204,7 +195,7 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                         <tbody>
                             <?php
                             if ($jumlahInstruktur == 0) {
-                                echo "<tr><td colspan='9' class='text-center'>Belum ada data instruktur</td></tr>";
+                                echo "<tr><td colspan='7' class='text-center'>Belum ada data instruktur</td></tr>";
                             } else {
                                 $no = 1;
                                 while ($data = mysqli_fetch_array($queryInstruktur)) {
@@ -213,8 +204,16 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                                         <td><?= $no++; ?></td>
                                         <td><?= htmlspecialchars($data['nama_instruktur']); ?></td>
                                         <td><?= htmlspecialchars($data['spesialisasi']); ?></td>
-                                        <td><?= htmlspecialchars($data['no_hp']); ?></td>
-                                        <td><?= htmlspecialchars($data['email']); ?></td>
+                                        <td>
+                                            <?php if (!empty($data['instagram'])): ?>
+                                                <a href="https://instagram.com/<?= htmlspecialchars(str_replace('@', '', $data['instagram'])); ?>" 
+                                                   target="_blank" class="text-info">
+                                                    <i class="fab fa-instagram"></i> @<?= htmlspecialchars($data['instagram']); ?>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <?php if (!empty($data['foto'])): ?>
                                                 <img src="../../../data/admin/img/<?= htmlspecialchars($data['foto']); ?>" width="60" height="60" class="rounded-circle" style="object-fit:cover;">
@@ -267,12 +266,14 @@ $jumlahInstruktur = mysqli_num_rows($queryInstruktur);
                         <input type="text" name="spesialisasi" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>No. HP</label>
-                        <input type="text" name="no_hp" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" required>
+                        <label>Instagram</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" name="instagram" class="form-control" placeholder="username" required>
+                        </div>
+                        <small class="text-muted">Masukkan username Instagram tanpa @</small>
                     </div>
                     <div class="form-group">
                         <label>Foto Instruktur</label>
@@ -316,12 +317,13 @@ while ($data = mysqli_fetch_array($queryInstruktur)) {
                             <input type="text" name="spesialisasi" class="form-control" value="<?= htmlspecialchars($data['spesialisasi']); ?>" required>
                         </div>
                         <div class="form-group">
-                            <label>No. HP</label>
-                            <input type="text" name="no_hp" class="form-control" value="<?= htmlspecialchars($data['no_hp']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($data['email']); ?>" required>
+                            <label>Instagram</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">@</span>
+                                </div>
+                                <input type="text" name="instagram" class="form-control" value="<?= htmlspecialchars($data['instagram']); ?>" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Foto Instruktur</label><br>

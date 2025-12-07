@@ -8,6 +8,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../vendor/autoload.php';
 
+// Set timezone ke Asia/Jakarta
+date_default_timezone_set('Asia/Jakarta');
+
 $error = "";
 $success = "";
 
@@ -37,7 +40,7 @@ if (isset($_POST['registerbtn'])) {
         if ($result->num_rows > 0) {
             $error = "Email sudah terdaftar! Silakan gunakan email lain.";
         } else {
-            // Cek apakah username sudah terdaftar
+            // Cek apakah nama sudah terdaftar
             $check_nama = $con->prepare("SELECT nama FROM tbl_member WHERE nama = ?");
             $check_nama->bind_param("s", $nama);
             $check_nama->execute();
@@ -49,11 +52,13 @@ if (isset($_POST['registerbtn'])) {
                 // Handle upload file KTM untuk mahasiswa
                 $bukti_ktm = null;
                 $is_mahasiswa = 0;
+                $upload_success = true;
                 
                 if ($tipe_member == 'mahasiswa') {
                     $is_mahasiswa = 1;
                     if (!isset($_FILES['bukti_ktm']) || $_FILES['bukti_ktm']['error'] == UPLOAD_ERR_NO_FILE) {
                         $error = "Upload KTM/Kartu Pelajar wajib untuk Mahasiswa/Pelajar!";
+                        $upload_success = false;
                     } else {
                         $file = $_FILES['bukti_ktm'];
                         $file_name = $file['name'];
@@ -67,10 +72,13 @@ if (isset($_POST['registerbtn'])) {
                         
                         if ($file_error !== 0) {
                             $error = "Terjadi kesalahan saat upload file!";
+                            $upload_success = false;
                         } elseif (!in_array($file_ext, $allowed_ext)) {
                             $error = "Format file tidak valid! Gunakan JPG, PNG, atau PDF.";
+                            $upload_success = false;
                         } elseif ($file_size > 2097152) { // 2MB in bytes
                             $error = "Ukuran file terlalu besar! Maksimal 2MB.";
+                            $upload_success = false;
                         } else {
                             // Create upload directory if not exists
                             $upload_dir = "../../../uploads/ktm/";
@@ -86,74 +94,127 @@ if (isset($_POST['registerbtn'])) {
                                 $bukti_ktm = $new_filename;
                             } else {
                                 $error = "Gagal mengupload file! Periksa permission folder.";
+                                $upload_success = false;
                             }
                         }
                     }
                 }
                 
-                // Jika tidak ada error, lanjutkan proses registrasi
-                if (empty($error)) {
-                    // Hash password
-                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    
-                    // Generate verification code
-                    $verification_code = sprintf("%06d", mt_rand(1, 999999));
-                    $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour")); // Berlaku 1 jam
-                    
-                    // Insert ke database - SESUAIKAN DENGAN STRUCTURE DATABASE ANDA
-                    $sql = "INSERT INTO tbl_member (nama, email, password, no_hp, is_mahasiswa, ktm_file, verification_code, code_expiry, is_verified, status_akun, membership_status, tanggal_daftar) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'nonaktif', 'belum_aktif', NOW())";
-                    $stmt = $con->prepare($sql);
-                    $stmt->bind_param("ssssisss", $nama, $email, $hashed_password, $no_hp, $is_mahasiswa, $bukti_ktm, $verification_code, $code_expiry);
-                    
-                    if ($stmt->execute()) {
+                // Jika tidak ada error, lanjutkan insert ke database
+                // Jika tidak ada error, lanjutkan insert ke database
+// Jika tidak ada error, lanjutkan insert ke database
+if ($upload_success && empty($error)) {
+    // Hash password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    
+    // Generate kode verifikasi 6 digit
+    $verification_code = sprintf("%06d", mt_rand(1, 999999));
+    
+    // Set expiry 1 jam dari sekarang
+    $code_expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+    
+    // CARA BARU: Insert manual tanpa prepare statement
+    $nama_safe = mysqli_real_escape_string($con, $nama);
+    $email_safe = mysqli_real_escape_string($con, $email);
+    $no_hp_safe = mysqli_real_escape_string($con, $no_hp);
+    $hashed_password_safe = mysqli_real_escape_string($con, $hashed_password);
+    $bukti_ktm_safe = mysqli_real_escape_string($con, $bukti_ktm);
+    $verification_code_safe = mysqli_real_escape_string($con, $verification_code);
+    $code_expiry_safe = mysqli_real_escape_string($con, $code_expiry);
+    
+    $sql = "INSERT INTO tbl_member (nama, email, password, no_hp, is_mahasiswa, ktm_file, verification_code, code_expiry, is_verified, membership_status) 
+            VALUES ('$nama_safe', '$email_safe', '$hashed_password_safe', '$no_hp_safe', $is_mahasiswa, '$bukti_ktm_safe', '$verification_code_safe', '$code_expiry_safe', 0, 'belum_aktif')";
+    
+    if ($con->query($sql)) {
+        $member_id = $con->insert_id;
+                        
                         // Kirim email verifikasi
                         $mail = new PHPMailer(true);
-                        
                         try {
                             $mail->isSMTP();
                             $mail->Host       = 'smtp.gmail.com';
                             $mail->SMTPAuth   = true;
                             $mail->Username   = 'valhidayat01@gmail.com';
                             $mail->Password   = 'ecbnikaaznxaujbk';
-                            $mail->SMTPSecure = 'tls';
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port       = 587;
+                            $mail->CharSet    = 'UTF-8';
 
                             $mail->setFrom('valhidayat01@gmail.com', 'Arena FIT');
                             $mail->addAddress($email);
+                            $mail->addReplyTo('valhidayat01@gmail.com', 'Arena FIT');
 
                             $mail->isHTML(true);
-                            $mail->Subject = 'Verifikasi Email - Arena FIT';
-                            $mail->Body    = "Halo <strong>$nama</strong>,<br><br>
-                                              Terima kasih telah mendaftar di Arena FIT.<br>
-                                              Kode verifikasi Anda adalah: <h2 style='color: #1976d2;'>$verification_code</h2><br>
-                                              Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB</strong><br><br>
-                                              Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.<br><br>
-                                              Salam,<br>Tim Arena FIT";
+                            $mail->Subject = 'Kode Verifikasi Email - Arena FIT';
+                            $mail->Body    = "
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <style>
+                                        body { font-family: Arial, sans-serif; color: #333; }
+                                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                                        .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                                        .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
+                                        .code { font-size: 32px; font-weight: bold; color: #1976d2; text-align: center; margin: 20px 0; letter-spacing: 8px; }
+                                        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class='container'>
+                                        <div class='header'>
+                                            <h1>Selamat Datang di Arena FIT!</h1>
+                                            <p>Verifikasi Email Anda</p>
+                                        </div>
+                                        <div class='content'>
+                                            <p>Halo <strong>$nama</strong>,</p>
+                                            <p>Terima kasih telah mendaftar di Arena FIT. Untuk mengaktifkan akun Anda, silakan masukkan kode verifikasi berikut:</p>
+                                            <div class='code'>$verification_code</div>
+                                            <p>Kode ini berlaku hingga: <strong>" . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB</strong></p>
+                                            <p>Silakan masukkan kode ini pada halaman verifikasi untuk mengaktifkan akun Anda.</p>
+                                            <p>Jika Anda tidak merasa mendaftar, abaikan email ini.</p>
+                                        </div>
+                                        <div class='footer'>
+                                            <p>&copy; " . date('Y') . " Arena FIT. All rights reserved.</p>
+                                        </div>
+                                    </div>
+                                </body>
+                                </html>
+                            ";
+                            
+                            $mail->AltBody = "Halo $nama,\n\nKode verifikasi Anda: $verification_code\n\nKode berlaku hingga: " . date('d M Y H:i:s', strtotime($code_expiry)) . " WIB\n\nSilakan masukkan kode pada halaman verifikasi.";
 
-                            $mail->send();
-                            
-                            // Set session untuk verifikasi
-                            $_SESSION['verify_email'] = $email;
-                            $_SESSION['registration_step'] = 'verification';
-                            
-                            // Redirect ke halaman verifikasi
-                            header("Location: verify.php");
-                            exit;
-                            
+                            if ($mail->send()) {
+                                // Set session untuk verifikasi
+                                $_SESSION['verify_email'] = $email;
+                                $_SESSION['registration_step'] = 2;
+                                $_SESSION['verify_member_id'] = $member_id;
+                                
+                                // Redirect ke halaman verify
+                                header("Location: verify.php");
+                                exit();
+                            } else {
+                                $error = "✖ Pendaftaran berhasil, tetapi gagal mengirim email verifikasi. Silakan minta kirim ulang kode.";
+                                // Tetap redirect ke verify meskipun email gagal
+                                $_SESSION['verify_email'] = $email;
+                                $_SESSION['registration_step'] = 2;
+                                $_SESSION['verify_member_id'] = $member_id;
+                                header("Location: verify.php?email_failed=1");
+                                exit();
+                            }
                         } catch (Exception $e) {
-                            $error = "Registrasi berhasil tetapi gagal mengirim email verifikasi. Error: " . $mail->ErrorInfo;
+                            error_log("Mailer Error: " . $mail->ErrorInfo);
+                            $error = "✖ Pendaftaran berhasil, tetapi terjadi kesalahan saat mengirim email.";
+                            // Tetap redirect ke verify
+                            $_SESSION['verify_email'] = $email;
+                            $_SESSION['registration_step'] = 2;
+                            $_SESSION['verify_member_id'] = $member_id;
+                            header("Location: verify.php?email_failed=1");
+                            exit();
                         }
                     } else {
-                        $error = "Gagal mendaftar! Silakan coba lagi. Error: " . $stmt->error;
-                        
-                        // Hapus file yang sudah diupload jika gagal insert
-                        if ($bukti_ktm && file_exists($upload_dir . $bukti_ktm)) {
-                            unlink($upload_dir . $bukti_ktm);
-                        }
+                        $error = "✖ Gagal menyimpan data! Silakan coba lagi.";
                     }
-                    
-                    $stmt->close();
+                    $insert->close();
                 }
             }
             $check_nama->close();
@@ -543,14 +604,6 @@ if (isset($_POST['registerbtn'])) {
                 alert('Password dan konfirmasi password tidak cocok!');
                 confirmPasswordInput.focus();
                 return;
-            }
-        });
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (tipeMemberSelect.value === 'mahasiswa') {
-                uploadKtmSection.style.display = 'block';
-                buktiKtmInput.setAttribute('required', 'required');
             }
         });
 

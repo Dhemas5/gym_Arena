@@ -317,7 +317,7 @@ $queryTransaksiTerbaru = mysqli_query($con, "
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>ID Transaksi</th>
+                    <th>ID Tran5saksi</th>
                     <th>Member</th>
                     <th>Paket</th>
                     <th>Total</th>
@@ -356,6 +356,54 @@ $queryTransaksiTerbaru = mysqli_query($con, "
     </div>
   </div>
 </section>
+
+ <!-- power bi -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Analisis Gym</title>
+    <style>
+        .powerbi-container {
+            position: relative; 
+            width: 100%;
+            height: 900px; 
+            overflow: hidden; 
+        }
+        .powerbi-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Dashboard Power BI</h4>
+                    
+                    <div class="powerbi-container">
+                        <iframe 
+                            src="https://app.powerbi.com/view?r=eyJrIjoiMTk3YmRmZmMtMzY3YS00MzdjLTgxOTUtMGE0ZGM5OGY2Y2IyIiwidCI6ImE2OWUxOWU4LWYwYTQtNGU3Ny1iZmY2LTk1NjRjODgxOWIxNCJ9" 
+                            frameborder="0" 
+                            allowfullscreen="true">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
 
 <!-- JavaScript untuk Chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
